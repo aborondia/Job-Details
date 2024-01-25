@@ -7,7 +7,7 @@ using JobDetails.Enumerations;
 public class JobDetail
 {
 
-    private string clientName = "Madame Butt";
+    private string clientName = "Jane Doe";
     public string ClientName => clientName;
     private string clientAddress = "123 Fake Street";
     public string ClientAddress => clientAddress;
@@ -21,7 +21,7 @@ public class JobDetail
     public List<Cleaner> Cleaners => cleaners;
     private PaymentTypeEnum paymentType = PaymentTypeEnum.Cash;
     public PaymentTypeEnum PaymentType => paymentType;
-    private string description = "I cleaned their butt.";
+    private string description = "I cleaned their house.";
     public string Description => description;
 
     public JobDetail()

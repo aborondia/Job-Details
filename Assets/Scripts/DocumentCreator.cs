@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using JobDetails;
 using BorderLineType = BorderLineWidthCollection.BorderLineTypeEnum;
+using System.Threading;
 
 [RequireComponent(typeof(JobDetailsContentCreator))]
 public class DocumentCreator : MonoBehaviour
@@ -34,6 +35,11 @@ public class DocumentCreator : MonoBehaviour
     public static int XMargin = 50;
     public static int DefaultPageWidth = 612;
     public static int DefaultPageHeight = 792;
+    private Thread mailThread;
+    private void OnDestroy()
+    {
+        mailThread.Abort();
+    }
 
     private void Awake()
     {
@@ -49,7 +55,12 @@ public class DocumentCreator : MonoBehaviour
         this.borderLinePDFColor = new pdfColor((int)this.lineColor.r, (int)this.lineColor.g, (int)this.lineColor.b);
         this.rectanglePDFColor = new pdfColor((int)this.rectangleColor.r, (int)this.rectangleColor.g, (int)this.rectangleColor.b);
 
-        CreateDocument(new DetailsReport());
+        // CreateDocument(new DetailsReport());
+        // MailSender mailSender = new MailSender();
+
+        // this.mailThread = new Thread(mailSender.SendEmail);
+
+        this.mailThread.Start();
     }
 
     void CreateDocument(DetailsReport report)
