@@ -1,0 +1,153 @@
+/*------------------------------------------------------------------Base Styles/*------------------------------------------------------------------*/
+
+.show-cursor:enabled {
+  cursor: url("project://database/Assets/Images/pointer.png") 5 0;
+}
+
+.show-cursor:enabled * {
+  cursor: url("project://database/Assets/Images/pointer.png") 5 0;
+}
+
+CustomButton {
+  transition-duration: var(--transition-time);
+  transition-timing-function: ease;
+  transition-property: all;
+}
+
+CustomButton.hover-text * {
+  color: var(--white);
+}
+
+CustomButton.hover-text.regular-hover:hover * {
+  color: var(--white);
+}
+
+CustomButton.hover-text.active * {
+  color: var(--white);
+}
+/*------------------------------------------------------------------Regular Styles/*------------------------------------------------------------------*/
+
+CustomButton.regular-border {
+  border-color: var(--gray1);
+}
+
+CustomButton.regular-active {
+  background-color: var(--gray2);
+}
+
+CustomButton.hover-background.regular-hover {
+  background-color: var(--gray-transparent);
+}
+
+/*------------------------------------------------------------------Primary Styles/*------------------------------------------------------------------*/
+
+CustomButton.primary-border {
+  border-color: var(--blue1);
+}
+
+CustomButton.primary-unselectable {
+  background-color: var(--blue4);
+}
+
+CustomButton.secondary-selectable {
+  background-color: var(--blue3);
+}
+
+CustomButton.primary-active {
+  background-color: var(--blue2);
+}
+
+CustomButton.hover-background.primary-hover {
+  background-color: var(--blue-transparent);
+}
+
+/*------------------------------------------------------------------Secondary Styles/*------------------------------------------------------------------*/
+
+CustomButton.secondary-border {
+  border-color: var(--green1);
+}
+
+CustomButton.secondary-unselectable {
+  background-color: var(--green4);
+}
+
+CustomButton.secondary-selectable {
+  background-color: var(--green3);
+}
+
+CustomButton.secondary-active {
+  background-color: var(--green2);
+  opacity: 1;
+}
+
+CustomButton.hover-background.secondary-hover {
+  background-color: var(--green-transparent);
+}
+
+/*------------------------------------------------------------------Moderate Styles/*------------------------------------------------------------------*/
+
+CustomButton.moderate-border {
+  border-color: var(--orange1);
+}
+
+CustomButton.moderate-unselectable {
+  background-color: var(--orange4);
+}
+
+CustomButton.moderate-selectable {
+  background-color: var(--orange3);
+}
+
+CustomButton.moderate-active {
+  background-color: var(--orange2);
+  opacity: 1;
+}
+
+CustomButton.hover-background.moderate-hover {
+  background-color: var(--orange-transparent);
+}
+
+/*------------------------------------------------------------------Warning Styles/*------------------------------------------------------------------*/
+
+CustomButton.warning-border {
+  border-color: var(--red1);
+}
+
+CustomButton.warning-unselectable {
+  background-color: var(--red4);
+}
+
+CustomButton.warning-selectable {
+  background-color: var(--red3);
+}
+
+CustomButton.warning-active {
+  background-color: var(--red2);
+  opacity: 1;
+}
+
+CustomButton.hover-background.warning-hover {
+  background-color: var(--red-transparent);
+}
+
+/*------------------------------------------------------------------Disabled Styles/*------------------------------------------------------------------*/
+
+CustomButton.disabled-unselectable {
+  opacity: 0.5;
+}
+
+CustomButton.disabled-selectable {
+  opacity: 0.5;
+}
+
+CustomButton.disabled-selected {
+  opacity: 0.5;
+}
+
+CustomButton.disabled-active {
+  opacity: 1;
+}
+
+CustomButton.disabled-hover {
+  opacity: 0.5;
+}

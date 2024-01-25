@@ -1,0 +1,276 @@
+ScrollView Scroller {
+  background-color: var(--gray1);
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-left-width: 0;
+  border-right-width: 0;
+  border-top-width: 0;
+  border-bottom-width: 0;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  height: 100%;
+  right: 0;
+  width: 7.5px;
+  min-width: 7.5px;
+  max-width: 7.5px;
+}
+
+.custom-scrollbar
+  > #unity-content-and-vertical-scroll-container
+  Scroller
+  ScrollerSlider {
+  background-color: var(--gray1);
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  width: 7.5px;
+  min-width: 7.5px;
+  max-width: 7.5px;
+}
+
+.custom-scrollbar
+  > #unity-content-and-vertical-scroll-container
+  Scroller
+  ScrollerSlider
+  #unity-drag-container {
+  background-color: var(--gray1);
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  width: 7.5px;
+  max-width: 7.5px;
+  min-width: 7.5px;
+}
+
+.custom-scrollbar
+  > #unity-content-and-vertical-scroll-container
+  Scroller
+  RepeatButton {
+  background-color: rgba(35, 208, 235, 0.15);
+  -unity-background-image-tint-color: rgb(35, 208, 235);
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  translate: 0 0;
+  display: none;
+}
+
+.custom-scrollbar
+  > #unity-content-and-vertical-scroll-container
+  Scroller
+  ScrollerSlider
+  #unity-dragger {
+  border-left-width: 0;
+  border-right-width: 0;
+  border-top-width: 0;
+  border-bottom-width: 0;
+  background-color: rgb(35, 208, 235);
+  width: 7.5px;
+  max-width: 7.5px;
+  min-width: 7.5px;
+  max-height: 25%;
+}
+
+.custom-scrollbar
+  > #unity-content-and-vertical-scroll-container
+  Scroller
+  ScrollerSlider
+  .unity-base-field__input {
+  background-color: var(--gray1);
+  -unity-background-image-tint-color: var(--gray1);
+}
+
+.custom-scrollbar
+  > #unity-content-and-vertical-scroll-container
+  Scroller
+  ScrollerSlider
+  #unity-tracker {
+  width: 7.5px;
+  min-width: 7.5px;
+  background-color: var(--gray1);
+  border-left-width: 0;
+  border-right-width: 0;
+  border-top-width: 0;
+  border-bottom-width: 0;
+  max-width: 7.5px;
+}
+
+.custom-scrollbar
+  > #unity-content-and-vertical-scroll-container
+  Scroller
+  ScrollerSlider
+  #unity-dragger {
+  min-width: 7.5px;
+  width: 7.5px;
+  max-width: 7.5px;
+}
+
+ScrollView Scroller ScrollerSlider #unity-drag-container #unity-dragger-border {
+  background-color: rgba(35, 208, 235, 0.15);
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  width: 6px;
+  min-width: auto;
+}
+
+.unity-scroller--vertical #unity-dragger {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 7.5px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  max-width: 7.5px;
+  min-width: 7.5px;
+}
+
+.custom-scrollbar {
+}
+
+.custom-scrollbar-horizontal > Scroller {
+  background-color: var(--gray1);
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  min-width: 100%;
+  height: 7.5px;
+  min-height: 7.5px;
+  max-height: 7.5px;
+  bottom: -10px;
+}
+
+.custom-scrollbar-horizontal > Scroller ScrollerSlider {
+  background-color: var(--gray1);
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  height: 7.5px;
+  min-height: 7.5px;
+  max-height: 7.5px;
+}
+
+.custom-scrollbar-horizontal > Scroller ScrollerSlider #unity-drag-container {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  opacity: 1;
+  height: 7.5px;
+  max-height: 7.5px;
+  min-height: 7.5px;
+}
+
+.custom-scrollbar-horizontal > Scroller RepeatButton {
+  background-color: rgba(35, 208, 235, 0.15);
+  -unity-background-image-tint-color: rgb(35, 208, 235);
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  translate: 0 0;
+  display: none;
+}
+
+.custom-scrollbar-horizontal > Scroller ScrollerSlider #unity-dragger {
+  border-left-width: 0;
+  border-right-width: 0;
+  border-top-width: 0;
+  border-bottom-width: 0;
+  background-color: rgb(35, 208, 235);
+  height: 7.5px;
+  max-height: 7.5px;
+  max-width: 25%;
+  min-height: 7.5px;
+  top: 0;
+}
+
+.custom-scrollbar-horizontal
+  > Scroller
+  ScrollerSlider
+  .unity-base-field__input {
+  background-color: var(--gray1);
+  -unity-background-image-tint-color: var(--gray1);
+}
+
+.custom-scrollbar-horizontal > Scroller #unity-tracker {
+  background-color: var(--gray1);
+  border-left-width: 0;
+  border-right-width: 0;
+  border-top-width: 0;
+  border-bottom-width: 0;
+  height: 7.5px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  max-height: 7.5px;
+  min-height: 7.5px;
+  bottom: -3px;
+}
+
+.custom-scrollbar-horizontal > Scroller #unity-dragger {
+  height: 7.5px;
+  max-height: 7.5px;
+  min-height: 7.5px;
+}
+
+.custom-scrollbar-horizontal
+  > Scroller
+  ScrollerSlider
+  #unity-drag-container
+  #unity-dragger-border {
+  background-color: rgba(35, 208, 235, 0.15);
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  height: 6px;
+  min-height: auto;
+}
+
+.custom-scrollbar-horizontal .unity-scroller--horizontal #unity-dragger {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  height: 7.5px;
+  max-height: 7.5px;
+  min-width: auto;
+  min-height: 7.5px;
+}
+
+.custom-scrollbar-horizontal > Scroller {
+  background-color: rgba(0, 221, 255, 0.1);
+  border-left-width: 0;
+  border-right-width: 0;
+  border-top-width: 0;
+  border-bottom-width: 0;
+  justify-content: center;
+  align-items: center;
+  border-left-color: rgba(0, 0, 0, 0);
+  border-right-color: rgba(0, 0, 0, 0);
+  border-top-color: rgba(0, 0, 0, 0);
+  border-bottom-color: rgba(0, 0, 0, 0);
+  display: none;
+  height: 0;
+  width: 100%;
+}
+
+.custom-scrollbar-horizontal {
+  justify-content: flex-end;
+  align-items: flex-start;
+  flex-direction: column;
+}
