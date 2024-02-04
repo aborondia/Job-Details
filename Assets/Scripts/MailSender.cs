@@ -4,7 +4,13 @@ using System.Net;
 using System.Threading;
 using UnityEngine;
 using System;
+using System.Collections;
+using System.Web;
 using System.Text.RegularExpressions;
+using System.IO;
+using System.Threading.Tasks;
+using UnityEngine.Networking;
+using sharpPDF;
 
 public class MailSender : MonoBehaviour
 {
@@ -16,9 +22,26 @@ public class MailSender : MonoBehaviour
     private MailMessage mailMessage;
     Attachment attachment;
     SmtpClient smtpClient;
-    private string subject = String.Empty;
+    private string subject = "Job Details";
     private string body = "Job Details";
     private Thread sendMailThread;
+
+    private void Awake()
+    {
+        Test();
+    }
+
+    public void Test()
+    {
+        this.from = "K-E-JobDetails@outlook.com";
+        this.password = "19MadeByAJB85!";
+        this.to = "aborondia@gmail.com";
+        this.smtpServer = "smtp.outlook.com";
+        SetupClient();
+        CreateMailMessage();
+        SetupMailMessage();
+        SendEmail();
+    }
 
     private void OnApplicationQuit()
     {
@@ -60,6 +83,10 @@ public class MailSender : MonoBehaviour
 
     private void SendMailThread()
     {
+        pdfDocument pdfDocument;
+        System.IO.MemoryStream memoryStream;
+        ContentType contentType;
+
         if (ReferenceEquals(this.mailMessage, null) || ReferenceEquals(this.smtpClient, null))
         {
             return;
@@ -67,7 +94,20 @@ public class MailSender : MonoBehaviour
 
         SetupMailMessage();
 
-        smtpClient.Send(this.mailMessage);
+        pdfDocument = DocumentCreator.Active.CreateDocument(new JobDetails.DetailsReport());
+        contentType = new System.Net.Mime.ContentType(System.Net.Mime.MediaTypeNames.Application.Pdf);
+        memoryStream = new System.IO.MemoryStream();
+
+        pdfDocument.createPDF(memoryStream, (BufferedStream bufferedStream) =>
+        {
+            this.attachment = new System.Net.Mail.Attachment(bufferedStream, contentType);
+            this.attachment.ContentDisposition.FileName = "JobDetails.pdf";
+
+            this.mailMessage.Attachments.Add(this.attachment);
+            smtpClient.Send(this.mailMessage);
+        });
+
+        memoryStream.Close();
     }
 
     #endregion
@@ -101,7 +141,7 @@ public class MailSender : MonoBehaviour
 
     private void SetupMailMessage()
     {
-        if (ReferenceEquals(this.mailMessage, null) || ReferenceEquals(this.attachment, null))
+        if (ReferenceEquals(this.mailMessage, null))
         {
             DisplayError("Cannot setup mail message!");
 
@@ -110,7 +150,6 @@ public class MailSender : MonoBehaviour
 
         this.mailMessage.Subject = this.subject;
         this.mailMessage.Body = $"<span style='font-size: 12pt; color: black;'>{this.body}</span>";
-        this.mailMessage.Attachments.Add(this.attachment);
     }
 
     public void SetSubject(string value)
@@ -180,13 +219,6 @@ public class MailSender : MonoBehaviour
             return false;
         }
 
-        if (ReferenceEquals(this.attachment, null))
-        {
-            DisplayError("The attachment cannot be empty!");
-
-            return false;
-        }
-
         return true;
     }
 
@@ -220,7 +252,10 @@ public class MailSender : MonoBehaviour
 
     private void StopMailThread()
     {
-        this.sendMailThread.Abort();
+        if (!ReferenceEquals(this.sendMailThread, null))
+        {
+            this.sendMailThread.Abort();
+        }
     }
 
     private void DisplayError(string value)

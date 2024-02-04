@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using JobDetails;
 using BorderLineType = BorderLineWidthCollection.BorderLineTypeEnum;
 using System.Threading;
+using System.IO;
 
 [RequireComponent(typeof(JobDetailsContentCreator))]
 public class DocumentCreator : MonoBehaviour
@@ -35,11 +36,6 @@ public class DocumentCreator : MonoBehaviour
     public static int XMargin = 50;
     public static int DefaultPageWidth = 612;
     public static int DefaultPageHeight = 792;
-    private Thread mailThread;
-    private void OnDestroy()
-    {
-        mailThread.Abort();
-    }
 
     private void Awake()
     {
@@ -49,21 +45,14 @@ public class DocumentCreator : MonoBehaviour
         }
 
         Active = this;
-
         this.document = new pdfDocument(this.documentTitle, this.author);
-        this.font = this.document.getFontReference(predefinedFont.csTimes);
+
+        this.font = this.document.getFontReference("Helvetica");
         this.borderLinePDFColor = new pdfColor((int)this.lineColor.r, (int)this.lineColor.g, (int)this.lineColor.b);
         this.rectanglePDFColor = new pdfColor((int)this.rectangleColor.r, (int)this.rectangleColor.g, (int)this.rectangleColor.b);
-
-        // CreateDocument(new DetailsReport());
-        // MailSender mailSender = new MailSender();
-
-        // this.mailThread = new Thread(mailSender.SendEmail);
-
-        this.mailThread.Start();
     }
 
-    void CreateDocument(DetailsReport report)
+    public pdfDocument CreateDocument(DetailsReport report)
     {
         foreach (JobDetail jobDetail in report.Details)
         {
@@ -112,16 +101,14 @@ public class DocumentCreator : MonoBehaviour
             this.jobDetailsContentCreator.AddMultiText(paymentOptionsText, paymentOptionBorders, true, (int)jobDetail.PaymentType);
 
             detailPage.OnTextLineAdded();
-            this.jobDetailsContentCreator.AddParagraph("hjbdvhvfv vfdgfd gfdg fdgfdg fdgfd gfdg fdgfdgfdgfd gfdgfd gfdgfdgfdg fdgfd g fdgfdg fdgfdg fdgfd gfdgfdgfdg fdg fd");
+            this.jobDetailsContentCreator.AddParagraph("Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum ");
 
             this.jobDetailsContentCreator.StopCreatingPDFPage();
         }
 
         document.createPDF(@"C:\Users\MZ-admin\Desktop\Notes\test.pdf");
-        document = null;
 
         Debug.Log("PDF Created!");
+        return document;
     }
-
-
 }
