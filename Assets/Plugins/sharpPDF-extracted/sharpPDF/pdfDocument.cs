@@ -123,6 +123,19 @@ namespace sharpPDF
 			return _fonts[fontReference];
 		}
 
+		public pdfAbstractFont getFontReference(string fontName, byte[] fontReference)
+		{
+			// if (!isFontLoaded(fontReference))
+			// {
+			// if (!pdfFontFactory.isPredefinedFont(fontReference))
+			// {
+			// 	throw new pdfFontNotLoadedException();
+			// }
+			_fonts.Add(fontName, pdfFontFactory.getFontObject(fontName, fontReference, _fonts.Count + 1, documentFontType.csPredefinedfont));
+			// }
+			return _fonts[fontName];
+		}
+
 		public void addImageReference(string fileName, string imageName)
 		{
 			if (!isImageReferenceLoaded(imageName))

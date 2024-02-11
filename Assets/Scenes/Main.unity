@@ -365,11 +365,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cff7151b544a6bb40bcd6389f2f43469, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smtpServer: 
+  appId: 
+  restKey: 
   from: 
   to: 
-  password: 
-  port: 587
+  subject: 
+  body: 
 --- !u!1 &790054420
 GameObject:
   m_ObjectHideFlags: 0

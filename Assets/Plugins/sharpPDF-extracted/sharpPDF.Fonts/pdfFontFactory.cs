@@ -19,8 +19,21 @@ namespace sharpPDF.Fonts
 			FontReader fontReader = getFontReader(fontReference, fontType);
 			pdfAbstractFont2 = fontType switch
 			{
-				documentFontType.csTrueTypeFont => new pdfTrueTypeFont(fontReader.getFontDefinition(), fontNumber, documentFontEncoding.csIdentityH, fontReference), 
-				_ => new pdfPredefinedFont(fontReader.getFontDefinition(), fontNumber, documentFontEncoding.csWinAnsiEncoding), 
+				documentFontType.csTrueTypeFont => new pdfTrueTypeFont(fontReader.getFontDefinition(), fontNumber, documentFontEncoding.csIdentityH, fontReference),
+				_ => new pdfPredefinedFont(fontReader.getFontDefinition(), fontNumber, documentFontEncoding.csWinAnsiEncoding),
+			};
+			fontReader = null;
+			return pdfAbstractFont2;
+		}
+
+		public static pdfAbstractFont getFontObject(string fontName, byte[] fontReference, int fontNumber, documentFontType fontType)
+		{
+			pdfAbstractFont pdfAbstractFont2 = null;
+			FontReader fontReader = getFontReader(fontName, fontReference, fontType);
+			pdfAbstractFont2 = fontType switch
+			{
+				documentFontType.csTrueTypeFont => new pdfTrueTypeFont(fontReader.getFontDefinition(), fontNumber, documentFontEncoding.csIdentityH, fontName),
+				_ => new pdfPredefinedFont(fontReader.getFontDefinition(), fontNumber, documentFontEncoding.csWinAnsiEncoding),
 			};
 			fontReader = null;
 			return pdfAbstractFont2;
@@ -30,8 +43,17 @@ namespace sharpPDF.Fonts
 		{
 			return fontType switch
 			{
-				documentFontType.csTrueTypeFont => new ttfFontReader(fontReference), 
-				_ => new afmFontReader(fontReference), 
+				documentFontType.csTrueTypeFont => new ttfFontReader(fontReference),
+				_ => new afmFontReader(fontReference),
+			};
+		}
+
+		private static FontReader getFontReader(string fontName, byte[] fontReference, documentFontType fontType)
+		{
+			return fontType switch
+			{
+				documentFontType.csTrueTypeFont => new ttfFontReader(fontName),
+				_ => new afmFontReader(fontName, fontReference),
 			};
 		}
 
@@ -44,20 +66,20 @@ namespace sharpPDF.Fonts
 		{
 			switch (fontReference)
 			{
-			default:
-				return fontReference == "Times-BoldItalic";
-			case "Helvetica":
-			case "Helvetica-Bold":
-			case "Helvetica-Oblique":
-			case "Helvetica-BoldOblique":
-			case "Courier":
-			case "Courier-Bold":
-			case "Courier-Oblique":
-			case "Courier-BoldOblique":
-			case "Times-Roman":
-			case "Times-Bold":
-			case "Times-Italic":
-				return true;
+				default:
+					return fontReference == "Times-BoldItalic";
+				case "Helvetica":
+				case "Helvetica-Bold":
+				case "Helvetica-Oblique":
+				case "Helvetica-BoldOblique":
+				case "Courier":
+				case "Courier-Bold":
+				case "Courier-Oblique":
+				case "Courier-BoldOblique":
+				case "Times-Roman":
+				case "Times-Bold":
+				case "Times-Italic":
+					return true;
 			}
 		}
 	}

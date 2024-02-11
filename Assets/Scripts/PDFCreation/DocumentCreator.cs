@@ -2,12 +2,11 @@ using sharpPDF;
 using sharpPDF.Fonts;
 using sharpPDF.Enumerators;
 using UnityEngine;
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using JobDetails;
-using BorderLineType = BorderLineWidthCollection.BorderLineTypeEnum;
-using System.Threading;
 using System.IO;
+using UnityEngine.Networking;
 
 [RequireComponent(typeof(JobDetailsContentCreator))]
 public class DocumentCreator : MonoBehaviour
@@ -28,6 +27,7 @@ public class DocumentCreator : MonoBehaviour
     [SerializeField] private int borderLineWidth = 1;
     public int BorderLineWidth => borderLineWidth;
     private pdfDocument document;
+    private byte[] fontReference;
     private pdfAbstractFont font;
     public pdfAbstractFont Font => font;
     private predefinedLineStyle lineStyle = predefinedLineStyle.csNormal;
@@ -36,6 +36,15 @@ public class DocumentCreator : MonoBehaviour
     public static int XMargin = 50;
     public static int DefaultPageWidth = 612;
     public static int DefaultPageHeight = 792;
+    private bool sent = false;
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.S) && !this.sent)
+        {
+            this.sent = true;
+            AppController.Active.MailSender.StartSendingEmail();
+        }
+    }
 
     private void Awake()
     {
@@ -47,12 +56,27 @@ public class DocumentCreator : MonoBehaviour
         Active = this;
         this.document = new pdfDocument(this.documentTitle, this.author);
 
+#if UNITY_EDITOR
         this.font = this.document.getFontReference("Helvetica");
+#else
+                StartCoroutine(GetFontReference("Helvetica"));
+#endif
         this.borderLinePDFColor = new pdfColor((int)this.lineColor.r, (int)this.lineColor.g, (int)this.lineColor.b);
         this.rectanglePDFColor = new pdfColor((int)this.rectangleColor.r, (int)this.rectangleColor.g, (int)this.rectangleColor.b);
     }
 
-    public pdfDocument CreateDocument(DetailsReport report)
+    private IEnumerator GetFontReference(string fontReference)
+    {
+        UnityWebRequest www = UnityWebRequest.Get(Path.Combine(Application.streamingAssetsPath, "Fonts", $"{fontReference}.afm"));
+
+        yield return www.SendWebRequest();
+
+        this.fontReference = www.downloadHandler.data;
+
+        this.font = this.document.getFontReference(fontReference, this.fontReference);
+    }
+
+    public pdfDocument GetDocument(DetailsReport report)
     {
         foreach (JobDetail jobDetail in report.Details)
         {
@@ -106,7 +130,7 @@ public class DocumentCreator : MonoBehaviour
             this.jobDetailsContentCreator.StopCreatingPDFPage();
         }
 
-        document.createPDF(@"C:\Users\MZ-admin\Desktop\Notes\test.pdf");
+        // document.createPDF(@"C:\Users\MZ-admin\Desktop\Notes\test.pdf");
 
         Debug.Log("PDF Created!");
         return document;

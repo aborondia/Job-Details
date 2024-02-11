@@ -1,7 +1,10 @@
 using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using sharpPDF.Exceptions;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace sharpPDF.Fonts.AFM
 {
@@ -12,7 +15,7 @@ namespace sharpPDF.Fonts.AFM
 		private char[] csSemicolonToken = new char[1] { ';' };
 
 		private StreamReader _afmStream = null;
-		private string fontsDirectory => Path.Combine(Application.dataPath, "Fonts");
+		private string fontsDirectory => Path.Combine(Application.streamingAssetsPath, "Fonts");
 
 		public afmFontReader(string fontReference)
 			: base(fontReference)
@@ -20,7 +23,19 @@ namespace sharpPDF.Fonts.AFM
 			try
 			{
 				_afmStream = new StreamReader(Path.Combine(fontsDirectory, $"{fontReference}.afm"));
-				// _afmStream = new StreamReader(GetType().Assembly.GetManifestResourceStream("sharpPDF.Fonts.AFM." + _fontReference + ".afm"));
+			}
+			catch (Exception ex)
+			{
+				throw new pdfGenericIOException(ex.Message, ex);
+			}
+		}
+
+		public afmFontReader(string fontName, byte[] fontReference)
+			: base(fontName)
+		{
+			try
+			{
+				_afmStream = new StreamReader(new MemoryStream(fontReference));
 			}
 			catch (Exception ex)
 			{
