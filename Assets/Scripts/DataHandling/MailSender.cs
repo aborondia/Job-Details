@@ -6,12 +6,11 @@ using System.IO;
 using UnityEngine.Networking;
 using sharpPDF;
 using Newtonsoft.Json;
-
+using SimpleJSON;
+using System.Text;
 
 public class MailSender : MonoBehaviour
 {
-    [SerializeField] string appId;
-    [SerializeField] string restKey;
     [SerializeField] private string from;
     [SerializeField] private string to;
     [SerializeField] private string subject;
@@ -19,28 +18,87 @@ public class MailSender : MonoBehaviour
     private CustomMailMessage mailMessage;
     CustomMailAttachment attachment;
     Regex emailRegex = new Regex(@"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
-    private const string apiUrl = "https://parseapi.back4app.com/functions/sendEmail";
 
     public void StartSendingEmail()
     {
-        CreateEmail();
-        StartCoroutine(SendEmail());
+        // CreateEmail();
+        // StartCoroutine(SendEmail());
+        // StartCoroutine(GetUniqueId());
     }
 
     #region Sending
 
+    private IEnumerator GetUniqueId()
+    {
+        UnityWebRequest request = new UnityWebRequest($"{AppController.Active.ServerCommunicator.FunctionsUrl}/getUniqueId", "POST");
+        string jsonBody = "{}";
+        byte[] bodyRaw = new System.Text.UTF8Encoding().GetBytes(jsonBody);
+
+        request.SetRequestHeader("X-Parse-Application-Id", AppController.Active.ServerCommunicator.AppId);
+        request.SetRequestHeader("X-Parse-REST-API-Key", AppController.Active.ServerCommunicator.RestKey);
+
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            JSONNode node = JSON.Parse(request.downloadHandler.text);
+            Debug.Log("Response: " + request.downloadHandler.text);
+
+            StartCoroutine(CreateJobDetails(node["result"]["objectId"]));
+        }
+        else
+        {
+            Debug.LogError("Request failed: " + request.error);
+        }
+    }
+
+    public class Test
+    {
+        public string CustomId { get; set; }
+        public string Content { get; set; }
+
+        public Test(string customId, string content)
+        {
+            this.CustomId = customId;
+            this.Content = content;
+        }
+    }
+
+    private IEnumerator CreateJobDetails(string id)
+    {
+        UnityWebRequest request = new UnityWebRequest($"{AppController.Active.ServerCommunicator.FunctionsUrl}/uploadJobDetail", "POST");
+        string jsonBody = JsonConvert.SerializeObject(new Test(id, "{data: test}"));
+        byte[] bodyRaw = new UTF8Encoding().GetBytes(jsonBody);
+
+        request.SetRequestHeader("X-Parse-Application-Id", AppController.Active.ServerCommunicator.AppId);
+        request.SetRequestHeader("X-Parse-REST-API-Key", AppController.Active.ServerCommunicator.RestKey);
+
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log("Response: " + request.downloadHandler.text);
+        }
+        else
+        {
+            Debug.LogError("Request failed: " + request.error);
+        }
+    }
+
     private IEnumerator SendEmail()
     {
-        UnityWebRequest request = new UnityWebRequest(apiUrl, "POST");
+        UnityWebRequest request = new UnityWebRequest($"{AppController.Active.ServerCommunicator.FunctionsUrl}/sendEmail", "POST");
         string jsonBody = JsonConvert.SerializeObject(this.mailMessage);
         byte[] bodyRaw = new System.Text.UTF8Encoding().GetBytes(jsonBody);
 
-        Debug.Log(this.mailMessage.To);
-        Debug.Log(this.mailMessage.Content);
-        Debug.Log(jsonBody);
-
-        request.SetRequestHeader("X-Parse-Application-Id", this.appId);
-        request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
+        request.SetRequestHeader("X-Parse-Application-Id", AppController.Active.ServerCommunicator.AppId);
+        request.SetRequestHeader("X-Parse-REST-API-Key", AppController.Active.ServerCommunicator.RestKey);
 
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
@@ -133,42 +191,4 @@ public class MailSender : MonoBehaviour
     {
         Debug.LogError(value);
     }
-}
-
-[System.Serializable]
-public class Personalization
-{
-    public Recipient[] to;
-    public string subject;
-}
-
-[System.Serializable]
-public class Recipient
-{
-    public string email;
-}
-
-[System.Serializable]
-public class Content
-{
-    public string type;
-    public string value;
-}
-
-[System.Serializable]
-public class Attachment
-{
-    public string content;
-    public string filename;
-    public string type;
-    public string disposition;
-}
-
-[System.Serializable]
-public class SendGridEmail
-{
-    public Personalization[] personalizations;
-    public Recipient from;
-    public Content[] content;
-    public Attachment[] attachments;
 }

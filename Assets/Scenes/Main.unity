@@ -365,12 +365,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cff7151b544a6bb40bcd6389f2f43469, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appId: 
-  restKey: 
-  from: 
-  to: 
-  subject: 
-  body: 
+  from: K-E-JobDetails@outlook.com
+  to: aborondia@gmail.com
+  subject: Subject
+  body: Body
 --- !u!1 &790054420
 GameObject:
   m_ObjectHideFlags: 0
@@ -417,6 +415,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mailSender: {fileID: 698238383}
   documentCreator: {fileID: 177572860}
+  serverCommunicator: {fileID: 0}
 --- !u!1 &1117361653
 GameObject:
   m_ObjectHideFlags: 0
@@ -509,6 +508,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9eed42cd1ef39984d804ca4e92bde280, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &2010118322
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2010118323}
+  - component: {fileID: 2010118324}
+  m_Layer: 0
+  m_Name: ServerCommunicator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2010118323
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2010118322}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2010118324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2010118322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 056fb30636f9977479b61a4df2264a94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  appId: 
+  restKey: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -519,3 +564,4 @@ SceneRoots:
   - {fileID: 698238382}
   - {fileID: 1117361655}
   - {fileID: 1142191013}
+  - {fileID: 2010118323}

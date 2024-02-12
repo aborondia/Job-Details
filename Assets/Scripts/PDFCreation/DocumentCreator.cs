@@ -41,7 +41,7 @@ public class DocumentCreator : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.S) && !this.sent)
         {
-            this.sent = true;
+            // this.sent = true;
             AppController.Active.MailSender.StartSendingEmail();
         }
     }

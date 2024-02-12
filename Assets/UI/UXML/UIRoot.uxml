@@ -1,3 +1,10 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <CustomVisualElement name="root" style="background-color: rgb(0, 0, 0); width: 100%; height: 100%;" />
+    <Style src="project://database/Assets/UI/USS/root.uss?fileID=7433441132597879392&amp;guid=7a2186fad6b55d945aceae12b11b37ba&amp;type=3#root" />
+    <Style src="project://database/Assets/UI/USS/global-colors.uss?fileID=7433441132597879392&amp;guid=95fa0ffd1caf2d94496c697ddec4f348&amp;type=3#global-colors" />
+    <Style src="project://database/Assets/UI/USS/global-icons.uss?fileID=7433441132597879392&amp;guid=113284d08076176438392cae17ec1c7b&amp;type=3#global-icons" />
+    <Style src="project://database/Assets/UI/USS/custom-buttons.uss?fileID=7433441132597879392&amp;guid=1fc973030d3ba0c4c98613fe765b9207&amp;type=3#custom-buttons" />
+    <Style src="project://database/Assets/UI/USS/custom-scrollbar.uss?fileID=7433441132597879392&amp;guid=bf31e3ed28c4b304980fb95a53272512&amp;type=3#custom-scrollbar" />
+    <CustomVisualElement name="root" style="background-color: rgb(0, 0, 0); width: 100%; height: 100%;">
+        <CustomVisualElement name="body" class="root-body" />
+    </CustomVisualElement>
 </ui:UXML>

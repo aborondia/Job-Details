@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public class CustomMailMessage
 {
     public string To { get; set; }
@@ -8,6 +10,7 @@ public class CustomMailMessage
     public string FileName { get; set; }
     public string Type { get; set; }
     public string Disposition { get; set; }
+    public List<string> CC { get; set; }
 
     public CustomMailMessage(string to, string from, string subject, string body, CustomMailAttachment attachment)
     {
@@ -15,6 +18,8 @@ public class CustomMailMessage
         this.From = from;
         this.Subject = subject;
         this.Body = body;
+        this.CC = new List<string>();
+
         SetAttachment(attachment.Content, attachment.FileName, attachment.Type, attachment.Disposition);
     }
 
@@ -24,5 +29,10 @@ public class CustomMailMessage
         this.FileName = fileName;
         this.Type = type;
         this.Disposition = dispositon;
+    }
+
+    public void AddCC(string email)
+    {
+        this.CC.Add(email);
     }
 }
