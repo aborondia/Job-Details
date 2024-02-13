@@ -125,7 +125,7 @@ public class MailSender : MonoBehaviour
         MemoryStream memoryStream;
         byte[] fileBytes;
 
-        pdfDocument = DocumentCreator.Active.GetDocument(new JobDetails.DetailsReport());
+        pdfDocument = DocumentCreator.Active.GetDocument(new JobDetails.DetailsReport(AppController.Active.ServerCommunicator.CurrentUser.objectId));
         memoryStream = new System.IO.MemoryStream();
         fileBytes = new byte[0];
 

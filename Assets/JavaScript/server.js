@@ -35,50 +35,104 @@ Parse.Cloud.define("sendEmail", async (request) => {
   }
 });
 
-Parse.Cloud.define("uploadJobDetail", async (request) => {
+Parse.Cloud.define("createJobDetail", async (request) => {
   try {
     const data = request.params;
-    if (!data.CustomId) {
-      throw new Parse.Error(400, "Id is required");
-    }
     const FileObject = Parse.Object.extend("JobDetail");
-    const query = new Parse.Query(FileObject);
-    query.equalTo("CustomId", data.CustomId);
-    const existingFileObject = await query.first();
-    if (existingFileObject) {
-      const existingJsonFile = existingFileObject.get("jsonFile");
-      existingJsonFile.setData(data.Content, { base64: true });
-      await existingJsonFile.save();
-      return {
-        result: "JSON file replaced successfully",
-        objectId: existingFileObject.id,
-      };
-    } else {
-      const newJsonFile = new Parse.File("uploaded_data.json", {
-        base64: Buffer.from(data.Content).toString("base64"),
-      });
-      await newJsonFile.save();
-      const newFileObject = new FileObject();
-      newFileObject.set("jsonFile", newJsonFile);
-      newFileObject.set("CustomId", data.CustomId);
-      newFileObject.set("Content", data.Content);
-      await newFileObject.save();
-      return {
-        result: data,
-      };
-    }
+    const newJsonFile = new Parse.File("stuff.json", {
+      base64: Buffer.from(data.content).toString("base64"),
+    });
+    await newJsonFile.save();
+
+    const newFileObject = new FileObject();
+    newFileObject.set("jsonFile", newJsonFile);
+    newFileObject.set("content", data.content);
+    newFileObject.set("userId", data.userId);
+
+    const result = await newFileObject.save();
+
+    return {
+      objectId: result.id,
+      createdAt: result.createdAt,
+    };
   } catch (error) {
-    console.error("Error uploading/replacing JSON file:", error);
-    throw new Parse.Error(500, "Error uploading/replacing JSON file");
+    console.error("Error creating JobDetail:", error);
+    throw new Parse.Error(500, "Error creating JobDetail");
   }
 });
 
-Parse.Cloud.define("getUniqueId", async () => {
+Parse.Cloud.define("updateJobDetail", async (request) => {
   try {
-    const uniqueId = uuidv4();
-    return { objectId: uniqueId };
+    const objectId = request.params.objectId;
+    const data = request.params;
+
+    const JobDetail = Parse.Object.extend("JobDetail");
+    const existingJobDetail = await new Parse.Query(JobDetail).get(objectId);
+
+    existingJobDetail.set("content", data.content);
+    existingJobDetail.set("userId", data.userId);
+
+    const contentBuffer = Buffer.from(data.content, "utf-8");
+    const base64Content = contentBuffer.toString("base64");
+
+    existingJobDetail.set(
+      "jsonFile",
+      new Parse.File("resume.txt", { base64: base64Content })
+    );
+    existingJobDetail.set("userId", data.userId);
+
+    const result = await existingJobDetail.save();
+
+    return {
+      objectId: result.id,
+      updatedAt: result.updatedAt,
+    };
   } catch (error) {
-    console.error("Error generating unique Id:", error);
-    throw new Parse.Error(500, "Error generating unique Id");
+    console.error("Error updating JobDetail:", error);
+    throw new Parse.Error(500, "Error updating JobDetail");
+  }
+});
+
+Parse.Cloud.define("retrieveJobDetails", async (request) => {
+  try {
+    const userId = request.params.userId;
+
+    const JobDetail = Parse.Object.extend("JobDetail");
+    const query = new Parse.Query(JobDetail);
+
+    query.equalTo("userId", userId);
+
+    const results = await query.find();
+    const jobDetails = results.map((result) => {
+      return {
+        objectId: result.id,
+        jsonFile: result.get("jsonFile"),
+        userId: result.get("userId"),
+        content: result.get("content"),
+      };
+    });
+
+    return { jobDetails };
+  } catch (error) {
+    console.error("Error retrieving JobDetails:", error);
+    throw new Parse.Error(500, "Error retrieving JobDetails");
+  }
+});
+
+Parse.Cloud.define("deleteJobDetail", async (request) => {
+  try {
+    const objectId = request.params.objectId;
+
+    const JobDetail = Parse.Object.extend("JobDetail");
+    const query = new Parse.Query(JobDetail);
+
+    const jobDetail = await query.get(objectId);
+
+    await jobDetail.destroy();
+
+    return { result: "JobDetail deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting JobDetail:", error);
+    throw new Parse.Error(500, "Error deleting JobDetail");
   }
 });
