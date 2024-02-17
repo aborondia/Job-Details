@@ -37,15 +37,7 @@ public class DocumentCreator : MonoBehaviour
     public static int DefaultPageWidth = 612;
     public static int DefaultPageHeight = 792;
     private bool sent = false;
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.S) && !this.sent)
-        {
-            // this.sent = true;
-            AppController.Active.MailSender.StartSendingEmail();
-        }
-    }
-
+    
     private void Awake()
     {
         if (Active != null)

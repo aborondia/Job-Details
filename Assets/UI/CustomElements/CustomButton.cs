@@ -35,6 +35,8 @@ public class CustomButton : Button
     public UxmlTraits uxmlTraits;
     public new class UxmlTraits : VisualElement.UxmlTraits
     {
+        UxmlBoolAttributeDescription m_RegenerateInEditor =
+        new UxmlBoolAttributeDescription { name = "regenerate-in-editor", defaultValue = false };
         UxmlEnumAttributeDescription<CustomButton.ButtonStyleType> m_Type =
         new UxmlEnumAttributeDescription<CustomButton.ButtonStyleType> { name = "button-type", defaultValue = CustomButton.ButtonStyleType.Regular };
         UxmlEnumAttributeDescription<CustomButton.ButtonStyleType> m_UnselectableOverride =
@@ -69,8 +71,6 @@ public class CustomButton : Button
         new UxmlBoolAttributeDescription { name = "no-interactable-styles", defaultValue = false };
         UxmlBoolAttributeDescription m_ActiveButton =
         new UxmlBoolAttributeDescription { name = "active-button", defaultValue = false };
-        UxmlBoolAttributeDescription m_RegenerateInEditor =
-        new UxmlBoolAttributeDescription { name = "regenerate-in-editor", defaultValue = false };
         UxmlBoolAttributeDescription m_showCursor =
         new UxmlBoolAttributeDescription { name = "show-cursor", defaultValue = true };
 
@@ -81,7 +81,6 @@ public class CustomButton : Button
 
         public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
         {
-
             base.Init(ve, bag, cc);
             CustomButton ate = ve as CustomButton;
             ate.baseInitializationComplete = false;
@@ -107,10 +106,17 @@ public class CustomButton : Button
             ate.activeButton = m_ActiveButton.GetValueFromBag(bag, cc);
             ate.showCursor = m_showCursor.GetValueFromBag(bag, cc);
 
+            ate.AddToClassList("custom-button");
+
             if (ate.showCursor)
             {
                 ate.AddToClassList("show-cursor");
             }
+
+            // if (m_RegenerateInEditor.GetValueFromBag(bag, cc))
+            // {
+            //     ate.InitializeButton();
+            // }
 
             if (Application.isPlaying || m_RegenerateInEditor.GetValueFromBag(bag, cc))
             {

@@ -12,9 +12,9 @@ using System;
 
 public class ServerCommunicator : MonoBehaviour
 {
-    [SerializeField] private string appId;
+    private string appId;
     public string AppId => appId;
-    [SerializeField] private string restKey;
+    private string restKey;
     public string RestKey => restKey;
     private const string apiUrl = "https://parseapi.back4app.com";
     public string FunctionsUrl => $"{apiUrl}/functions";
@@ -32,9 +32,10 @@ public class ServerCommunicator : MonoBehaviour
         }
         if (String.IsNullOrEmpty(this.restKey))
         {
-            this.appId = PlayerPrefs.GetString("RestKey");
+            this.restKey = PlayerPrefs.GetString("RestKey");
         }
 
+        // CreateUser(new UserSignupDTM("Andrew", "aborondia@gmail.com", "123"));
     }
 
     #region Communication

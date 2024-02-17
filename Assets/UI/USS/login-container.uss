@@ -1,0 +1,47 @@
+.custom-input {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.input-floating-label-container {
+    padding-top: 2px;
+    padding-right: 4px;
+    padding-bottom: 2px;
+    padding-left: 15px;
+}
+
+.input-container {
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.options-container {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding-top: 2px;
+    padding-right: 4px;
+    padding-bottom: 2px;
+    padding-left: 4px;
+}
+
+.option-button-container {
+    min-height: 100px;
+    min-width: 40%;
+}
+
+.option-button {
+    align-items: center;
+    justify-content: center;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+}
+
+.option-button-label {
+}

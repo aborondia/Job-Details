@@ -2,3 +2,61 @@
     width: 100%;
     height: 100%;
 }
+
+.x-small-font {
+    font-size: 8px;
+}
+
+.small-font {
+    font-size: 16px;
+}
+
+.regular-font {
+    font-size: 24px;
+}
+
+.large-font {
+    font-size: 36px;
+}
+
+.x-large-font {
+    font-size: 48px;
+}
+
+.app-header {
+    min-height: 60px;
+    width: 100%;
+}
+
+.views-container {
+    flex-direction: row;
+    flex-grow: 1;
+}
+
+.main-views {
+    height: 100%;
+    flex-grow: 1;
+}
+
+.app-left-bar {
+    height: 100%;
+    min-width: 75px;
+}
+
+.app-right-bar {
+    min-width: 75px;
+    height: 100%;
+}
+
+.app-footer {
+    width: 100%;
+    min-height: 60px;
+}
+
+.main-view {
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
