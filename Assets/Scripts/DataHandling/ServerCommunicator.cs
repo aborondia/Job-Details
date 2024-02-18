@@ -8,6 +8,7 @@ using UnityEngine.Networking;
 using ReturnStringDelegate = ActionHelper.ReturnStringDelegate;
 using JobDetails;
 using System;
+using System.Collections.Generic;
 
 public class ServerCommunicator : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class ServerCommunicator : MonoBehaviour
     private const string apiUrl = "https://parseapi.back4app.com";
     public string FunctionsUrl => $"{apiUrl}/functions";
     public string UsersUrl => $"{apiUrl}/users";
+    public string ClassesUrl => $"{apiUrl}/classes";
     public string LoginUrl => $"{apiUrl}/login";
     public string LogoutUrl => $"{apiUrl}/logout";
     private bool signedIn;
@@ -41,6 +43,17 @@ public class ServerCommunicator : MonoBehaviour
         {
             this.restKey = PlayerPrefs.GetString("RestKey");
         }
+
+        this.OnSignInSuccessEvent.AddListener(() =>
+        {
+            // CreateJobDetails(new JobDetail(), "ANVUxDjPru");
+            // CreateDetailsReport(new DetailsReport(this.currentUser.objectId));
+            // GetJobDetails("bY7VbX6fIP");
+            // GetDetailsReports();
+            // DeleteDetailsReport("bnfHqJVG5d");
+            // UpdateJobDetails("8KRnJSC9BK", "bY7VbX6fIP", new JobDetail());
+            // DeleteJobDetails("eKsFih6wE5");
+        });
     }
 
     #region Communication
@@ -57,7 +70,6 @@ public class ServerCommunicator : MonoBehaviour
     private IEnumerator StartCreatingUser(UserSignupDTM userSignupDTM)
     {
         UnityWebRequest request = new UnityWebRequest($"{this.UsersUrl}", "POST");
-
         string jsonBody = JsonConvert.SerializeObject(userSignupDTM);
         byte[] bodyRaw = new System.Text.UTF8Encoding().GetBytes(jsonBody);
 
@@ -169,6 +181,8 @@ public class ServerCommunicator : MonoBehaviour
 
     #region Job Details
 
+    #region DetailsReport
+
     public void CreateDetailsReport(DetailsReport detailsReport)
     {
         if (ReferenceEquals(this.currentUser, null))
@@ -185,9 +199,8 @@ public class ServerCommunicator : MonoBehaviour
 
     private IEnumerator StartCreatingDetailsReport(DetailsReport detailsReport)
     {
-        UnityWebRequest request = new UnityWebRequest($"{this.FunctionsUrl}/updateJobDetail", "POST");
-        string detailsData = JsonConvert.SerializeObject(detailsReport);
-        string jsonBody = JsonConvert.SerializeObject(new JobDetailsDTM(this.currentUser.objectId, detailsData));
+        UnityWebRequest request = new UnityWebRequest($"https://parseapi.back4app.com/classes/DetailsReport", "POST");
+        string jsonBody = $"{{\"createdBy\":\"{this.currentUser.objectId}\"}}";
         byte[] bodyRaw = new UTF8Encoding().GetBytes(jsonBody);
 
         request.SetRequestHeader("X-Parse-Application-Id", this.appId);
@@ -211,7 +224,81 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void UpdateDetailsReport(DetailsReport detailsReport)
+    private void GetDetailsReports()
+    {
+        this.OnRequestStartedEvent.Invoke();
+
+        StartCoroutine(StartGettingDetailsReports());
+    }
+
+    private IEnumerator StartGettingDetailsReports()
+    {
+        Dictionary<string, object> whereDict = new Dictionary<string, object>
+        {
+            { "createdBy", this.currentUser.objectId },
+        };
+
+        string whereJson = JsonUtility.ToJson(whereDict);
+        string encodedWhere = UnityWebRequest.EscapeURL(whereJson);
+
+        string url = $"{this.ClassesUrl}/DetailsReport?where={encodedWhere}";
+
+        UnityWebRequest request = UnityWebRequest.Get(url);
+
+        request.SetRequestHeader("X-Parse-Application-Id", this.appId);
+        request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
+        request.SetRequestHeader("X-Parse-Session-Token", this.currentUser.sessionToken);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
+        }
+        else
+        {
+            LogHelper.Active.LogError("Request failed: " + request.error + request.downloadHandler.text);
+        }
+
+        this.OnRequestCompletedEvent.Invoke();
+    }
+
+    private void DeleteDetailsReport(string id)
+    {
+        this.OnRequestStartedEvent.Invoke();
+
+        StartCoroutine(StartDeletingDetailsReport(id));
+    }
+
+    private IEnumerator StartDeletingDetailsReport(string id)
+    {
+        string url = $"{this.ClassesUrl}/DetailsReport/{id}";
+
+        UnityWebRequest request = UnityWebRequest.Delete(url);
+
+        request.SetRequestHeader("X-Parse-Application-Id", this.appId);
+        request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
+        request.SetRequestHeader("X-Parse-Session-Token", this.currentUser.sessionToken);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            LogHelper.Active.Log("Deleted: " + id);
+        }
+        else
+        {
+            LogHelper.Active.LogError("Request failed: " + request.error);
+        }
+
+        this.OnRequestCompletedEvent.Invoke();
+    }
+
+    #endregion
+
+    #region JobDetails
+
+    public void CreateJobDetails(JobDetail jobDetails, string detailsReportId)
     {
         if (ReferenceEquals(this.currentUser, null))
         {
@@ -222,14 +309,15 @@ public class ServerCommunicator : MonoBehaviour
 
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartUpdatingDetailsReport(detailsReport));
+        StartCoroutine(StartCreatingJobDetails(jobDetails, detailsReportId));
     }
 
-    private IEnumerator StartUpdatingDetailsReport(DetailsReport detailsReport)
+    private IEnumerator StartCreatingJobDetails(JobDetail jobDetails, string detailsReportId)
     {
-        UnityWebRequest request = new UnityWebRequest($"{this.FunctionsUrl}/updateJobDetail", "POST");
-        string detailsData = JsonConvert.SerializeObject(detailsReport);
-        string jsonBody = JsonConvert.SerializeObject(new JobDetailsDTM(this.currentUser.objectId, detailsData));
+        string url = $"https://parseapi.back4app.com/classes/JobDetail";
+        UnityWebRequest request = new UnityWebRequest(url, "POST");
+        JobDetailsDTM dtm = new JobDetailsDTM(this.currentUser.objectId, jobDetails, detailsReportId);
+        string jsonBody = JsonConvert.SerializeObject(dtm);
         byte[] bodyRaw = new UTF8Encoding().GetBytes(jsonBody);
 
         request.SetRequestHeader("X-Parse-Application-Id", this.appId);
@@ -253,7 +341,46 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void DeleteDetailsReport(DetailsReport detailsReport)
+    private void GetJobDetails(string detailsReportObjectId)
+    {
+        this.OnRequestStartedEvent.Invoke();
+
+        StartCoroutine(StartGettingJobDetails(detailsReportObjectId));
+    }
+
+    private IEnumerator StartGettingJobDetails(string detailsReportObjectId)
+    {
+        Dictionary<string, object> whereDict = new Dictionary<string, object>
+        {
+            { "jsonFile", new { __type = "File", name = "" } },
+            { "createdBy", "" },
+            { "content", "" },
+            { "reportPointer", new { __type = "Pointer", className = "DetailsReport", objectId = detailsReportObjectId } }
+        };
+        string whereJson = JsonUtility.ToJson(whereDict);
+        string encodedWhere = UnityWebRequest.EscapeURL(whereJson);
+        string url = $"{this.ClassesUrl}/JobDetail?where={encodedWhere}";
+        UnityWebRequest request = UnityWebRequest.Get(url);
+
+        request.SetRequestHeader("X-Parse-Application-Id", this.appId);
+        request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
+        request.SetRequestHeader("X-Parse-Session-Token", this.currentUser.sessionToken);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
+        }
+        else
+        {
+            LogHelper.Active.LogError("Request failed: " + request.error + request.downloadHandler.text);
+        }
+
+        this.OnRequestCompletedEvent.Invoke();
+    }
+
+    public void UpdateJobDetails(string jobDetailsId, string detailsReportId, JobDetail jobDetails)
     {
         if (ReferenceEquals(this.currentUser, null))
         {
@@ -264,16 +391,17 @@ public class ServerCommunicator : MonoBehaviour
 
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartDeletingDetailsReport(detailsReport));
+        StartCoroutine(StartUpdatingJobDetails(jobDetailsId, detailsReportId, jobDetails));
     }
 
-    private IEnumerator StartDeletingDetailsReport(DetailsReport detailsReport)
+    private IEnumerator StartUpdatingJobDetails(string jobDetailsId, string detailsReportId, JobDetail jobDetails)
     {
-        UnityWebRequest request = new UnityWebRequest($"{this.FunctionsUrl}/deleteJobDetail", "POST");
-        string detailsData = JsonConvert.SerializeObject(detailsReport);
-        string jsonBody = JsonConvert.SerializeObject(new JobDetailsDTM(this.currentUser.objectId, detailsData, detailsReport.ObjectId));
+        string url = $"{this.ClassesUrl}/JobDetail/{jobDetailsId}";
+        JobDetailsDTM dtm = new JobDetailsDTM(this.currentUser.objectId, jobDetails, detailsReportId);
+        string jsonBody = JsonConvert.SerializeObject(dtm);
         byte[] bodyRaw = new UTF8Encoding().GetBytes(jsonBody);
-        LogHelper.Active.Log(jsonBody);
+        UnityWebRequest request = UnityWebRequest.Put(url, bodyRaw);
+
         request.SetRequestHeader("X-Parse-Application-Id", this.appId);
         request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
         request.SetRequestHeader("Content-Type", "application/json");
@@ -295,39 +423,44 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    private void RetrieveJobDetails()
+    public void DeleteJobDetails(string id)
     {
+        if (ReferenceEquals(this.currentUser, null))
+        {
+            LogHelper.Active.LogError("Current user is null!");
+
+            return;
+        }
+
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartRetrievingJobDetails());
+        StartCoroutine(StartDeletingJobDetails(id));
     }
 
-    private IEnumerator StartRetrievingJobDetails()
+    private IEnumerator StartDeletingJobDetails(string id)
     {
-        UnityWebRequest request = new UnityWebRequest($"{this.FunctionsUrl}/retrieveJobDetails", "POST");
-        string jsonBody = JsonConvert.SerializeObject(new JobDetailsDTM(this.currentUser.objectId, ""));
-        byte[] bodyRaw = new UTF8Encoding().GetBytes(jsonBody);
+        string url = $"{this.ClassesUrl}/JobDetail/{id}";
+        UnityWebRequest request = UnityWebRequest.Delete(url);
 
         request.SetRequestHeader("X-Parse-Application-Id", this.appId);
         request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
-        request.SetRequestHeader("Content-Type", "application/json");
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUser.sessionToken);
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
 
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
+            LogHelper.Active.Log("Deleted: " + id);
         }
         else
         {
-            LogHelper.Active.LogError("Request failed: " + request.error + request.downloadHandler.text);
+            LogHelper.Active.LogError("Request failed: " + request.error);
         }
 
         this.OnRequestCompletedEvent.Invoke();
     }
+
+    #endregion
 
     #endregion
 

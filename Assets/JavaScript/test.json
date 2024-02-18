@@ -1,0 +1,39 @@
+{
+    "jsonFile": {
+        "__type": "File",
+        "name": "JobDetails"
+    },
+    "userId": "Pa5ACvx78A",
+    "reportPointer": {
+        "__type": "Pointer",
+        "className": "DetailsReport",
+        "objectId": "g9OAp2rZmU"
+    },
+    "content": {
+        "clientName": "Jane Doe",
+        "clientAddress": "123 Fake Street",
+        "startTime": "2024-02-18T15:40:05.818403-06:00",
+        "finishTime": "2024-02-18T21:40:05.818403-06:00",
+        "jobType": 0,
+        "cleaners": [
+            {
+                "name": "John Doe",
+                "hours": 666.0
+            },
+            {
+                "name": "John Doe",
+                "hours": 666.0
+            },
+            {
+                "name": "John Doe",
+                "hours": 666.0
+            },
+            {
+                "name": "John Doe",
+                "hours": 666.0
+            }
+        ],
+        "paymentType": 0,
+        "description": "I cleaned their house."
+    }
+}

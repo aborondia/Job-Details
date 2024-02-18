@@ -19,7 +19,7 @@ public class LogHelper : MonoBehaviour
 
     public void Log(string value)
     {
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
         if (editorOnly)
         {
             return;
@@ -31,7 +31,7 @@ public class LogHelper : MonoBehaviour
 
     public void LogError(string value)
     {
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
         if (editorOnly)
         {
             return;
