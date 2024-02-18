@@ -51,7 +51,7 @@ public class PDFPage
         }
         catch (Exception e)
         {
-            Debug.LogError(e.Message);
+            LogHelper.Active.LogError(e.Message);
 
             this.currentBorderLineY = 0;
         }

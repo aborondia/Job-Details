@@ -37,20 +37,20 @@ public class CustomButton : Button
     {
         UxmlBoolAttributeDescription m_RegenerateInEditor =
         new UxmlBoolAttributeDescription { name = "regenerate-in-editor", defaultValue = false };
-        UxmlEnumAttributeDescription<CustomButton.ButtonStyleType> m_Type =
-        new UxmlEnumAttributeDescription<CustomButton.ButtonStyleType> { name = "button-type", defaultValue = CustomButton.ButtonStyleType.Regular };
-        UxmlEnumAttributeDescription<CustomButton.ButtonStyleType> m_UnselectableOverride =
-        new UxmlEnumAttributeDescription<CustomButton.ButtonStyleType> { name = "unselectable-override", defaultValue = CustomButton.ButtonStyleType.None };
-        UxmlEnumAttributeDescription<CustomButton.ButtonStyleType> m_SelectableOverride =
-        new UxmlEnumAttributeDescription<CustomButton.ButtonStyleType> { name = "selectable-override", defaultValue = CustomButton.ButtonStyleType.None };
-        UxmlEnumAttributeDescription<CustomButton.ButtonStyleType> m_ActiveOverride =
-        new UxmlEnumAttributeDescription<CustomButton.ButtonStyleType> { name = "active-override", defaultValue = CustomButton.ButtonStyleType.None };
-        UxmlEnumAttributeDescription<CustomButton.ButtonStyleType> m_HoverOverride =
-        new UxmlEnumAttributeDescription<CustomButton.ButtonStyleType> { name = "hover-override", defaultValue = CustomButton.ButtonStyleType.None };
-        UxmlEnumAttributeDescription<CustomButton.ButtonStyleType> m_SelectedOverride =
-        new UxmlEnumAttributeDescription<CustomButton.ButtonStyleType> { name = "selected-override", defaultValue = CustomButton.ButtonStyleType.None };
-        UxmlEnumAttributeDescription<CustomButton.StartState> m_StartState =
-        new UxmlEnumAttributeDescription<CustomButton.StartState> { name = "default-start-state", defaultValue = CustomButton.StartState.Selectable };
+        UxmlEnumAttributeDescription<ButtonStyleType> m_Type =
+        new UxmlEnumAttributeDescription<ButtonStyleType> { name = "button-type", defaultValue = ButtonStyleType.Regular };
+        UxmlEnumAttributeDescription<ButtonStyleType> m_UnselectableOverride =
+        new UxmlEnumAttributeDescription<ButtonStyleType> { name = "unselectable-override", defaultValue = ButtonStyleType.None };
+        UxmlEnumAttributeDescription<ButtonStyleType> m_SelectableOverride =
+        new UxmlEnumAttributeDescription<ButtonStyleType> { name = "selectable-override", defaultValue = ButtonStyleType.None };
+        UxmlEnumAttributeDescription<ButtonStyleType> m_ActiveOverride =
+        new UxmlEnumAttributeDescription<ButtonStyleType> { name = "active-override", defaultValue = ButtonStyleType.None };
+        UxmlEnumAttributeDescription<ButtonStyleType> m_HoverOverride =
+        new UxmlEnumAttributeDescription<ButtonStyleType> { name = "hover-override", defaultValue = ButtonStyleType.None };
+        UxmlEnumAttributeDescription<ButtonStyleType> m_SelectedOverride =
+        new UxmlEnumAttributeDescription<ButtonStyleType> { name = "selected-override", defaultValue = ButtonStyleType.None };
+        UxmlEnumAttributeDescription<StartState> m_StartState =
+        new UxmlEnumAttributeDescription<StartState> { name = "default-start-state", defaultValue = StartState.Selectable };
         UxmlBoolAttributeDescription m_UseCustomSelectableBorderColor =
         new UxmlBoolAttributeDescription { name = "use-custom-selectable-border-color", defaultValue = false };
         UxmlColorAttributeDescription m_CustomSelectableBorderColor =
@@ -73,6 +73,10 @@ public class CustomButton : Button
         new UxmlBoolAttributeDescription { name = "active-button", defaultValue = false };
         UxmlBoolAttributeDescription m_showCursor =
         new UxmlBoolAttributeDescription { name = "show-cursor", defaultValue = true };
+        UxmlBoolAttributeDescription m_UseBackgroundColor =
+        new UxmlBoolAttributeDescription { name = "use-background-color", defaultValue = true };
+        UxmlBoolAttributeDescription m_UseBorder =
+        new UxmlBoolAttributeDescription { name = "use-border", defaultValue = true };
 
         public override IEnumerable<UxmlChildElementDescription> uxmlChildElementsDescription
         {
@@ -105,20 +109,12 @@ public class CustomButton : Button
             ate.noInteractableStyles = m_NoInteractableStyles.GetValueFromBag(bag, cc);
             ate.activeButton = m_ActiveButton.GetValueFromBag(bag, cc);
             ate.showCursor = m_showCursor.GetValueFromBag(bag, cc);
+            ate.useBackgroundColor = m_UseBackgroundColor.GetValueFromBag(bag, cc);
+            ate.useBorder = m_UseBorder.GetValueFromBag(bag, cc);
 
             ate.AddToClassList("custom-button");
 
-            if (ate.showCursor)
-            {
-                ate.AddToClassList("show-cursor");
-            }
-
-            // if (m_RegenerateInEditor.GetValueFromBag(bag, cc))
-            // {
-            //     ate.InitializeButton();
-            // }
-
-            if (Application.isPlaying || m_RegenerateInEditor.GetValueFromBag(bag, cc))
+            if (Application.isPlaying)
             {
                 ate.InitializeBaseValues();
 
@@ -292,16 +288,16 @@ public class CustomButton : Button
             onActiveStateChange.Invoke();
         }
     }
-    private CustomButton.ButtonStyleType buttonType;
-    public CustomButton.ButtonStyleType ButtonType
+    private ButtonStyleType buttonType;
+    public ButtonStyleType ButtonType
     {
         get
         {
             return this.buttonType;
         }
     }
-    private CustomButton.ButtonStyleType unselectableOverride;
-    public CustomButton.ButtonStyleType UnselectableOverride
+    private ButtonStyleType unselectableOverride;
+    public ButtonStyleType UnselectableOverride
     {
         get
         {
@@ -312,8 +308,8 @@ public class CustomButton : Button
             this.unselectableOverride = value;
         }
     }
-    private CustomButton.ButtonStyleType selectableOverride;
-    public CustomButton.ButtonStyleType SelectableOverride
+    private ButtonStyleType selectableOverride;
+    public ButtonStyleType SelectableOverride
     {
         get
         {
@@ -324,8 +320,8 @@ public class CustomButton : Button
             this.selectableOverride = value;
         }
     }
-    private CustomButton.ButtonStyleType activeOverride;
-    public CustomButton.ButtonStyleType ActiveOverride
+    private ButtonStyleType activeOverride;
+    public ButtonStyleType ActiveOverride
     {
         get
         {
@@ -336,8 +332,8 @@ public class CustomButton : Button
             this.activeOverride = value;
         }
     }
-    private CustomButton.ButtonStyleType hoverOverride;
-    public CustomButton.ButtonStyleType HoverOverride
+    private ButtonStyleType hoverOverride;
+    public ButtonStyleType HoverOverride
     {
         get
         {
@@ -348,8 +344,8 @@ public class CustomButton : Button
             this.hoverOverride = value;
         }
     }
-    private CustomButton.ButtonStyleType selectedOverride;
-    public CustomButton.ButtonStyleType SelectedOverride
+    private ButtonStyleType selectedOverride;
+    public ButtonStyleType SelectedOverride
     {
         get
         {
@@ -385,6 +381,8 @@ public class CustomButton : Button
             return this.firstInitializationComplete;
         }
     }
+    private bool useBackgroundColor = true;
+    private bool useBorder = true;
     private UnityEvent onActiveStateChange = new UnityEvent();
     public UnityEvent OnPointerDownEvent = new UnityEvent();
     public UnityEvent OnPointerUpEvent = new UnityEvent();
@@ -434,6 +432,15 @@ public class CustomButton : Button
                     CoroutineHelper.Active.StartCoroutine(WaitForInitializationToComplete());
                 }
 
+                if (this.useBackgroundColor)
+                {
+                    this.AddToClassList("use-background");
+                }
+                else
+                {
+                    this.RemoveFromClassList("use-background");
+                }
+
                 UpdateBorderClasses();
                 UpdateHoverClasses();
 
@@ -455,6 +462,11 @@ public class CustomButton : Button
             this.baseInitializationComplete = true;
         }
 
+        foreach (VisualElement child in this.Children())
+        {
+            child.pickingMode = PickingMode.Ignore;
+        }
+
         InitializeButton();
     }
 
@@ -466,6 +478,7 @@ public class CustomButton : Button
         }
 
         ClearButtonClasses();
+
         this.style.backgroundColor = StyleKeyword.Null;
 
         if (this.buttonType == ButtonStyleType.Disabled)
@@ -475,6 +488,7 @@ public class CustomButton : Button
 
         UpdateBorderClasses();
         UpdateHoverClasses();
+        UpdateCursor();
 
         if (this.buttonType != ButtonStyleType.None)
         {
@@ -552,11 +566,17 @@ public class CustomButton : Button
     {
         ButtonStyleType buttonStyleType = this.hoverOverride == ButtonStyleType.None ? this.buttonType : this.hoverOverride;
 
+        this.AddToClassList(GetHoverClass());
+
         this.OnHoverInEvent.Invoke();
     }
 
     private void OnHoverOut()
     {
+        ButtonStyleType buttonStyleType = this.hoverOverride == ButtonStyleType.None ? this.buttonType : this.hoverOverride;
+
+        this.RemoveFromClassList(GetHoverClass());
+
         this.OnHoverOutEvent.Invoke();
     }
 
@@ -708,6 +728,18 @@ public class CustomButton : Button
         this.RemoveFromClassList(activeClass);
     }
 
+    private void UpdateCursor()
+    {
+        if (this.showCursor && this.buttonType != ButtonStyleType.Disabled)
+        {
+            this.AddToClassList("show-cursor");
+        }
+        else
+        {
+            this.RemoveFromClassList("show-cursor");
+        }
+    }
+
     private void UpdateCustomSelectableColors()
     {
         if (!this.useCustomSelectableBorderColor)
@@ -764,6 +796,11 @@ public class CustomButton : Button
         }
 
         removeOldSelectors.Invoke();
+
+        if (!this.useBorder)
+        {
+            return;
+        }
 
         if (this.activeButton && this.activeOverride != ButtonStyleType.None)
         {

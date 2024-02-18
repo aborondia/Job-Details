@@ -1,153 +1,165 @@
-.show-cursor:enabled {
-    cursor: url('project://database/Assets/Images/pointer.png') 5 0;
-}
-
-.show-cursor:enabled * {
-    cursor: url('project://database/Assets/Images/pointer.png') 5 0;
+/* Global----------------------------------------------------------------------------------------------------- */
+.show-cursor {
+  cursor: url("project://database/Assets/Images/pointer.png?fileID=2800000&guid=f804b400b5d41f34991691e77c4a9a71&type=3#pointer") 45 0;
 }
 
 .custom-button {
-    transition-duration: var(--transition-time);
-    transition-timing-function: ease;
-    transition-property: all;
+  transition-duration: var(--transition-time);
+  transition-timing-function: ease;
+  transition-property: all;
 }
 
 .custom-button.hover-text * {
-    color: var(--white);
+  color: var(--white);
 }
 
 .custom-button.hover-text.regular-hover:hover * {
-    color: var(--white);
+  color: var(--white);
 }
 
 .custom-button.hover-text.active * {
-    color: var(--white);
+  color: var(--white);
 }
 
 .custom-button {
-    width: 100%;
-    height: 100%;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
-    border-bottom-left-radius: 20px;
-    border-top-width: 1px;
-    border-right-width: 1px;
-    border-bottom-width: 1px;
-    border-left-width: 1px;
+  width: 100%;
+  height: 100%;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
 }
 
+/* Regular----------------------------------------------------------------------------------------------------- */
 .custom-button.regular-border {
-    border-color: var(--gray1);
+  border-color: var(--white);
 }
 
-.custom-button.regular-active {
-    background-color: var(--gray2);
+.custom-button.regular-unselectable.use-background {
+  background-color: var(--gray4);
 }
 
-.custom-button.hover-background.regular-hover {
-    background-color: var(--gray-transparent);
+.custom-button.regular-selectable.use-background {
+  background-color: var(--gray3);
 }
 
+.custom-button.regular-active.use-background {
+  background-color: var(--gray2);
+}
+
+.custom-button.hover-background.use-background.regular-hover {
+  background-color: var(--gray-transparent);
+}
+
+/* Primary----------------------------------------------------------------------------------------------------- */
 .custom-button.primary-border {
-    border-color: var(--blue1);
+  border-color: var(--blue1);
 }
 
-.custom-button.primary-unselectable {
-    background-color: var(--blue4);
+.custom-button.primary-unselectable.use-background {
+  background-color: var(--blue4);
 }
 
-.custom-button.secondary-selectable {
-    background-color: var(--blue3);
+.custom-button.primary-selectable.use-background {
+  background-color: var(--blue3);
 }
 
-.custom-button.primary-active {
-    background-color: var(--blue2);
+.custom-button.primary-active.use-background {
+  background-color: var(--blue2);
 }
 
-.custom-button.hover-background.primary-hover {
-    background-color: var(--blue-transparent);
+.custom-button.hover-background.use-background.primary-hover {
+  background-color: var(--blue-transparent);
 }
+
+/* Secondary----------------------------------------------------------------------------------------------------- */
 
 .custom-button.secondary-border {
-    border-color: var(--green1);
+  border-color: var(--green1);
 }
 
-.custom-button.secondary-unselectable {
-    background-color: var(--green4);
+.custom-button.secondary-unselectable.use-background {
+  background-color: var(--green4);
 }
 
-.custom-button.secondary-selectable {
-    background-color: var(--green3);
+.custom-button.secondary-selectable.use-background {
+  background-color: var(--green3);
 }
 
-.custom-button.secondary-active {
-    background-color: var(--green2);
-    opacity: 1;
+.custom-button.secondary-active.use-background {
+  background-color: var(--green2);
+  opacity: 1;
 }
 
-.custom-button.hover-background.secondary-hover {
-    background-color: var(--green-transparent);
+.custom-button.hover-background.use-background.secondary-hover {
+  background-color: var(--green-transparent);
 }
+
+/* Moderate----------------------------------------------------------------------------------------------------- */
 
 .custom-button.moderate-border {
-    border-color: var(--orange1);
+  border-color: var(--orange1);
 }
 
-.custom-button.moderate-unselectable {
-    background-color: var(--orange4);
+.custom-button.moderate-unselectable.use-background {
+  background-color: var(--orange4);
 }
 
-.custom-button.moderate-selectable {
-    background-color: var(--orange3);
+.custom-button.moderate-selectable.use-background {
+  background-color: var(--orange3);
 }
 
-.custom-button.moderate-active {
-    background-color: var(--orange2);
-    opacity: 1;
+.custom-button.moderate-active.use-background {
+  background-color: var(--orange2);
+  opacity: 1;
 }
 
-.custom-button.hover-background.moderate-hover {
-    background-color: var(--orange-transparent);
+.custom-button.hover-background.use-background.moderate-hover {
+  background-color: var(--orange-transparent);
 }
 
+/* Warning----------------------------------------------------------------------------------------------------- */
 .custom-button.warning-border {
-    border-color: var(--red1);
+  border-color: var(--red1);
 }
 
-.custom-button.warning-unselectable {
-    background-color: var(--red4);
+.custom-button.warning-unselectable.use-background {
+  background-color: var(--red4);
 }
 
-.custom-button.warning-selectable {
-    background-color: var(--red3);
+.custom-button.warning-selectable.use-background {
+  background-color: var(--red3);
 }
 
-.custom-button.warning-active {
-    background-color: var(--red2);
-    opacity: 1;
+.custom-button.warning-active.use-background {
+  background-color: var(--red2);
+  opacity: 1;
 }
 
-.custom-button.hover-background.warning-hover {
-    background-color: var(--red-transparent);
+.custom-button.hover-background.use-background.warning-hover {
+  background-color: var(--red-transparent);
 }
 
-.custom-button.disabled-unselectable {
-    opacity: 0.5;
+/* Disabled----------------------------------------------------------------------------------------------------- */
+.custom-button.disabled-border {
+  border-color: var(--white);
 }
 
-.custom-button.disabled-selectable {
-    opacity: 0.5;
+.custom-button.disabled-unselectable.use-background {
+  opacity: 0.5;
+  background-color: var(--gray4);
 }
 
-.custom-button.disabled-selected {
-    opacity: 0.5;
+.custom-button.disabled-selectable.use-background {
+  opacity: 0.5;
+  background-color: var(--gray3);
 }
 
-.custom-button.disabled-active {
-    opacity: 1;
-}
-
-.custom-button.disabled-hover {
-    opacity: 0.5;
+.custom-button.disabled-active.use-background {
+  opacity: 0.5;
+  background-color: var(--gray2);
 }

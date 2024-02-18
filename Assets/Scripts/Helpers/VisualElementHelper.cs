@@ -8,7 +8,7 @@ public static class VisualElementHelper
     {
         if (ReferenceEquals(element, null))
         {
-            LogHelper.Active.DebugLogError("Element is null!");
+            LogHelper.Active.LogError("Element is null!");
 
             return;
         }
@@ -19,5 +19,22 @@ public static class VisualElementHelper
         }
 
         element.style.display = displayStyle;
+    }
+
+    public static void SetElementVisibility(VisualElement element, Visibility visibility)
+    {
+        if (ReferenceEquals(element, null))
+        {
+            LogHelper.Active.LogError("Element is null!");
+
+            return;
+        }
+
+        if (element.resolvedStyle.visibility == visibility)
+        {
+            return;
+        }
+
+        element.style.visibility = visibility;
     }
 }

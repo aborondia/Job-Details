@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/USS/interaction-blocker.uss?fileID=7433441132597879392&amp;guid=49c5ca9fd0ab0be42beeedec8d564433&amp;type=3#interaction-blocker" />
+    <CustomVisualElement name="main" class="interaction-blocker-main">
+        <CustomLabel text="BLOCKING" class="white-font interaction-blocker-label" />
+    </CustomVisualElement>
+</ui:UXML>

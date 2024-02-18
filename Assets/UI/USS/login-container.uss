@@ -7,9 +7,12 @@
 
 .input-floating-label-container {
     padding-top: 2px;
-    padding-right: 4px;
+    padding-right: 15px;
     padding-bottom: 2px;
     padding-left: 15px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .input-container {
@@ -27,21 +30,71 @@
     padding-right: 4px;
     padding-bottom: 2px;
     padding-left: 4px;
+    min-height: 50px;
 }
 
 .option-button-container {
-    min-height: 100px;
     min-width: 40%;
+    height: 100%;
 }
 
 .option-button {
+    justify-content: center;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
+}
+
+.option-button-label {
+    color: var(--gray1);
+    -unity-font-style: italic;
+}
+
+.error-label-container {
+    align-items: flex-end;
+    flex-grow: 1;
+}
+
+.floating-label-container {
+}
+
+.navigation-button-container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding-top: 2px;
+    padding-right: 4px;
+    padding-bottom: 2px;
+    padding-left: 4px;
+    width: 100%;
+    min-height: 100px;
+    align-items: center;
+    min-width: 40%;
+    max-width: 40%;
+}
+
+.navigation-button {
     align-items: center;
     justify-content: center;
     padding-top: 10px;
     padding-right: 10px;
     padding-bottom: 10px;
     padding-left: 10px;
+    width: 100%;
 }
 
-.option-button-label {
+.buttons-container {
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.error-label {
+    -unity-font-style: italic;
+    white-space: normal;
+    font-size: 18px;
 }

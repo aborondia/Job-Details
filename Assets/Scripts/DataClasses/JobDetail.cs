@@ -39,7 +39,7 @@ public class JobDetail
 
         if (index >= this.cleaners.Count)
         {
-            Debug.Log("Cleaner list does not contain index " + index);
+            LogHelper.Active.Log("Cleaner list does not contain index " + index);
 
             return null;
         }

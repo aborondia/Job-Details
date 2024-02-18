@@ -11,7 +11,7 @@ public abstract class QueryHandler : MonoBehaviour
     protected VisualElement parentElement;
     public VisualElement ParentElement => parentElement;
     protected List<VisualElement> mainViewElements;
-    protected Dictionary<Subview, VisualElement> subviewElements;
+    protected Dictionary<Subview, List<VisualElement>> subviewElements;
     protected bool initialized;
     public bool Initialized => initialized;
     protected abstract void InitializeElements();
@@ -44,6 +44,9 @@ public abstract class QueryHandler : MonoBehaviour
 
         QueryController.Active.OnMainViewChangedEvent.AddListener(OnMainViewChanged);
         QueryController.Active.OnSubviewChangedEvent.AddListener(OnSubviewChanged);
+        QueryController.Active.OnAnyViewChangedEvent.AddListener(OnAnyViewChanged);
+
+        ResetView();
 
         this.initialized = true;
     }
@@ -53,7 +56,7 @@ public abstract class QueryHandler : MonoBehaviour
         this.parentElement = QueryController.Active.RootDocument.rootVisualElement.Q<TemplateContainer>(this.parentBaseElement.name);
 
         this.mainViewElements = new List<VisualElement>();
-        this.subviewElements = new Dictionary<Subview, VisualElement>();
+        this.subviewElements = new Dictionary<Subview, List<VisualElement>>();
     }
 
     protected void AddMainViewElement(VisualElement element)
@@ -63,7 +66,12 @@ public abstract class QueryHandler : MonoBehaviour
 
     protected void AddSubviewElement(Subview subview, VisualElement element)
     {
-        this.subviewElements.Add(subview, element);
+        if (!this.subviewElements.ContainsKey(subview))
+        {
+            this.subviewElements.Add(subview, new List<VisualElement>());
+        }
+
+        this.subviewElements[subview].Add(element);
     }
 
     #endregion
@@ -87,27 +95,57 @@ public abstract class QueryHandler : MonoBehaviour
 
     protected virtual void OnSubviewChanged()
     {
+        Subview? previousSubview;
+        Subview currentSubview;
+
         if (this.mainView != MainView.None && QueryController.Active.CurrentMainView != this.mainView)
         {
+            this.HideParent();
+
             return;
         }
 
-        foreach (var entry in this.subviewElements)
+        previousSubview = QueryController.Active.PreviousView.Subview;
+        currentSubview = QueryController.Active.CurrentSubview;
+
+        if (previousSubview.HasValue && this.subviewElements.ContainsKey(previousSubview.Value))
         {
-            if (QueryController.Active.CurrentSubview == entry.Key)
-            {
-                VisualElementHelper.SetElementDisplay(entry.Value, DisplayStyle.Flex);
-            }
-            else
-            {
-                VisualElementHelper.SetElementDisplay(entry.Value, DisplayStyle.None);
-            }
+            HideSubviewElements(previousSubview.Value);
         }
+
+        ShowSubviewElements(currentSubview);
     }
 
     protected virtual void OnAnyViewChanged()
     {
 
+    }
+
+    public void ResetView()
+    {
+        Subview currentSubview;
+
+        if (this.mainView != MainView.None && QueryController.Active.CurrentMainView != this.mainView)
+        {
+            this.HideParent();
+
+            return;
+        }
+
+        currentSubview = QueryController.Active.CurrentSubview;
+
+        foreach (Subview subview in this.subviewElements.Keys)
+        {
+            if (subview != currentSubview)
+            {
+                HideSubviewElements(subview);
+            }
+        }
+
+        if (this.subviewElements.ContainsKey(currentSubview))
+        {
+            ShowSubviewElements(currentSubview);
+        }
     }
 
     #endregion
@@ -122,6 +160,32 @@ public abstract class QueryHandler : MonoBehaviour
     public void HideParent()
     {
         VisualElementHelper.SetElementDisplay(this.parentElement, DisplayStyle.None);
+    }
+
+    protected void ShowSubviewElements(Subview subview)
+    {
+        if (!this.subviewElements.ContainsKey(subview))
+        {
+            return;
+        }
+
+        foreach (VisualElement element in this.subviewElements[subview])
+        {
+            ShowElement(element);
+        }
+    }
+
+    protected void HideSubviewElements(Subview subview)
+    {
+        if (!this.subviewElements.ContainsKey(subview))
+        {
+            return;
+        }
+
+        foreach (VisualElement element in this.subviewElements[subview])
+        {
+            HideElement(element);
+        }
     }
 
     protected void ShowElement(VisualElement element)

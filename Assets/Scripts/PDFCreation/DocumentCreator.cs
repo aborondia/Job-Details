@@ -37,7 +37,7 @@ public class DocumentCreator : MonoBehaviour
     public static int DefaultPageWidth = 612;
     public static int DefaultPageHeight = 792;
     private bool sent = false;
-    
+
     private void Awake()
     {
         if (Active != null)
@@ -124,7 +124,7 @@ public class DocumentCreator : MonoBehaviour
 
         // document.createPDF(@"C:\Users\MZ-admin\Desktop\Notes\test.pdf");
 
-        Debug.Log("PDF Created!");
+        LogHelper.Active.Log("PDF Created!");
         return document;
     }
 }

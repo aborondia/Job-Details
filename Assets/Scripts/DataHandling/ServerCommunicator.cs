@@ -1,10 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
 using System.Text;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using SimpleJSON;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
 using ReturnStringDelegate = ActionHelper.ReturnStringDelegate;
 using JobDetails;
@@ -21,8 +20,16 @@ public class ServerCommunicator : MonoBehaviour
     public string UsersUrl => $"{apiUrl}/users";
     public string LoginUrl => $"{apiUrl}/login";
     public string LogoutUrl => $"{apiUrl}/logout";
+    private bool signedIn;
+    public bool SignedIn => signedIn;
     private UserDTM currentUser;
     public UserDTM CurrentUser => currentUser;
+    public UnityEvent OnSignInSuccessEvent;
+    public UnityEvent OnSignInFailedEvent;
+    public UnityEvent OnRegisterSuccessEvent;
+    public UnityEvent OnRegisterFailedEvent;
+    public UnityEvent OnRequestStartedEvent;
+    public UnityEvent OnRequestCompletedEvent;
 
     private void Awake()
     {
@@ -34,8 +41,6 @@ public class ServerCommunicator : MonoBehaviour
         {
             this.restKey = PlayerPrefs.GetString("RestKey");
         }
-
-        // CreateUser(new UserSignupDTM("Andrew", "aborondia@gmail.com", "123"));
     }
 
     #region Communication
@@ -44,6 +49,8 @@ public class ServerCommunicator : MonoBehaviour
 
     public void CreateUser(UserSignupDTM userSignupDTM)
     {
+        this.OnRequestStartedEvent.Invoke();
+
         StartCoroutine(StartCreatingUser(userSignupDTM));
     }
 
@@ -66,16 +73,22 @@ public class ServerCommunicator : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("User Created: " + request.downloadHandler.text);
+            LogHelper.Active.Log("User Created: " + request.downloadHandler.text);
+            this.OnRegisterSuccessEvent.Invoke();
         }
         else
         {
-            Debug.LogError("Request failed: " + request.error);
+            LogHelper.Active.LogError("Request failed: " + request.error);
+            this.OnRegisterFailedEvent.Invoke();
         }
+
+        this.OnRequestCompletedEvent.Invoke();
     }
 
     public void SignIn(UserSignInDTM userSignInDTM)
     {
+        this.OnRequestStartedEvent.Invoke();
+
         StartCoroutine(StartSigningIn(userSignInDTM));
     }
 
@@ -97,22 +110,33 @@ public class ServerCommunicator : MonoBehaviour
             JSONNode node = JSON.Parse(request.downloadHandler.text);
 
             this.currentUser = JsonConvert.DeserializeObject<UserDTM>(request.downloadHandler.text);
-            Debug.Log("Login successful: " + request.downloadHandler.text);
+            LogHelper.Active.Log("Login successful: " + request.downloadHandler.text);
+
+            this.signedIn = true;
+
+            this.OnSignInSuccessEvent.Invoke();
         }
         else
         {
-            Debug.LogError("Login failed: " + request.error);
+            LogHelper.Active.LogError("Login failed: " + request.error);
+            this.OnSignInFailedEvent.Invoke();
         }
+
+        this.OnRequestCompletedEvent.Invoke();
     }
 
     private void SignOut()
     {
-        if (ReferenceEquals(this.currentUser, null))
+        if (ReferenceEquals(this.currentUser, null) || !this.signedIn)
         {
-            Debug.LogError("Current user is null!");
+            LogHelper.Active.LogError("Not signed in!");
 
             return;
         }
+
+        this.OnRequestStartedEvent.Invoke();
+
+        StartCoroutine(StartSigningOut());
     }
 
     private IEnumerator StartSigningOut()
@@ -129,12 +153,16 @@ public class ServerCommunicator : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Logout successful");
+            LogHelper.Active.Log("Logout successful");
+
+            this.signedIn = false;
         }
         else
         {
-            Debug.LogError("Logout failed: " + request.error);
+            LogHelper.Active.LogError("Logout failed: " + request.error);
         }
+
+        this.OnRequestCompletedEvent.Invoke();
     }
 
     #endregion
@@ -145,10 +173,12 @@ public class ServerCommunicator : MonoBehaviour
     {
         if (ReferenceEquals(this.currentUser, null))
         {
-            Debug.LogError("Current user is null!");
+            LogHelper.Active.LogError("Current user is null!");
 
             return;
         }
+
+        this.OnRequestStartedEvent.Invoke();
 
         StartCoroutine(StartCreatingDetailsReport(detailsReport));
     }
@@ -171,22 +201,26 @@ public class ServerCommunicator : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Response: " + request.downloadHandler.text);
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
         }
         else
         {
-            Debug.LogError("Request failed: " + request.error + request.downloadHandler.text);
+            LogHelper.Active.LogError("Request failed: " + request.error + request.downloadHandler.text);
         }
+
+        this.OnRequestCompletedEvent.Invoke();
     }
 
     public void UpdateDetailsReport(DetailsReport detailsReport)
     {
         if (ReferenceEquals(this.currentUser, null))
         {
-            Debug.LogError("Current user is null!");
+            LogHelper.Active.LogError("Current user is null!");
 
             return;
         }
+
+        this.OnRequestStartedEvent.Invoke();
 
         StartCoroutine(StartUpdatingDetailsReport(detailsReport));
     }
@@ -209,22 +243,26 @@ public class ServerCommunicator : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Response: " + request.downloadHandler.text);
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
         }
         else
         {
-            Debug.LogError("Request failed: " + request.error + request.downloadHandler.text);
+            LogHelper.Active.LogError("Request failed: " + request.error + request.downloadHandler.text);
         }
+
+        this.OnRequestCompletedEvent.Invoke();
     }
 
     public void DeleteDetailsReport(DetailsReport detailsReport)
     {
         if (ReferenceEquals(this.currentUser, null))
         {
-            Debug.LogError("Current user is null!");
+            LogHelper.Active.LogError("Current user is null!");
 
             return;
         }
+
+        this.OnRequestStartedEvent.Invoke();
 
         StartCoroutine(StartDeletingDetailsReport(detailsReport));
     }
@@ -235,7 +273,7 @@ public class ServerCommunicator : MonoBehaviour
         string detailsData = JsonConvert.SerializeObject(detailsReport);
         string jsonBody = JsonConvert.SerializeObject(new JobDetailsDTM(this.currentUser.objectId, detailsData, detailsReport.ObjectId));
         byte[] bodyRaw = new UTF8Encoding().GetBytes(jsonBody);
-        Debug.Log(jsonBody);
+        LogHelper.Active.Log(jsonBody);
         request.SetRequestHeader("X-Parse-Application-Id", this.appId);
         request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
         request.SetRequestHeader("Content-Type", "application/json");
@@ -247,16 +285,20 @@ public class ServerCommunicator : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Response: " + request.downloadHandler.text);
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
         }
         else
         {
-            Debug.LogError("Request failed: " + request.error + request.downloadHandler.text);
+            LogHelper.Active.LogError("Request failed: " + request.error + request.downloadHandler.text);
         }
+
+        this.OnRequestCompletedEvent.Invoke();
     }
 
     private void RetrieveJobDetails()
     {
+        this.OnRequestStartedEvent.Invoke();
+
         StartCoroutine(StartRetrievingJobDetails());
     }
 
@@ -277,12 +319,14 @@ public class ServerCommunicator : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Response: " + request.downloadHandler.text);
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
         }
         else
         {
-            Debug.LogError("Request failed: " + request.error + request.downloadHandler.text);
+            LogHelper.Active.LogError("Request failed: " + request.error + request.downloadHandler.text);
         }
+
+        this.OnRequestCompletedEvent.Invoke();
     }
 
     #endregion
@@ -291,6 +335,8 @@ public class ServerCommunicator : MonoBehaviour
 
     public void SendEmail(CustomMailMessage customMailMessage)
     {
+        this.OnRequestStartedEvent.Invoke();
+
         StartCoroutine(StartSendingEmail(customMailMessage));
     }
 
@@ -310,12 +356,14 @@ public class ServerCommunicator : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Response: " + request.downloadHandler.text);
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
         }
         else
         {
-            Debug.LogError("Request failed: " + request.error);
+            LogHelper.Active.LogError("Request failed: " + request.error);
         }
+
+        this.OnRequestCompletedEvent.Invoke();
     }
 
     #endregion

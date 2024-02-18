@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using UnityEngine.UIElements;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UIElements;
 using MainView = EnumLibrary.MainView;
 using Subview = EnumLibrary.Subview;
+using System;
+using System.Linq;
+using System.Text;
 
 public class QueryController : MonoBehaviour
 {
@@ -20,8 +22,11 @@ public class QueryController : MonoBehaviour
     public JobDetailsQueryHandler JobDetailsQueryHandler => jobDetailsQueryHandler;
     [SerializeField] private GameObject queryHandlersParent;
     [SerializeField] private QueryHandler[] queryhandlers;
+    private VisualElement interactionBlocker;
+    private CustomLabel interactionBlockerLabel;
     private FullViewContainer previousView;
     public FullViewContainer PreviousView => previousView;
+    private HashSet<int> interactionBlockerIds;
     private bool initialized;
     public bool Initialized => initialized;
     private MainView currentMainView;
@@ -50,15 +55,37 @@ public class QueryController : MonoBehaviour
     {
         this.previousView = new FullViewContainer();
 
+        this.interactionBlocker = this.rootDocument.rootVisualElement.Q<TemplateContainer>("InteractionBlocker");
+        this.interactionBlockerLabel = this.interactionBlocker.Q<CustomLabel>();
+        this.interactionBlockerIds = new HashSet<int>();
+        UpdateInteractionBlocker();
+
         this.OnMainViewChangedEvent.AddListener(() => this.OnAnyViewChangedEvent.Invoke());
         this.OnSubviewChangedEvent.AddListener(() => this.OnAnyViewChangedEvent.Invoke());
 
+        SetupEvents();
+        ChangeView(this.defaultMainView, this.defaultSubview);
         GetAllQueryHandlers();
         InitializeAllQueryHandlers();
 
-        ChangeView(this.defaultMainView, this.defaultSubview);
-
         this.initialized = true;
+    }
+
+    private void SetupEvents()
+    {
+        UnityAction onServerRequestStarted = () =>
+        {
+            int blockingId = BlockInteractions();
+            UnityAction onServerRequestCompleted = () =>
+            {
+                UnblockInteractions(blockingId);
+            };
+
+            onServerRequestCompleted += () => AppController.Active.ServerCommunicator.OnRequestCompletedEvent.RemoveListener(onServerRequestCompleted);
+            AppController.Active.ServerCommunicator.OnRequestCompletedEvent.AddListener(onServerRequestCompleted);
+        };
+
+        AppController.Active.ServerCommunicator.OnRequestStartedEvent.AddListener(onServerRequestStarted);
     }
 
     private void GetAllQueryHandlers()
@@ -87,11 +114,11 @@ public class QueryController : MonoBehaviour
 
         if (resetPreviousView)
         {
-            previousView.ResetView();
+            this.previousView.ResetView();
         }
         else
         {
-            previousView.SetView(this.currentMainView, this.currentSubview);
+            this.previousView.SetView(this.currentMainView, this.currentSubview);
         }
 
         if (this.currentMainView != mainView)
@@ -133,10 +160,56 @@ public class QueryController : MonoBehaviour
     {
         if (!this.previousView.PreviousViewValid)
         {
-            LogHelper.Active.DebugLogError("Previous view not valid!");
+            LogHelper.Active.LogError("Previous view not valid!");
         }
 
-        ChangeView(this.previousView.MainView.Value, this.previousView.Subview.Value, true);
+        ChangeView(this.previousView.MainView.Value, this.previousView.Subview.Value);
+    }
+
+    #endregion
+
+    #region Actions
+
+    public int BlockInteractions(string feedbackMessage = "Processing...")
+    {
+        int blockingId = this.interactionBlockerIds.Count <= 0 ? 0 : this.interactionBlockerIds.Max() + 1;
+
+        StartCoroutine(UnblockIntereractionsAfterTimeout(blockingId));
+
+        UpdateInteractionBlocker();
+
+        return blockingId;
+    }
+
+    public void UnblockInteractions(int blockingId)
+    {
+        this.interactionBlockerIds.Remove(blockingId);
+
+        UpdateInteractionBlocker();
+    }
+
+    private void UpdateInteractionBlocker()
+    {
+        if (this.interactionBlockerIds.Count > 0)
+        {
+            VisualElementHelper.SetElementDisplay(this.interactionBlocker, DisplayStyle.Flex);
+        }
+        else
+        {
+            VisualElementHelper.SetElementDisplay(this.interactionBlocker, DisplayStyle.None);
+        }
+    }
+
+    private IEnumerator UnblockIntereractionsAfterTimeout(int blockingId, float timeout = 5f)
+    {
+        float elapsedTime = 0;
+
+        yield return new WaitUntil(() =>
+        {
+            elapsedTime += Time.deltaTime;
+
+            return elapsedTime >= timeout;
+        });
     }
 
     #endregion

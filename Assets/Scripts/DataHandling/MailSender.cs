@@ -45,13 +45,13 @@ public class MailSender : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             JSONNode node = JSON.Parse(request.downloadHandler.text);
-            Debug.Log("Response: " + request.downloadHandler.text);
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
 
             StartCoroutine(CreateJobDetails(node["result"]["objectId"]));
         }
         else
         {
-            Debug.LogError("Request failed: " + request.error);
+            LogHelper.Active.LogError("Request failed: " + request.error);
         }
     }
 
@@ -83,11 +83,11 @@ public class MailSender : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Response: " + request.downloadHandler.text);
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
         }
         else
         {
-            Debug.LogError("Request failed: " + request.error);
+            LogHelper.Active.LogError("Request failed: " + request.error);
         }
     }
 
@@ -107,11 +107,11 @@ public class MailSender : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Response: " + request.downloadHandler.text);
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
         }
         else
         {
-            Debug.LogError("Request failed: " + request.error);
+            LogHelper.Active.LogError("Request failed: " + request.error);
         }
     }
 
@@ -189,6 +189,6 @@ public class MailSender : MonoBehaviour
 
     private void DisplayError(string value)
     {
-        Debug.LogError(value);
+        LogHelper.Active.LogError(value);
     }
 }

@@ -17,7 +17,7 @@ public class LogHelper : MonoBehaviour
         Active = this;
     }
 
-    public void DebugLog(string value)
+    public void Log(string value)
     {
 #if UNITY_EDITOR
         if (editorOnly)
@@ -29,7 +29,7 @@ public class LogHelper : MonoBehaviour
         Debug.Log(value);
     }
 
-    public void DebugLogError(string value)
+    public void LogError(string value)
     {
 #if UNITY_EDITOR
         if (editorOnly)
