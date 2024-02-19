@@ -79,6 +79,8 @@ public class CustomVisualElement : VisualElement
 
         if (this.isImage)
         {
+            this.pickingMode = PickingMode.Ignore;
+            
             if (this.enforceLargestDimension)
             {
                 if (ReferenceEquals(this.resolvedStyle.backgroundImage.sprite?.rect, null))

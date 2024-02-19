@@ -6,7 +6,8 @@ using JobDetails.Enumerations;
 
 public class JobDetail
 {
-
+    private string objectId = "";
+    public string ObjectId => objectId;
     private string clientName = "Jane Doe";
     public string ClientName => clientName;
     private string clientAddress = "123 Fake Street";

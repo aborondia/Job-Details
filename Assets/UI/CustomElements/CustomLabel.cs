@@ -22,6 +22,8 @@ public class CustomLabel : Label
             base.Init(ve, bag, cc);
             CustomLabel ate = ve as CustomLabel;
 
+            ate.AddToClassList("custom-label");
+
             if (Application.isPlaying)
             {
                 ate.generateVisualContent += mgc =>

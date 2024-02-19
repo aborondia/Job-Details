@@ -1,0 +1,37 @@
+.details-report-main {
+    min-height: 60px;
+    flex-direction: row;
+}
+
+.time-range-labels-container {
+    flex-direction: row;
+    align-items: center;
+}
+
+.time-range-label {
+}
+
+.time-range-label-container {
+}
+
+.option-buttons-container {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.option-button-container {
+    height: 100%;
+    min-width: 60px;
+    margin-left: 10px;
+}
+
+.option-button {
+    justify-content: center;
+    align-items: center;
+}
+
+.report-details-container {
+    flex-direction: row;
+    min-height: 60px;
+}

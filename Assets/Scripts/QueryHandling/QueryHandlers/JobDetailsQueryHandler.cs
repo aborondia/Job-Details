@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MainView = EnumLibrary.MainView;
+using Subview = EnumLibrary.Subview;
 
 public class JobDetailsQueryHandler : QueryHandler
 {

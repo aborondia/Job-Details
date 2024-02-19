@@ -1,0 +1,39 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/USS/job-details-entry.uss?fileID=7433441132597879392&amp;guid=a76fd5bd4d4de8f4f91716e7cf6be800&amp;type=3#job-details-entry" />
+    <CustomVisualElement name="main" class="job-details-main">
+        <CustomVisualElement name="info-labels-container" class="info-labels-container">
+            <CustomVisualElement name="left-labels-container" class="multi-labels-container">
+                <CustomVisualElement name="client-name-label-container" class="info-label-container">
+                    <CustomLabel text="Client: FirstName LastName" class="info-label" />
+                </CustomVisualElement>
+                <CustomVisualElement name="address-label-container" class="info-label-container">
+                    <CustomLabel text="Address: 123 Fake St." class="info-label" />
+                </CustomVisualElement>
+            </CustomVisualElement>
+            <CustomVisualElement name="right-labels-container" class="multi-labels-container">
+                <CustomVisualElement name="date-time-label-container" class="info-label-container">
+                    <CustomLabel text="Time: 24/2/19" class="info-label" />
+                </CustomVisualElement>
+                <CustomVisualElement name="job-type-label-container" class="info-label-container">
+                    <CustomLabel text="Job Type: Bi-weekly" class="info-label" />
+                </CustomVisualElement>
+            </CustomVisualElement>
+        </CustomVisualElement>
+        <CustomVisualElement name="option-buttons-container" class="option-buttons-container">
+            <CustomVisualElement name="edit-button-container" class="option-button-container">
+                <CustomButton use-border="false" use-background-color="false" class="option-button">
+                    <CustomVisualElement name="icon-container">
+                        <CustomVisualElement name="icon" largest-dimension="30" enforce-largest-dimension="true" regenerate-in-editor="true" class="gi-edit" />
+                    </CustomVisualElement>
+                </CustomButton>
+            </CustomVisualElement>
+            <CustomVisualElement name="delete-button-container" class="option-button-container">
+                <CustomButton use-background-color="false" use-border="false" class="option-button">
+                    <CustomVisualElement name="icon-container">
+                        <CustomVisualElement name="icon" largest-dimension="30" enforce-largest-dimension="true" regenerate-in-editor="true" class="gi-recycle-bin red1-img" />
+                    </CustomVisualElement>
+                </CustomButton>
+            </CustomVisualElement>
+        </CustomVisualElement>
+    </CustomVisualElement>
+</ui:UXML>

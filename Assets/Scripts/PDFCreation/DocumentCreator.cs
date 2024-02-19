@@ -70,8 +70,9 @@ public class DocumentCreator : MonoBehaviour
 
     public pdfDocument GetDocument(DetailsReport report)
     {
-        foreach (JobDetail jobDetail in report.Details)
+        foreach (var entry in report.Details)
         {
+            JobDetail jobDetail = entry.Value;
             PDFPage detailPage = new PDFPage(this.document);
             List<string> timeContent = this.jobDetailsContentCreator.GetTimeContentText(jobDetail);
             List<string> paymentOptionsText = this.jobDetailsContentCreator.GetPaymentText();

@@ -9,7 +9,7 @@ using ReturnStringDelegate = ActionHelper.ReturnStringDelegate;
 using JobDetails;
 using System;
 using System.Collections.Generic;
-
+using ResponseDelegate = ActionHelper.ReturnStringDelegate;
 public class ServerCommunicator : MonoBehaviour
 {
     private string appId;
@@ -47,7 +47,7 @@ public class ServerCommunicator : MonoBehaviour
         this.OnSignInSuccessEvent.AddListener(() =>
         {
             // CreateJobDetails(new JobDetail(), "ANVUxDjPru");
-            // CreateDetailsReport(new DetailsReport(this.currentUser.objectId));
+            // CreateDetailsReport();
             // GetJobDetails("bY7VbX6fIP");
             // GetDetailsReports();
             // DeleteDetailsReport("bnfHqJVG5d");
@@ -183,7 +183,7 @@ public class ServerCommunicator : MonoBehaviour
 
     #region DetailsReport
 
-    public void CreateDetailsReport(DetailsReport detailsReport)
+    public void CreateDetailsReport(ResponseDelegate responseDelegate = null)
     {
         if (ReferenceEquals(this.currentUser, null))
         {
@@ -194,10 +194,10 @@ public class ServerCommunicator : MonoBehaviour
 
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartCreatingDetailsReport(detailsReport));
+        StartCoroutine(StartCreatingDetailsReport(responseDelegate));
     }
 
-    private IEnumerator StartCreatingDetailsReport(DetailsReport detailsReport)
+    private IEnumerator StartCreatingDetailsReport(ResponseDelegate responseDelegate)
     {
         UnityWebRequest request = new UnityWebRequest($"https://parseapi.back4app.com/classes/DetailsReport", "POST");
         string jsonBody = $"{{\"createdBy\":\"{this.currentUser.objectId}\"}}";
@@ -215,6 +215,11 @@ public class ServerCommunicator : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             LogHelper.Active.Log("Response: " + request.downloadHandler.text);
+
+            if (!ReferenceEquals(responseDelegate, null))
+            {
+                responseDelegate.Invoke(request.downloadHandler.text);
+            }
         }
         else
         {
@@ -224,14 +229,14 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    private void GetDetailsReports()
+    public void GetDetailsReports(ResponseDelegate responseDelegate = null)
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartGettingDetailsReports());
+        StartCoroutine(StartGettingDetailsReports(responseDelegate));
     }
 
-    private IEnumerator StartGettingDetailsReports()
+    private IEnumerator StartGettingDetailsReports(ResponseDelegate responseDelegate)
     {
         Dictionary<string, object> whereDict = new Dictionary<string, object>
         {
@@ -254,6 +259,11 @@ public class ServerCommunicator : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             LogHelper.Active.Log("Response: " + request.downloadHandler.text);
+
+            if (!ReferenceEquals(responseDelegate, null))
+            {
+                responseDelegate.Invoke(request.downloadHandler.text);
+            }
         }
         else
         {
@@ -263,7 +273,7 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    private void DeleteDetailsReport(string id)
+    public void DeleteDetailsReport(string id)
     {
         this.OnRequestStartedEvent.Invoke();
 
@@ -341,7 +351,7 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    private void GetJobDetails(string detailsReportObjectId)
+    public void GetJobDetails(string detailsReportObjectId)
     {
         this.OnRequestStartedEvent.Invoke();
 

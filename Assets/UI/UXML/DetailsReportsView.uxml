@@ -1,0 +1,23 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Template name="DetailsReportEntry" src="project://database/Assets/UI/UXML/DetailsReportEntry.uxml?fileID=9197481963319205126&amp;guid=32fcca1b17392b74daf2f459004886f3&amp;type=3#DetailsReportEntry" />
+    <Style src="project://database/Assets/UI/USS/details-reports-view.uss?fileID=7433441132597879392&amp;guid=055cc069986c7e347b2a7c64b561a1a9&amp;type=3#details-reports-view" />
+    <CustomVisualElement name="main" class="details-reports-view-main">
+        <CustomVisualElement name="reports-header" class="gray1-border reports-header">
+            <CustomVisualElement name="header-label-container" class="header-label-container">
+                <CustomLabel text="Job Details" class="white-font x-large-font header-label" />
+            </CustomVisualElement>
+            <CustomVisualElement name="add-button-container" class="add-button-container">
+                <CustomButton name="CustomButton" use-background-color="false" use-border="false" class="add-button">
+                    <CustomVisualElement name="icon-container">
+                        <CustomVisualElement name="icon" largest-dimension="40" regenerate-in-editor="true" enforce-largest-dimension="true" class="gi-plus green1-img" />
+                    </CustomVisualElement>
+                </CustomButton>
+            </CustomVisualElement>
+        </CustomVisualElement>
+        <CustomVisualElement name="details-scrollview-container" style="flex-grow: 1; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;">
+            <ui:ScrollView horizontal-scroller-visibility="Hidden" class="custom-scrollbar">
+                <ui:Instance template="DetailsReportEntry" name="DetailsReportEntry" />
+            </ui:ScrollView>
+        </CustomVisualElement>
+    </CustomVisualElement>
+</ui:UXML>

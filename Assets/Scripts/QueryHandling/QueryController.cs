@@ -24,6 +24,8 @@ public class QueryController : MonoBehaviour
     [SerializeField] private QueryHandler[] queryhandlers;
     private VisualElement interactionBlocker;
     private CustomLabel interactionBlockerLabel;
+    private VisualElement debugInfo;
+    private CustomLabel debugInfoLabel;
     private FullViewContainer previousView;
     public FullViewContainer PreviousView => previousView;
     private HashSet<int> interactionBlockerIds;
@@ -48,6 +50,16 @@ public class QueryController : MonoBehaviour
 
         Active = this;
 
+        this.debugInfo = this.rootDocument.rootVisualElement.Q<VisualElement>("debug-info");
+
+#if UNITY_EDITOR
+        this.debugInfoLabel = this.debugInfo.Q<CustomLabel>();
+        VisualElementHelper.SetElementDisplay(this.debugInfo, DisplayStyle.Flex);
+        this.OnAnyViewChangedEvent.AddListener(() => this.debugInfoLabel.text = $"{this.currentMainView} - {this.currentSubview}");
+#else
+        VisualElementHelper.SetElementDisplay(this.debugInfo, DisplayStyle.None);
+#endif
+
         Initialize();
     }
 
@@ -67,6 +79,8 @@ public class QueryController : MonoBehaviour
         ChangeView(this.defaultMainView, this.defaultSubview);
         GetAllQueryHandlers();
         InitializeAllQueryHandlers();
+
+        this.OnMainViewChangedEvent.Invoke();
 
         this.initialized = true;
     }

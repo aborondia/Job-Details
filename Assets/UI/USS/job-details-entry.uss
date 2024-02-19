@@ -1,0 +1,42 @@
+.job-details-main {
+    min-height: 60px;
+    flex-direction: row;
+}
+
+.info-labels-container {
+    flex-direction: row;
+    width: 100%;
+}
+
+.multi-labels-container {
+    flex-grow: 1;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    justify-content: space-between;
+}
+
+.info-label-container {
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}
+
+.info-label {
+}
+
+.option-buttons-container {
+}
+
+.option-button-container {
+    min-width: 60px;
+    height: 100%;
+    margin-left: 10px;
+}
+
+.option-button {
+    align-items: center;
+    justify-content: center;
+}

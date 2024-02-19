@@ -9,6 +9,8 @@ public class AppController : MonoBehaviour
     public MailSender MailSender => mailSender;
     [SerializeField] private DocumentCreator documentCreator;
     public DocumentCreator DocumentCreator => documentCreator;
+    [SerializeField] private DetailsReportsHandler detailsReportsHandler;
+    public DetailsReportsHandler DetailsReportsHandler => detailsReportsHandler;
     [SerializeField] private ServerCommunicator serverCommunicator;
     public ServerCommunicator ServerCommunicator => serverCommunicator;
 

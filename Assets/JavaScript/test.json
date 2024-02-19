@@ -1,39 +1,52 @@
 {
-    "jsonFile": {
-        "__type": "File",
-        "name": "JobDetails"
-    },
-    "userId": "Pa5ACvx78A",
-    "reportPointer": {
-        "__type": "Pointer",
-        "className": "DetailsReport",
-        "objectId": "g9OAp2rZmU"
-    },
-    "content": {
-        "clientName": "Jane Doe",
-        "clientAddress": "123 Fake Street",
-        "startTime": "2024-02-18T15:40:05.818403-06:00",
-        "finishTime": "2024-02-18T21:40:05.818403-06:00",
-        "jobType": 0,
-        "cleaners": [
-            {
-                "name": "John Doe",
-                "hours": 666.0
-            },
-            {
-                "name": "John Doe",
-                "hours": 666.0
-            },
-            {
-                "name": "John Doe",
-                "hours": 666.0
-            },
-            {
-                "name": "John Doe",
-                "hours": 666.0
-            }
-        ],
-        "paymentType": 0,
-        "description": "I cleaned their house."
-    }
+    "results": [
+        {
+            "objectId": "bY7VbX6fIP",
+            "createdBy": "Pa5ACvx78A",
+            "createdAt": "2024-02-18T22:15:02.564Z",
+            "updatedAt": "2024-02-18T22:15:02.564Z"
+        },
+        {
+            "objectId": "ANVUxDjPru",
+            "createdBy": "ZD11H2zCP6",
+            "createdAt": "2024-02-18T22:15:30.834Z",
+            "updatedAt": "2024-02-18T22:15:30.834Z"
+        },
+        {
+            "objectId": "EoAAL7VZPH",
+            "createdBy": "Pa5ACvx78A",
+            "createdAt": "2024-02-18T22:41:21.966Z",
+            "updatedAt": "2024-02-18T22:41:21.966Z"
+        },
+        {
+            "objectId": "3OJoWqY2rn",
+            "createdBy": "Pa5ACvx78A",
+            "createdAt": "2024-02-18T22:41:22.084Z",
+            "updatedAt": "2024-02-18T22:41:22.084Z"
+        },
+        {
+            "objectId": "2F7YsXSjb1",
+            "createdBy": "Pa5ACvx78A",
+            "createdAt": "2024-02-18T22:41:22.254Z",
+            "updatedAt": "2024-02-18T22:41:22.254Z"
+        },
+        {
+            "objectId": "8MkDsYa0v7",
+            "createdBy": "Pa5ACvx78A",
+            "createdAt": "2024-02-18T22:41:22.387Z",
+            "updatedAt": "2024-02-18T22:41:22.387Z"
+        },
+        {
+            "objectId": "BzIY8d7pCA",
+            "createdBy": "Pa5ACvx78A",
+            "createdAt": "2024-02-18T22:41:22.452Z",
+            "updatedAt": "2024-02-18T22:41:22.452Z"
+        },
+        {
+            "objectId": "TqQPffscpj",
+            "createdBy": "Pa5ACvx78A",
+            "createdAt": "2024-02-18T22:41:22.660Z",
+            "updatedAt": "2024-02-18T22:41:22.660Z"
+        }
+    ]
 }

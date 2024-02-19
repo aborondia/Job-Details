@@ -1,0 +1,46 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Template name="JobDetailsEntry" src="project://database/Assets/UI/UXML/JobDetailsEntry.uxml?fileID=9197481963319205126&amp;guid=578b927db5b55d747be647b56b1738b7&amp;type=3#JobDetailsEntry" />
+    <Style src="project://database/Assets/UI/USS/details-report-entry.uss?fileID=7433441132597879392&amp;guid=e42ddeb8475faf04489af6f788d101ad&amp;type=3#details-report-entry" />
+    <CustomVisualElement name="main" class="details-report-main">
+        <CustomVisualElement name="left-column" style="min-width: 60px; height: 100%;">
+            <CustomVisualElement name="expand-collapse-button-container" style="height: 100%;">
+                <CustomButton use-background-color="false" use-border="false" name="CustomButton" style="align-items: center; justify-content: center;">
+                    <CustomVisualElement name="icon-container">
+                        <CustomVisualElement name="icon" largest-dimension="30" enforce-largest-dimension="true" regenerate-in-editor="true" class="gi-chevron-down" />
+                    </CustomVisualElement>
+                </CustomButton>
+            </CustomVisualElement>
+        </CustomVisualElement>
+        <CustomVisualElement name="right-column" style="height: 100%; flex-grow: 1;">
+            <CustomVisualElement name="report-details-container" class="report-details-container">
+                <CustomVisualElement name="time-range-labels-container" class="time-range-labels-container" style="flex-grow: 1;">
+                    <CustomVisualElement name="tag-label-container" class="time-range-label-container">
+                        <CustomLabel text="Time Range: " class="regular-font time-range-label" />
+                    </CustomVisualElement>
+                    <CustomVisualElement name="time-label-container" class="time-range-label-container">
+                        <CustomLabel text="--" class="regular-font time-range-label" />
+                    </CustomVisualElement>
+                </CustomVisualElement>
+                <CustomVisualElement name="option-buttons-container" class="option-buttons-container">
+                    <CustomVisualElement name="add-details-button-container" class="option-button-container">
+                        <CustomButton use-background-color="false" use-border="false" class="option-button">
+                            <CustomVisualElement name="icon-container">
+                                <CustomVisualElement name="icon" largest-dimension="30" enforce-largest-dimension="true" regenerate-in-editor="true" class="gi-plus green1-img" />
+                            </CustomVisualElement>
+                        </CustomButton>
+                    </CustomVisualElement>
+                    <CustomVisualElement name="delete-report-button-container" class="option-button-container">
+                        <CustomButton use-background-color="false" use-border="false" class="option-button">
+                            <CustomVisualElement name="icon-container">
+                                <CustomVisualElement name="icon" largest-dimension="30" enforce-largest-dimension="true" regenerate-in-editor="true" class="gi-recycle-bin red1-img" />
+                            </CustomVisualElement>
+                        </CustomButton>
+                    </CustomVisualElement>
+                </CustomVisualElement>
+            </CustomVisualElement>
+            <CustomVisualElement name="job-details-container">
+                <ui:Instance template="JobDetailsEntry" name="JobDetailsEntry" />
+            </CustomVisualElement>
+        </CustomVisualElement>
+    </CustomVisualElement>
+</ui:UXML>

@@ -40,7 +40,7 @@ public class LoginQueryHandler : QueryHandler
 
         AppController.Active.ServerCommunicator.OnSignInSuccessEvent.AddListener(() =>
         {
-            QueryController.Active.ChangeView(MainView.JobDetails, Subview.JobDetails_ReportList);
+            QueryController.Active.ChangeView(MainView.DetailsReports, Subview.Default);
         });
 
         AppController.Active.ServerCommunicator.OnRegisterSuccessEvent.AddListener(() =>

@@ -9,6 +9,7 @@ namespace EnumLibrary
         None = 0,
         Login = 1,
         JobDetails = 2,
+        DetailsReports = 3,
     }
     public enum Subview
     {
@@ -16,7 +17,5 @@ namespace EnumLibrary
         Login_EnterCredentials = 1,
         Login_Register = 2,
         Login_ForgotPassword = 3,
-        JobDetails_ReportList = 4,
-        JobDetails_Details = 5,
     }
 }
