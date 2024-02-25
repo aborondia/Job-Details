@@ -144,7 +144,7 @@ public class DetailsReportsQueryHandler : QueryHandler
             timeLabel.text = "--";
         }
 
-        // add details button logic
+        addDetailsButton.RegisterCallback<ClickEvent>(evt => QueryController.Active.ChangeView(MainView.JobDetails, Subview.Default));
 
         deleteReportButton.RegisterCallback<ClickEvent>(evt =>
         {

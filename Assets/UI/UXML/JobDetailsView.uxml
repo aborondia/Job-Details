@@ -1,5 +1,77 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <CustomVisualElement name="main">
-        <CustomLabel text="COMING SOON" class="white-font x-large-font" />
+    <ui:Template name="CleanerRow" src="project://database/Assets/UI/UXML/CleanerRow.uxml?fileID=9197481963319205126&amp;guid=48236067c3f0d7b44ab26632e778212a&amp;type=3#CleanerRow" />
+    <Style src="project://database/Assets/UI/USS/job-details-view.uss?fileID=7433441132597879392&amp;guid=70c26b4262b94244aae426f8bb2a51ad&amp;type=3#job-details-view" />
+    <CustomVisualElement name="main" class="job-details-view-main">
+        <CustomVisualElement name="reports-header" class="gray1-border details-header">
+            <CustomVisualElement name="header-label-container" class="header-label-container">
+                <CustomLabel text="Job Details" class="white-font x-large-font header-label" />
+            </CustomVisualElement>
+        </CustomVisualElement>
+        <CustomVisualElement name="main-content" style="flex-grow: 1; flex-direction: column-reverse;">
+            <CustomVisualElement name="details-content-container" class="white-bg" style="flex-grow: 1; margin-bottom: 10px;">
+                <CustomInput multiline="true" placeholder-text="Details" style="white-space: normal;" />
+            </CustomVisualElement>
+            <CustomVisualElement name="inputs-container" style="flex-direction: row; justify-content: space-between; width: 100%; flex-wrap: wrap;">
+                <CustomVisualElement name="client-name-input-container" class="text-input-container">
+                    <CustomInput placeholder-text="Client Name" class="text-input" />
+                </CustomVisualElement>
+                <CustomVisualElement name="client-address-input-container" class="text-input-container">
+                    <CustomInput placeholder-text="Client Address" class="text-input" />
+                </CustomVisualElement>
+                <CustomVisualElement name="date-input-container" class="text-input-container">
+                    <CustomInput placeholder-text="Date" class="text-input" />
+                </CustomVisualElement>
+                <CustomVisualElement name="time-inputs-container" class="time-inputs-container">
+                    <CustomVisualElement name="start-time-input-container" class="time-input-container">
+                        <CustomInput placeholder-text="Start Time" class="time-input" />
+                        <CustomEnumField type="JobDetails.Enumerations.TimeOfDayEnum, Assembly-CSharp" value="AM" />
+                    </CustomVisualElement>
+                    <CustomVisualElement name="finish-time-input-container" class="time-input-container" style="justify-content: flex-end;">
+                        <CustomInput placeholder-text="Finish Time" class="time-input" />
+                        <CustomEnumField type="JobDetails.Enumerations.TimeOfDayEnum, Assembly-CSharp" />
+                    </CustomVisualElement>
+                </CustomVisualElement>
+                <CustomVisualElement name="job-type-input-container" class="enum-input-container">
+                    <CustomEnumField type="JobDetails.Enumerations.JobTypeEnum, Assembly-CSharp" />
+                </CustomVisualElement>
+                <CustomVisualElement name="payment-type-input-container" class="enum-input-container">
+                    <CustomEnumField type="JobDetails.Enumerations.PaymentTypeEnum, Assembly-CSharp" />
+                </CustomVisualElement>
+                <CustomVisualElement name="cleaners-container" style="width: 100%; flex-direction: column; margin-bottom: 10px;">
+                    <CustomVisualElement name="header-container" class="gray1-border" style="width: 100%; border-bottom-width: 1px; justify-content: space-between; flex-direction: row; min-height: 60px; max-height: 60px;">
+                        <CustomVisualElement name="label-container" style="height: 100%; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px;">
+                            <CustomLabel text="Cleaners" class="x-large-font header-label" />
+                        </CustomVisualElement>
+                        <CustomVisualElement name="add-cleaner-button-container" style="min-width: 60px; height: 100%;">
+                            <CustomButton use-background-color="false" use-border="false" style="align-items: center; justify-content: center; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px;">
+                                <CustomVisualElement name="icon-container">
+                                    <CustomVisualElement name="icon" largest-dimension="30" enforce-largest-dimension="true" regenerate-in-editor="true" class="gi-plus green1-img" />
+                                </CustomVisualElement>
+                            </CustomButton>
+                        </CustomVisualElement>
+                    </CustomVisualElement>
+                    <CustomVisualElement name="cleaners-content" style="min-width: 300px; flex-direction: row; justify-content: space-between;">
+                        <ui:Instance template="CleanerRow" name="CleanerRow" style="min-height: 60px; max-height: 60px; min-width: 45%; max-width: 45%;" />
+                        <ui:Instance template="CleanerRow" name="CleanerRow" style="min-height: 60px; max-height: 60px; min-width: 45%; max-width: 45%;" />
+                    </CustomVisualElement>
+                </CustomVisualElement>
+            </CustomVisualElement>
+        </CustomVisualElement>
+        <CustomVisualElement name="reports-footer" style="min-height: 60px; max-height: 60px; flex-direction: row; justify-content: flex-end;">
+            <CustomVisualElement name="cancel-button-container" class="footer-button-container">
+                <CustomButton class="footer-button">
+                    <CustomVisualElement name="label-container" class="footer-button-label-container">
+                        <CustomLabel text="Cancel" class="large-font footer-button-label" />
+                    </CustomVisualElement>
+                </CustomButton>
+            </CustomVisualElement>
+            <CustomVisualElement name="save-button-container" class="footer-button-container">
+                <CustomButton button-type="Secondary" class="footer-button">
+                    <CustomVisualElement name="label-container" class="footer-button-label-container">
+                        <CustomLabel text="Save" class="large-font footer-button-label" />
+                    </CustomVisualElement>
+                </CustomButton>
+            </CustomVisualElement>
+        </CustomVisualElement>
     </CustomVisualElement>
 </ui:UXML>

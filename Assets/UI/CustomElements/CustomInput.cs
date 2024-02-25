@@ -18,6 +18,8 @@ public class CustomInput : TextField
         {
             base.Init(ve, bag, cc);
             CustomInput ate = ve as CustomInput;
+
+            ate.AddToClassList("custom-input");
         }
     }
 }

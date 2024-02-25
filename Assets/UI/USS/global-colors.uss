@@ -1,5 +1,6 @@
 :root {
   --white: rgb(255, 255, 255);
+  --black: rgb(0, 0, 0);
   --blue1: rgb(0, 0, 255);
   --blue2: rgb(0, 0, 128);
   --blue3: rgb(0, 0, 64);
@@ -46,6 +47,22 @@
 
 .white-img {
   -unity-background-image-tint-color: var(--white);
+}
+
+.black-font {
+  color: var(--black);
+}
+
+.black-bg {
+  background-color: var(--black);
+}
+
+.black-border {
+  border-color: var(--black);
+}
+
+.black-img {
+  -unity-background-image-tint-color: var(--black);
 }
 
 .gray1-bg {

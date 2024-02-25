@@ -6,6 +6,7 @@ namespace JobDetails
     {
         public enum JobTypeEnum
         {
+            Other,
             BiWeekly,
             FirstTime,
             Monthly,
@@ -15,10 +16,15 @@ namespace JobDetails
         }
         public enum PaymentTypeEnum
         {
+            Other,
             Cash,
             Cheque,
             NoPayment,
             Premium,
+        }
+        public enum TimeOfDayEnum{
+            AM,
+            PM
         }
     }
 }

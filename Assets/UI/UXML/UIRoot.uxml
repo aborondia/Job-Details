@@ -12,14 +12,17 @@
     <Style src="project://database/Assets/UI/USS/global-icons.uss?fileID=7433441132597879392&amp;guid=113284d08076176438392cae17ec1c7b&amp;type=3#global-icons" />
     <Style src="project://database/Assets/UI/USS/custom-buttons.uss?fileID=7433441132597879392&amp;guid=1fc973030d3ba0c4c98613fe765b9207&amp;type=3#custom-buttons" />
     <Style src="project://database/Assets/UI/USS/custom-scrollbar.uss?fileID=7433441132597879392&amp;guid=bf31e3ed28c4b304980fb95a53272512&amp;type=3#custom-scrollbar" />
+    <Style src="project://database/Assets/UI/USS/custom-enum-fields.uss?fileID=7433441132597879392&amp;guid=54c890de2ddde9e468b224a8491bd50b&amp;type=3#custom-enum-fields" />
+    <Style src="project://database/Assets/UI/USS/custom-labels.uss?fileID=7433441132597879392&amp;guid=b03b64069e011fb40abd2bc7cec6ad87&amp;type=3#custom-labels" />
+    <Style src="project://database/Assets/UI/USS/custom-inputs.uss?fileID=7433441132597879392&amp;guid=70287a2dcf738d94cae4d88df76e4bfd&amp;type=3#custom-inputs" />
     <CustomVisualElement name="root" style="background-color: rgb(0, 0, 0); width: 100%; height: 100%;">
         <CustomVisualElement name="body" class="root-body" style="flex-direction: column; align-items: center; justify-content: center;">
             <ui:Instance template="AppHeader" name="AppHeader" class="app-header" />
             <CustomVisualElement name="views-container" class="views-container">
                 <ui:Instance template="AppLeftBar" name="AppLeftBar" class="app-left-bar" />
                 <CustomVisualElement name="main-views" class="main-views">
-                    <ui:Instance template="DetailsReportsView" name="DetailsReportsView" class="main-view" />
-                    <ui:Instance template="JobDetailsView" name="JobDetailsView" class="main-view" style="display: none;" />
+                    <ui:Instance template="DetailsReportsView" name="DetailsReportsView" class="main-view" style="display: none;" />
+                    <ui:Instance template="JobDetailsView" name="JobDetailsView" class="main-view" />
                     <ui:Instance template="LoginView" name="LoginView" class="main-view" style="display: none;" />
                 </CustomVisualElement>
                 <ui:Instance template="AppRightBar" name="AppRightBar" class="app-right-bar" />

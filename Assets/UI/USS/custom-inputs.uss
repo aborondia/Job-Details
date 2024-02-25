@@ -1,0 +1,15 @@
+.custom-input {
+  background-color: var(--gray1);
+  border-width: 1px;
+  margin-left: 0;
+  margin-top: 0;
+  margin-right: 0;
+  margin-bottom: 0;
+}
+
+.custom-input > .unity-base-field__input {
+  margin-left: 0;
+  margin-top: 0;
+  margin-right: 0;
+  margin-bottom: 0;
+}
