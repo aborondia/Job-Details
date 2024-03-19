@@ -1,4 +1,4 @@
-.custom-label {
+.custom-label.use-default-font-color {
   color: var(--white);
 }
 

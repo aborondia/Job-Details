@@ -16,4 +16,16 @@ public class DetailsReport
         this.createdBy = dtm.createdBy;
         this.objectId = dtm.objectId;
     }
+
+    public void AddJobDetail(JobDetail jobDetail)
+    {
+        if (this.details.ContainsKey(jobDetail.ObjectId))
+        {
+            LogHelper.Active.Log($"{jobDetail.ObjectId} is already in report {this.objectId}");
+
+            return;
+        }
+
+        this.details.Add(jobDetail.ObjectId, jobDetail);
+    }
 }

@@ -869,6 +869,7 @@ namespace UI.Dates
 
         private void _Hide()
         {
+            this.Config.Events.OnDatePickerClosed.Invoke(this.SelectedDate);
             if (Config.Modal.IsModal)
             {
                 if (Ref_ScreenOverlay != null) Ref_ScreenOverlayAnimator.PlayAnimation(Animation.Fade, AnimationType.Hide, HideScreenOverlay_Complete);

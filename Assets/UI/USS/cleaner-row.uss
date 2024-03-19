@@ -13,6 +13,7 @@
     padding-right: 5px;
     padding-bottom: 5px;
     padding-left: 5px;
+    flex-grow: 1;
 }
 
 .hours-input-container {
@@ -30,4 +31,35 @@
 .name-selection-container {
     flex-grow: 1;
     justify-content: center;
+    flex-direction: row;
+}
+
+.cleaners-scrollview {
+    position: absolute;
+    min-height: 400%;
+    width: 100%;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    top: 0;
+    margin-top: 5px;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    max-height: 400%;
+}
+
+.select-cleaner-button-container {
+    min-width: 60px;
+    max-width: 60px;
+}
+
+.select-cleaner-button {
+    align-items: center;
+    justify-content: center;
+}
+
+.select-cleaner-button-icon-container {
 }

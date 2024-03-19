@@ -26,31 +26,35 @@
     min-width: 45%;
     margin-top: 10px;
     max-width: 45%;
+    flex-direction: row;
+    min-height: 50px;
+    max-height: 50px;
 }
 
 .text-input {
+    flex-grow: 1;
 }
 
 .time-input-container {
     min-width: 45%;
-    max-width: 45%;
     flex-direction: row;
+    flex-grow: 1;
+    justify-content: flex-end;
 }
 
 .time-inputs-container {
     min-width: 45%;
-    min-height: auto;
-    margin-top: 10px;
+    min-height: 50px;
     margin-bottom: 10px;
     flex-direction: row;
     justify-content: space-between;
     max-width: 45%;
+    max-height: 50px;
 }
 
 .enum-input-container {
     min-width: 45%;
     max-width: 45%;
-    margin-bottom: 10px;
 }
 
 .custom-input > .unity-text-field__input {
@@ -80,4 +84,94 @@
 
 .time-input {
     margin-right: 5px;
+    max-width: 30%;
+    min-width: 30%;
+}
+
+.cleaner-row {
+    min-height: 60px;
+    max-height: 60px;
+    min-width: 45%;
+    max-width: 45%;
+}
+
+.cleaners-content {
+    min-width: 300px;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.cleaner-header {
+    width: 100%;
+    border-bottom-width: 1px;
+    justify-content: space-between;
+    flex-direction: row;
+    min-height: 60px;
+    max-height: 60px;
+}
+
+.cleaners-header-label-container {
+    height: 100%;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}
+
+.cleaners-header-label {
+}
+
+.add-cleaner-button-container {
+    min-width: 60px;
+    height: 100%;
+}
+
+.add-cleaner-button {
+    align-items: center;
+    justify-content: center;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}
+
+.add-cleaner-button-icon-container {
+}
+
+.cleaners-container {
+    width: 100%;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.time-input-enum-filed {
+}
+
+.enum-input {
+    min-height: 50px;
+    max-height: 50px;
+}
+
+.time-input-label-container {
+    justify-content: center;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}
+
+.time-input-label {
+    -unity-font-style: italic;
+}
+
+.job-enums-container {
+    max-width: 45%;
+    min-width: 45%;
+    flex-direction: row;
+    justify-content: space-between;
+    max-height: 50px;
+    min-height: 50px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }

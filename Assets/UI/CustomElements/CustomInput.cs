@@ -22,4 +22,24 @@ public class CustomInput : TextField
             ate.AddToClassList("custom-input");
         }
     }
+
+    public void AddCustomOnFocusOutCallback(EventCallback<FocusOutEvent> callback)
+    {
+        this.RegisterCallback<FocusOutEvent>(callback);
+    }
+
+    public void AddCustomBlurCallback(EventCallback<BlurEvent> callback)
+    {
+        this.RegisterCallback<BlurEvent>(callback);
+    }
+
+    public void AddCustomFocusInCallback(EventCallback<FocusInEvent> callback)
+    {
+        this.RegisterCallback<FocusInEvent>(callback);
+    }
+
+    public void AddCustomFocusCallback(EventCallback<FocusEvent> callback)
+    {
+        this.RegisterCallback<FocusEvent>(callback);
+    }
 }

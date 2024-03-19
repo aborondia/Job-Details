@@ -5,8 +5,8 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
-using MainView = EnumLibrary.MainView;
-using Subview = EnumLibrary.Subview;
+using MainView = Enumerations.MainView;
+using Subview = Enumerations.Subview;
 
 public class LoginQueryHandler : QueryHandler
 {

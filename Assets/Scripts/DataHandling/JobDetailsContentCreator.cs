@@ -4,7 +4,6 @@ using sharpPDF.Enumerators;
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using JobDetails;
 using DC = DocumentCreator;
 using BorderLineType = BorderLineWidthCollection.BorderLineTypeEnum;
 

@@ -337,6 +337,8 @@ namespace UI.Dates
         public DatePickerEvent OnDaySelected;
         [SerializeField]
         public DatePickerEvent OnDayMouseOver;
+        [SerializeField]
+        public DatePickerEvent OnDatePickerClosed;
     }
 
     [Serializable]

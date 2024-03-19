@@ -9,8 +9,8 @@ public class CustomLabel : Label
     public UxmlTraits uxmlTraits;
     public new class UxmlTraits : Label.UxmlTraits
     {
-        UxmlBoolAttributeDescription m_ShouldNotUpdate =
-        new UxmlBoolAttributeDescription { name = "should-not-update", defaultValue = true };
+        UxmlBoolAttributeDescription m_UseDefaultFontColor =
+        new UxmlBoolAttributeDescription { name = "use-default-font-color", defaultValue = true };
 
         public override IEnumerable<UxmlChildElementDescription> uxmlChildElementsDescription
         {
@@ -21,6 +21,10 @@ public class CustomLabel : Label
         {
             base.Init(ve, bag, cc);
             CustomLabel ate = ve as CustomLabel;
+            if (m_UseDefaultFontColor.GetValueFromBag(bag, cc))
+            {
+                ate.AddToClassList("use-default-font-color");
+            }
 
             ate.AddToClassList("custom-label");
 

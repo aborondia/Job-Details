@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
 using ReturnStringDelegate = ActionHelper.ReturnStringDelegate;
-using JobDetails;
 using System;
 using System.Collections.Generic;
 using ResponseDelegate = ActionHelper.ReturnStringDelegate;
@@ -308,7 +307,7 @@ public class ServerCommunicator : MonoBehaviour
 
     #region JobDetails
 
-    public void CreateJobDetails(JobDetail jobDetails, string detailsReportId)
+    public void CreateJobDetails(JobDetail jobDetails, ResponseDelegate responseDelegate = null)
     {
         if (ReferenceEquals(this.currentUser, null))
         {
@@ -319,14 +318,14 @@ public class ServerCommunicator : MonoBehaviour
 
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartCreatingJobDetails(jobDetails, detailsReportId));
+        StartCoroutine(StartCreatingJobDetails(jobDetails, responseDelegate));
     }
 
-    private IEnumerator StartCreatingJobDetails(JobDetail jobDetails, string detailsReportId)
+    private IEnumerator StartCreatingJobDetails(JobDetail jobDetails, ResponseDelegate responseDelegate = null)
     {
         string url = $"https://parseapi.back4app.com/classes/JobDetail";
         UnityWebRequest request = new UnityWebRequest(url, "POST");
-        JobDetailsDTM dtm = new JobDetailsDTM(this.currentUser.objectId, jobDetails, detailsReportId);
+        JobDetailsDTM dtm = new JobDetailsDTM(this.currentUser.objectId, jobDetails, jobDetails.DetailsReportId);
         string jsonBody = JsonConvert.SerializeObject(dtm);
         byte[] bodyRaw = new UTF8Encoding().GetBytes(jsonBody);
 
@@ -342,6 +341,7 @@ public class ServerCommunicator : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             LogHelper.Active.Log("Response: " + request.downloadHandler.text);
+            responseDelegate?.Invoke(request.downloadHandler.text);
         }
         else
         {

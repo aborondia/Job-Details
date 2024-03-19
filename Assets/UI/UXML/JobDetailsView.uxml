@@ -9,7 +9,7 @@
         </CustomVisualElement>
         <CustomVisualElement name="main-content" style="flex-grow: 1; flex-direction: column-reverse;">
             <CustomVisualElement name="details-content-container" class="white-bg" style="flex-grow: 1; margin-bottom: 10px;">
-                <CustomInput multiline="true" placeholder-text="Details" style="white-space: normal;" />
+                <CustomInput multiline="true" placeholder-text="Details" style="white-space: normal; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />
             </CustomVisualElement>
             <CustomVisualElement name="inputs-container" style="flex-direction: row; justify-content: space-between; width: 100%; flex-wrap: wrap;">
                 <CustomVisualElement name="client-name-input-container" class="text-input-container">
@@ -18,41 +18,55 @@
                 <CustomVisualElement name="client-address-input-container" class="text-input-container">
                     <CustomInput placeholder-text="Client Address" class="text-input" />
                 </CustomVisualElement>
+                <CustomVisualElement name="job-enums-container" class="job-enums-container">
+                    <CustomVisualElement name="job-type-input-container" class="enum-input-container">
+                        <CustomEnumField type="Enumerations.JobTypeEnum, Assembly-CSharp" class="enum-input" />
+                    </CustomVisualElement>
+                    <CustomVisualElement name="payment-type-input-container" class="enum-input-container">
+                        <CustomEnumField type="Enumerations.PaymentTypeEnum, Assembly-CSharp" name="CustomEnumField" class="enum-input" />
+                    </CustomVisualElement>
+                </CustomVisualElement>
                 <CustomVisualElement name="date-input-container" class="text-input-container">
                     <CustomInput placeholder-text="Date" class="text-input" />
                 </CustomVisualElement>
-                <CustomVisualElement name="time-inputs-container" class="time-inputs-container">
+                <CustomVisualElement name="start-time-inputs-container" class="time-inputs-container">
+                    <CustomVisualElement name="time-input-label-container" class="time-input-label-container">
+                        <CustomLabel text="Start Time" use-default-font-color="false" class="gray1-font regular-font time-input-label" />
+                    </CustomVisualElement>
                     <CustomVisualElement name="start-time-input-container" class="time-input-container">
-                        <CustomInput placeholder-text="Start Time" class="time-input" />
-                        <CustomEnumField type="JobDetails.Enumerations.TimeOfDayEnum, Assembly-CSharp" value="AM" />
-                    </CustomVisualElement>
-                    <CustomVisualElement name="finish-time-input-container" class="time-input-container" style="justify-content: flex-end;">
-                        <CustomInput placeholder-text="Finish Time" class="time-input" />
-                        <CustomEnumField type="JobDetails.Enumerations.TimeOfDayEnum, Assembly-CSharp" />
+                        <CustomInput placeholder-text="hr" hide-placeholder-on-focus="true" name="hour-input" class="time-input" />
+                        <CustomInput placeholder-text="min" hide-placeholder-on-focus="true" name="minute-input" class="time-input" />
+                        <CustomEnumField type="Enumerations.TimeOfDayEnum, Assembly-CSharp" class="time-input-enum-filed" />
                     </CustomVisualElement>
                 </CustomVisualElement>
-                <CustomVisualElement name="job-type-input-container" class="enum-input-container">
-                    <CustomEnumField type="JobDetails.Enumerations.JobTypeEnum, Assembly-CSharp" />
+                <CustomVisualElement name="finish-time-inputs-container" class="time-inputs-container">
+                    <CustomVisualElement name="time-input-label-container" class="time-input-label-container">
+                        <CustomLabel text="Finish Time" use-default-font-color="false" class="gray1-font regular-font time-input-label" />
+                    </CustomVisualElement>
+                    <CustomVisualElement name="finish-time-input-container" class="time-input-container">
+                        <CustomInput placeholder-text="hr" hide-placeholder-on-focus="true" name="hour-input" class="time-input" />
+                        <CustomInput placeholder-text="min" hide-placeholder-on-focus="true" name="minute-input" class="time-input" />
+                        <CustomEnumField type="Enumerations.TimeOfDayEnum, Assembly-CSharp" class="time-input-enum-filed" />
+                    </CustomVisualElement>
                 </CustomVisualElement>
-                <CustomVisualElement name="payment-type-input-container" class="enum-input-container">
-                    <CustomEnumField type="JobDetails.Enumerations.PaymentTypeEnum, Assembly-CSharp" />
-                </CustomVisualElement>
-                <CustomVisualElement name="cleaners-container" style="width: 100%; flex-direction: column; margin-bottom: 10px;">
-                    <CustomVisualElement name="header-container" class="gray1-border" style="width: 100%; border-bottom-width: 1px; justify-content: space-between; flex-direction: row; min-height: 60px; max-height: 60px;">
-                        <CustomVisualElement name="label-container" style="height: 100%; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px;">
-                            <CustomLabel text="Cleaners" class="x-large-font header-label" />
+                <CustomVisualElement name="cleaners-container" class="cleaners-container">
+                    <CustomVisualElement name="header-container" class="gray1-border cleaner-header">
+                        <CustomVisualElement name="label-container" class="cleaners-header-label-container">
+                            <CustomLabel text="Cleaners" class="x-large-font header-label cleaners-header-label" />
                         </CustomVisualElement>
-                        <CustomVisualElement name="add-cleaner-button-container" style="min-width: 60px; height: 100%;">
-                            <CustomButton use-background-color="false" use-border="false" style="align-items: center; justify-content: center; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px;">
-                                <CustomVisualElement name="icon-container">
+                        <CustomVisualElement name="add-cleaner-button-container" class="add-cleaner-button-container">
+                            <CustomButton use-background-color="false" use-border="false" class="add-cleaner-button">
+                                <CustomVisualElement name="icon-container" class="add-cleaner-button-icon-container">
                                     <CustomVisualElement name="icon" largest-dimension="30" enforce-largest-dimension="true" regenerate-in-editor="true" class="gi-plus green1-img" />
                                 </CustomVisualElement>
                             </CustomButton>
                         </CustomVisualElement>
                     </CustomVisualElement>
-                    <CustomVisualElement name="cleaners-content" style="min-width: 300px; flex-direction: row; justify-content: space-between;">
-                        <ui:Instance template="CleanerRow" name="CleanerRow" style="min-height: 60px; max-height: 60px; min-width: 45%; max-width: 45%;" />
-                        <ui:Instance template="CleanerRow" name="CleanerRow" style="min-height: 60px; max-height: 60px; min-width: 45%; max-width: 45%;" />
+                    <CustomVisualElement name="cleaners-content" class="cleaners-content">
+                        <ui:Instance template="CleanerRow" name="CleanerRow" class="cleaner-row" />
+                        <ui:Instance template="CleanerRow" name="CleanerRow" class="cleaner-row" />
+                        <ui:Instance template="CleanerRow" name="CleanerRow" class="cleaner-row" />
+                        <ui:Instance template="CleanerRow" name="CleanerRow" class="cleaner-row" />
                     </CustomVisualElement>
                 </CustomVisualElement>
             </CustomVisualElement>

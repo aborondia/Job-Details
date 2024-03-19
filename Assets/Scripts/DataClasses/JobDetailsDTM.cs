@@ -1,4 +1,3 @@
-using JobDetails;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 

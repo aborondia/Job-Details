@@ -6,8 +6,8 @@ using System.Xml;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
-using MainView = EnumLibrary.MainView;
-using Subview = EnumLibrary.Subview;
+using MainView = Enumerations.MainView;
+using Subview = Enumerations.Subview;
 
 public class DetailsReportsQueryHandler : QueryHandler
 {
@@ -18,6 +18,8 @@ public class DetailsReportsQueryHandler : QueryHandler
     private CustomButton addReportButton;
     private VisualElement scrollviewContainer;
     private ScrollView scrollview;
+    private DetailsReport currentlySelectedDetailsReport;
+    public DetailsReport CurrentlySelectedDetailsReport => currentlySelectedDetailsReport;
     private UnityEvent beforeDetailsReportExpandedEvent = new UnityEvent();
 
     #region Initialization
@@ -144,7 +146,8 @@ public class DetailsReportsQueryHandler : QueryHandler
             timeLabel.text = "--";
         }
 
-        addDetailsButton.RegisterCallback<ClickEvent>(evt => QueryController.Active.ChangeView(MainView.JobDetails, Subview.Default));
+        this.currentlySelectedDetailsReport = detailsReport;
+        addDetailsButton.RegisterCallback<ClickEvent>(evt => QueryController.Active.JobDetailsQueryHandler.OpenNewJobDetails());
 
         deleteReportButton.RegisterCallback<ClickEvent>(evt =>
         {

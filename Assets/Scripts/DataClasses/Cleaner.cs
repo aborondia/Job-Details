@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Cleaner
 {
-    private string name = "John Doe";
+    private string name;
     public string Name => this.name;
-    private float hours = 666;
+    private float hours;
     public float Hours => this.hours;
 }

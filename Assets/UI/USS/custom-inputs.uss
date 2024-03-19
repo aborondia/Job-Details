@@ -1,5 +1,5 @@
 .custom-input {
-  background-color: var(--gray1);
+  background-color: var(--white);
   border-width: 1px;
   margin-left: 0;
   margin-top: 0;

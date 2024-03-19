@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using EnumLibrary;
+using Enumerations;
 
 public class FullViewContainer
 {
