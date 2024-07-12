@@ -5,10 +5,11 @@ using SimpleJSON;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
-using ReturnStringDelegate = ActionHelper.ReturnStringDelegate;
+using ReturnStringDelegate = ActionHelper.StringDelegate;
 using System;
 using System.Collections.Generic;
-using ResponseDelegate = ActionHelper.ReturnStringDelegate;
+using ResponseDelegateString = ActionHelper.StringDelegate;
+using ResponseDelegateBool = ActionHelper.BoolDelegate;
 public class ServerCommunicator : MonoBehaviour
 {
     private string appId;
@@ -182,7 +183,7 @@ public class ServerCommunicator : MonoBehaviour
 
     #region DetailsReport
 
-    public void CreateDetailsReport(ResponseDelegate responseDelegate = null)
+    public void CreateDetailsReport(ResponseDelegateString responseDelegate = null)
     {
         if (ReferenceEquals(this.currentUser, null))
         {
@@ -196,7 +197,7 @@ public class ServerCommunicator : MonoBehaviour
         StartCoroutine(StartCreatingDetailsReport(responseDelegate));
     }
 
-    private IEnumerator StartCreatingDetailsReport(ResponseDelegate responseDelegate)
+    private IEnumerator StartCreatingDetailsReport(ResponseDelegateString responseDelegate)
     {
         UnityWebRequest request = new UnityWebRequest($"https://parseapi.back4app.com/classes/DetailsReport", "POST");
         string jsonBody = $"{{\"createdBy\":\"{this.currentUser.objectId}\"}}";
@@ -228,14 +229,14 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void GetDetailsReports(ResponseDelegate responseDelegate = null)
+    public void GetDetailsReports(ResponseDelegateString responseDelegate = null)
     {
         this.OnRequestStartedEvent.Invoke();
 
         StartCoroutine(StartGettingDetailsReports(responseDelegate));
     }
 
-    private IEnumerator StartGettingDetailsReports(ResponseDelegate responseDelegate)
+    private IEnumerator StartGettingDetailsReports(ResponseDelegateString responseDelegate)
     {
         Dictionary<string, object> whereDict = new Dictionary<string, object>
         {
@@ -307,7 +308,7 @@ public class ServerCommunicator : MonoBehaviour
 
     #region JobDetails
 
-    public void CreateJobDetails(JobDetail jobDetails, ResponseDelegate responseDelegate = null)
+    public void CreateJobDetails(JobDetail jobDetails, ResponseDelegateString responseDelegate = null)
     {
         if (ReferenceEquals(this.currentUser, null))
         {
@@ -321,7 +322,7 @@ public class ServerCommunicator : MonoBehaviour
         StartCoroutine(StartCreatingJobDetails(jobDetails, responseDelegate));
     }
 
-    private IEnumerator StartCreatingJobDetails(JobDetail jobDetails, ResponseDelegate responseDelegate = null)
+    private IEnumerator StartCreatingJobDetails(JobDetail jobDetails, ResponseDelegateString responseDelegate = null)
     {
         string url = $"https://parseapi.back4app.com/classes/JobDetail";
         UnityWebRequest request = new UnityWebRequest(url, "POST");
@@ -351,14 +352,14 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void GetJobDetails(string detailsReportObjectId, ResponseDelegate responseDelegate = null)
+    public void GetJobDetails(string detailsReportObjectId, ResponseDelegateString responseDelegate = null)
     {
         this.OnRequestStartedEvent.Invoke();
 
         StartCoroutine(StartGettingJobDetails(detailsReportObjectId, responseDelegate));
     }
 
-    private IEnumerator StartGettingJobDetails(string detailsReportObjectId, ResponseDelegate responseDelegate)
+    private IEnumerator StartGettingJobDetails(string detailsReportObjectId, ResponseDelegateString responseDelegate)
     {
         Dictionary<string, object> whereDict = new Dictionary<string, object>
         {
@@ -438,7 +439,7 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void DeleteJobDetails(string id)
+    public void DeleteJobDetails(string id, ResponseDelegateBool responseDelegate = null)
     {
         if (ReferenceEquals(this.currentUser, null))
         {
@@ -449,10 +450,10 @@ public class ServerCommunicator : MonoBehaviour
 
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartDeletingJobDetails(id));
+        StartCoroutine(StartDeletingJobDetails(id, responseDelegate));
     }
 
-    private IEnumerator StartDeletingJobDetails(string id)
+    private IEnumerator StartDeletingJobDetails(string id, ResponseDelegateBool responseDelegate)
     {
         string url = $"{this.ClassesUrl}/JobDetail/{id}";
         UnityWebRequest request = UnityWebRequest.Delete(url);
@@ -466,10 +467,13 @@ public class ServerCommunicator : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             LogHelper.Active.Log("Deleted: " + id);
+
+            responseDelegate?.Invoke(true);
         }
         else
         {
             LogHelper.Active.LogError("Request failed: " + request.error);
+            responseDelegate?.Invoke(false);
         }
 
         this.OnRequestCompletedEvent.Invoke();

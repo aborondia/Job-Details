@@ -5,7 +5,9 @@ using UnityEngine;
 public static class ActionHelper
 {
     public delegate bool ReturnBoolDelegate();
-    public delegate void ReturnStringDelegate(string value);
+    public delegate void StringDelegate(string value);
+    public delegate void BoolDelegate(bool value);
+    public delegate void ActionCompleteDelegate();
 
     public static void ExecuteActionNextFrame(Action action)
     {

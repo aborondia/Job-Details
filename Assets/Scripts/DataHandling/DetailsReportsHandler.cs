@@ -18,7 +18,7 @@ public class DetailsReportsHandler : MonoBehaviour
         }
 
         Active = this;
-        
+
         SetReportsOnLogin();
     }
 
@@ -26,7 +26,7 @@ public class DetailsReportsHandler : MonoBehaviour
     {
         AppController.Active.ServerCommunicator.OnSignInSuccessEvent.AddListener(() =>
         {
-            ActionHelper.ReturnStringDelegate responseDelegate = response =>
+            ActionHelper.StringDelegate responseDelegate = response =>
             {
                 PopulateReports(JSONHelper.GetDetailsReports(response));
             };
@@ -53,16 +53,6 @@ public class DetailsReportsHandler : MonoBehaviour
         {
             report.AddJobDetail(jobDetail);
         }
-    }
-
-    private void PopulateJobDetails(List<JobDetail> details)
-    {
-
-    }
-
-    private void SetReportOnJobDetailsReceived()
-    {
-
     }
 
     public void AddDetailsReports(DetailsReport detailsReport)
@@ -92,6 +82,18 @@ public class DetailsReportsHandler : MonoBehaviour
         }
 
         this.detailsReports.Remove(objectId);
+
+        OnReportsCollectionChangedEvent.Invoke();
+    }
+
+    public void RemoveJobDetails(JobDetail jobDetail)
+    {
+        if (this.detailsReports.ContainsKey(jobDetail.DetailsReportId))
+        {
+            this.detailsReports[jobDetail.DetailsReportId].Details.Remove(jobDetail.ObjectId);
+        }
+
+        AppController.Active.ServerCommunicator.DeleteJobDetails(jobDetail.ObjectId);
 
         OnReportsCollectionChangedEvent.Invoke();
     }

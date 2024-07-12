@@ -32,7 +32,7 @@ public static class JSONHelper
 
             detailsReports.Add(detailsReport);
 
-            ActionHelper.ReturnStringDelegate responseDelegate = GetDetailsReponseDelegate(detailsReport, jobDetails);
+            ActionHelper.StringDelegate responseDelegate = GetDetailsReponseDelegate(detailsReport, jobDetails);
 
             AppController.Active.ServerCommunicator.GetJobDetails(detailsReportDTM.objectId, responseDelegate);
         }
@@ -40,9 +40,9 @@ public static class JSONHelper
         return detailsReports;
     }
 
-    private static ActionHelper.ReturnStringDelegate GetDetailsReponseDelegate(DetailsReport detailsReport, List<JobDetail> jobDetails)
+    private static ActionHelper.StringDelegate GetDetailsReponseDelegate(DetailsReport detailsReport, List<JobDetail> jobDetails)
     {
-        ActionHelper.ReturnStringDelegate responseDelegate = (string response) =>
+        ActionHelper.StringDelegate responseDelegate = (string response) =>
         {
             jobDetails = GetJobDetails(response);
 

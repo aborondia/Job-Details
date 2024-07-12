@@ -120,7 +120,7 @@ public class JobDetailsQueryHandler : QueryHandler
         {
             SetJobDetailProperties();
 
-            ActionHelper.ReturnStringDelegate responseDelegate = (string response) =>
+            ActionHelper.StringDelegate responseDelegate = (string response) =>
             {
                 JSONNode resultNode = JSON.Parse(response);
 

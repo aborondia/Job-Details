@@ -59,7 +59,7 @@ public class DetailsReportsQueryHandler : QueryHandler
     {
         this.addReportButton.RegisterCallback<ClickEvent>(evt =>
         {
-            ActionHelper.ReturnStringDelegate responseDelegate = (string response) =>
+            ActionHelper.StringDelegate responseDelegate = (string response) =>
             {
                 DetailsReport newReport = JSONHelper.GetDetailsReportFromCreate(AppController.Active.ServerCommunicator.CurrentUser.objectId, response);
 
@@ -86,7 +86,7 @@ public class DetailsReportsQueryHandler : QueryHandler
         {
             return;
         }
-        
+
         RefreshDetailsReports();
     }
 
@@ -171,6 +171,11 @@ public class DetailsReportsQueryHandler : QueryHandler
 
         deleteReportButton.RegisterCallback<ClickEvent>(evt =>
         {
+            foreach (var entry in detailsReport.Details)
+            {
+                AppController.Active.ServerCommunicator.DeleteJobDetails(entry.Key);
+            }
+
             AppController.Active.ServerCommunicator.DeleteDetailsReport(detailsReport.ObjectId);
             AppController.Active.DetailsReportsHandler.RemoveDetailsReports(detailsReport.ObjectId);
 
@@ -190,6 +195,25 @@ public class DetailsReportsQueryHandler : QueryHandler
         Label addressLabel = mainElement.Q<VisualElement>("address-label-container").Q<Label>();
         Label dateTimeLabel = mainElement.Q<VisualElement>("date-time-label-container").Q<Label>();
         Label jobTypeLabel = mainElement.Q<VisualElement>("job-type-label-container").Q<Label>();
+        CustomButton editButton = mainElement.Q<VisualElement>("edit-button-container").Q<CustomButton>();
+        CustomButton deleteButton = mainElement.Q<VisualElement>("delete-button-container").Q<CustomButton>();
+        ActionHelper.BoolDelegate responseDelegate = isTrue =>
+        {
+            if (isTrue)
+            {
+                DetailsReportsHandler.Active.RemoveJobDetails(jobDetail);
+            }
+        };
+
+        editButton.RegisterCallback<ClickEvent>(evt =>
+        {
+            QueryController.Active.JobDetailsQueryHandler.OpenExistingJobDetails(jobDetail);
+        });
+
+        deleteButton.RegisterCallback<ClickEvent>(evt =>
+        {
+            AppController.Active.ServerCommunicator.DeleteJobDetails(jobDetail.ObjectId, responseDelegate);
+        });
 
         clientNameLabel.text = jobDetail.ClientName;
         addressLabel.text = jobDetail.ClientAddress;
