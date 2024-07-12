@@ -78,6 +78,18 @@ public class DetailsReportsQueryHandler : QueryHandler
 
     #region View Update
 
+    protected override void OnMainViewChanged()
+    {
+        base.OnMainViewChanged();
+
+        if (QueryController.Active.CurrentMainView != this.mainView)
+        {
+            return;
+        }
+        
+        RefreshDetailsReports();
+    }
+
     protected override void OnSubviewChanged()
     {
         base.OnSubviewChanged();
@@ -103,6 +115,14 @@ public class DetailsReportsQueryHandler : QueryHandler
         {
             DetailsReport detailsReport = entry.Value;
             VisualElement reportElement = CreateDetailsReportElement(detailsReport);
+            VisualElement detailsContainer = reportElement.Q<VisualElement>("job-details-container");
+
+            detailsContainer.Clear();
+
+            foreach (JobDetail jobDetail in detailsReport.Details.Values)
+            {
+                detailsContainer.Add(CreateJobDetailsElement(jobDetail));
+            }
 
             this.scrollview.contentContainer.Add(reportElement);
         }
@@ -159,6 +179,22 @@ public class DetailsReportsQueryHandler : QueryHandler
         beforeDetailsReportExpandedEvent.AddListener(() => VisualElementHelper.SetElementDisplay(jobDetailsContainer, DisplayStyle.None));
         jobDetailsContainer.Clear();
         // Populate details
+
+        return mainElement;
+    }
+
+    private VisualElement CreateJobDetailsElement(JobDetail jobDetail)
+    {
+        VisualElement mainElement = this.jobDetailsEntryBase.Instantiate();
+        Label clientNameLabel = mainElement.Q<VisualElement>("client-name-label-container").Q<Label>();
+        Label addressLabel = mainElement.Q<VisualElement>("address-label-container").Q<Label>();
+        Label dateTimeLabel = mainElement.Q<VisualElement>("date-time-label-container").Q<Label>();
+        Label jobTypeLabel = mainElement.Q<VisualElement>("job-type-label-container").Q<Label>();
+
+        clientNameLabel.text = jobDetail.ClientName;
+        addressLabel.text = jobDetail.ClientAddress;
+        dateTimeLabel.text = $"Date: {jobDetail.StartTime.ToString("yy/MM/dd")}";
+        jobTypeLabel.text = $"Job Type: {jobDetail.JobType.ToString()}";
 
         return mainElement;
     }

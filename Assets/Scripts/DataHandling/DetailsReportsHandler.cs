@@ -5,17 +5,29 @@ using UnityEngine.Events;
 
 public class DetailsReportsHandler : MonoBehaviour
 {
+    public static DetailsReportsHandler Active;
     private Dictionary<string, DetailsReport> detailsReports;
     public Dictionary<string, DetailsReport> DetailsReports => detailsReports;
     public UnityEvent OnReportsCollectionChangedEvent = new UnityEvent();
 
     private void Awake()
     {
+        if (Active != null)
+        {
+            GameObject.Destroy(Active);
+        }
+
+        Active = this;
+        
+        SetReportsOnLogin();
+    }
+
+    private void SetReportsOnLogin()
+    {
         AppController.Active.ServerCommunicator.OnSignInSuccessEvent.AddListener(() =>
         {
-            ActionHelper.ReturnStringDelegate responseDelegate = (string response) =>
+            ActionHelper.ReturnStringDelegate responseDelegate = response =>
             {
-                // Get attached job details
                 PopulateReports(JSONHelper.GetDetailsReports(response));
             };
 
@@ -33,6 +45,24 @@ public class DetailsReportsHandler : MonoBehaviour
         }
 
         OnReportsCollectionChangedEvent.Invoke();
+    }
+
+    private void SetJobDetails(DetailsReport report, List<JobDetail> jobDetails)
+    {
+        foreach (JobDetail jobDetail in jobDetails)
+        {
+            report.AddJobDetail(jobDetail);
+        }
+    }
+
+    private void PopulateJobDetails(List<JobDetail> details)
+    {
+
+    }
+
+    private void SetReportOnJobDetailsReceived()
+    {
+
     }
 
     public void AddDetailsReports(DetailsReport detailsReport)

@@ -235,29 +235,51 @@ public class JobDetailsQueryHandler : QueryHandler
 
     #region CRUD
 
-    private void SetJobDetailProperties()
+    private bool SetJobDetailProperties()
     {
-        DateTime startTime = DateTime.Parse(this.dateInput.value);
-        DateTime finishTime = DateTime.Parse(this.dateInput.value);
-        int startHoursModifier = (Enumerations.TimeOfDayEnum)this.startTimeOfDayField.value == Enumerations.TimeOfDayEnum.AM ? 0 : 12;
-        int finishHoursModifier = (Enumerations.TimeOfDayEnum)this.finishTimeOfDayField.value == Enumerations.TimeOfDayEnum.AM ? 0 : 12;
+        DateTime startTime = new DateTime();
+        DateTime finishTime = new DateTime();
+        double startHoursValue;
+        double startMinutesValue;
+        double finishHoursValue;
+        double finishMinutesValue;
+        int startHoursModifier;
+        int finishHoursModifier;
 
-        startTime = startTime.AddHours(double.Parse(this.startTimeHourInput.value) + startHoursModifier);
-        startTime = startTime.AddMinutes(double.Parse(this.startTimeMinuteInput.value) + finishHoursModifier);
+        if (DataValidationChecker.IsDateTimeStringValid(this.dateInput.value))
+        {
+            if (double.TryParse(this.startTimeHourInput.value, out startHoursValue)
+            && double.TryParse(this.startTimeMinuteInput.value, out startMinutesValue)
+            && double.TryParse(this.finishTimeHourInput.value, out finishHoursValue)
+            && double.TryParse(this.finishTimeMinuteInput.value, out finishMinutesValue))
+            {
+                startTime = DateTime.Parse(this.dateInput.value);
+                finishTime = DateTime.Parse(this.dateInput.value);
 
-        finishTime = finishTime.AddHours(double.Parse(this.finishTimeHourInput.value));
-        finishTime = finishTime.AddMinutes(double.Parse(this.finishTimeMinuteInput.value));
+
+                startHoursModifier = (Enumerations.TimeOfDayEnum)this.startTimeOfDayField.value == Enumerations.TimeOfDayEnum.AM ? 0 : 12;
+                finishHoursModifier = (Enumerations.TimeOfDayEnum)this.finishTimeOfDayField.value == Enumerations.TimeOfDayEnum.AM ? 0 : 12;
+
+                startTime = startTime.AddHours(startHoursValue + startHoursModifier);
+                startTime = startTime.AddMinutes(startMinutesValue);
+
+                finishTime = finishTime.AddHours(finishHoursValue + finishHoursModifier);
+                finishTime = finishTime.AddMinutes(finishMinutesValue);
+            }
+        }
 
         this.currentJobDetail.SetJobDetailProperties(
-                    QueryController.Active.DetailsReportsQueryHandler.CurrentlySelectedDetailsReport.ObjectId,
-                    this.clientNameInput.value,
-                    this.clientAddressInput.value,
-                    startTime, finishTime,
-                    (Enumerations.JobTypeEnum)this.jobTypeInput.value,
-                    this.currentJobDetail.Cleaners, // populate        
-                    (Enumerations.PaymentTypeEnum)this.paymentTypeInput.value,
-                    this.detailsInput.value
-                    );
+            QueryController.Active.DetailsReportsQueryHandler.CurrentlySelectedDetailsReport.ObjectId,
+            this.clientNameInput.value,
+            this.clientAddressInput.value,
+            startTime,
+            finishTime,
+            (Enumerations.JobTypeEnum)this.jobTypeInput.value,
+            this.currentJobDetail.Cleaners,
+            (Enumerations.PaymentTypeEnum)this.paymentTypeInput.value,
+            this.detailsInput.value);
+
+        return true;
     }
 
     private void CreateCleanerRow()
@@ -269,7 +291,7 @@ public class JobDetailsQueryHandler : QueryHandler
         VisualElement selectCleanerNameButtonContainer = newCleanerElement.Q<VisualElement>("select-cleaner-button-container");
         CustomButton selectCleanerNameButton = selectCleanerNameButtonContainer.Q<CustomButton>();
         List<string> cleanerNames = new List<string> { "Cleaner 1", "Cleaner 2", "Cleaner 3" }; // TODO replace with actual users
-        Cleaner cleaner = new Cleaner();
+        CleanerJobEntry cleaner = new CleanerJobEntry();
 
         this.currentJobDetail.AddCleaner(cleaner);
         newCleanerElement.AddToClassList("cleaner-row");

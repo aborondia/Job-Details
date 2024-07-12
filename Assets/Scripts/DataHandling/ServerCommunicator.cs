@@ -351,14 +351,14 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void GetJobDetails(string detailsReportObjectId)
+    public void GetJobDetails(string detailsReportObjectId, ResponseDelegate responseDelegate = null)
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartGettingJobDetails(detailsReportObjectId));
+        StartCoroutine(StartGettingJobDetails(detailsReportObjectId, responseDelegate));
     }
 
-    private IEnumerator StartGettingJobDetails(string detailsReportObjectId)
+    private IEnumerator StartGettingJobDetails(string detailsReportObjectId, ResponseDelegate responseDelegate)
     {
         Dictionary<string, object> whereDict = new Dictionary<string, object>
         {
@@ -381,6 +381,11 @@ public class ServerCommunicator : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             LogHelper.Active.Log("Response: " + request.downloadHandler.text);
+
+            if (!ReferenceEquals(responseDelegate, null))
+            {
+                responseDelegate.Invoke(request.downloadHandler.text);
+            }
         }
         else
         {

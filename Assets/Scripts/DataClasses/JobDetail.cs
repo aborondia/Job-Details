@@ -22,23 +22,29 @@ public class JobDetail
     public DateTime CreatedAt => createdAt;
     private JobTypeEnum jobType;
     public JobTypeEnum JobType => jobType;
-    private List<Cleaner> cleaners;
-    public List<Cleaner> Cleaners => cleaners;
+    private List<CleanerJobEntry> cleaners;
+    public List<CleanerJobEntry> Cleaners => cleaners;
     private PaymentTypeEnum paymentType;
     public PaymentTypeEnum PaymentType => paymentType;
     private string description;
     public string Description => description;
 
+    public JobDetail()
+    {
+
+    }
+
     public void SetJobDetailProperties(
-                string detailsReportId,
+        string detailsReportId,
         string clientName,
         string clientAddress,
         DateTime startTime,
         DateTime finishTime,
         JobTypeEnum jobType,
-        List<Cleaner> cleaners,
+        List<CleanerJobEntry> cleaners,
         PaymentTypeEnum paymentType,
-        string description
+        string description,
+        string objectId = ""
     )
     {
         this.detailsReportId = detailsReportId;
@@ -50,6 +56,7 @@ public class JobDetail
         this.cleaners = cleaners;
         this.paymentType = paymentType;
         this.description = description;
+        this.objectId = objectId;
     }
 
     public void OnServerCreation(string objectId, DateTime createdAt)
@@ -58,11 +65,11 @@ public class JobDetail
         this.createdAt = createdAt;
     }
 
-    public void AddCleaner(Cleaner cleaner)
+    public void AddCleaner(CleanerJobEntry cleaner)
     {
         if (ReferenceEquals(this.cleaners, null))
         {
-            this.cleaners = new List<Cleaner>();
+            this.cleaners = new List<CleanerJobEntry>();
         }
 
         this.cleaners.Add(cleaner);
@@ -92,7 +99,7 @@ public class JobDetail
         cleanerContent = new List<string>{
         cleanerFirstLine,
         $"{index + 1}){this.cleaners[index].Name}",
-        $"Hrs={this.cleaners[index].Hours}",
+        $"Hrs={this.cleaners[index].HoursWorked}",
         };
 
         return cleanerContent;

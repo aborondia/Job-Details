@@ -3,10 +3,16 @@ using Newtonsoft.Json.Serialization;
 
 public class JobDetailsDTM
 {
+    public string objectId;
     public JsonFile jsonFile;
     public string createdBy;
     public JobDetail content;
     public ReportPointer reportPointer;
+
+    public JobDetailsDTM()
+    {
+
+    }
 
     public JobDetailsDTM(string createdBy, JobDetail content, string detailsReportId)
     {
