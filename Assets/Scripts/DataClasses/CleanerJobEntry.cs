@@ -12,4 +12,14 @@ public class CleanerJobEntry
         this.name = name;
         this.hoursWorked = hoursWorked;
     }
+
+    public void SetName(string value)
+    {
+        this.name = value;
+    }
+
+    public void SetHoursWorked(float value)
+    {
+        this.hoursWorked = value;
+    }
 }

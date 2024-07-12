@@ -34,7 +34,6 @@ public class DetailsReport
     public void OnPopulatingAllJobDetails()
     {
         this.allJobDetailsAdded = true;
-        Debug.Log("INVOKE WITH: " + this.details.Count);
         DetailsReportsHandler.Active.OnReportsCollectionChangedEvent.Invoke();
     }
 }

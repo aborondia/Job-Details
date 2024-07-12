@@ -76,8 +76,6 @@ public static class JSONHelper
             }
 
             jobDetails.Add(dtm.content);
-
-            Debug.Log(dtm.content.ObjectId);
         }
 
         return jobDetails;
@@ -159,8 +157,6 @@ public static class JSONHelper
         int paymentTypeIndex = node["PaymentType"];
         string detailsReportId = node["DetailsReportId"];
         string clientName = node["ClientName"];
-        Debug.Log(node);
-        Debug.Log(node.ToString());
         string clientAddress = node["ClientAddress"];
         DateTime startTime = node["StartTime"];
         DateTime finishTime = node["FinishTime"];

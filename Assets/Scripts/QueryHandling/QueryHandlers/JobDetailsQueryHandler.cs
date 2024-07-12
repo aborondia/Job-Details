@@ -290,15 +290,27 @@ public class JobDetailsQueryHandler : QueryHandler
         ScrollView cleanerNameScrollView = newCleanerElement.Q<ScrollView>();
         VisualElement selectCleanerNameButtonContainer = newCleanerElement.Q<VisualElement>("select-cleaner-button-container");
         CustomButton selectCleanerNameButton = selectCleanerNameButtonContainer.Q<CustomButton>();
-        List<string> cleanerNames = new List<string> { "Cleaner 1", "Cleaner 2", "Cleaner 3" }; // TODO replace with actual users
-        CleanerJobEntry cleaner = new CleanerJobEntry();
+        List<string> cleanerNames = new List<string> { "Cleaner 1", "Cleaner 2", "Cleaner 3" }; // TODO replace with actual users in the DB
+        CleanerJobEntry cleanerJobEntry = new CleanerJobEntry();
+        VisualElement hoursInputContainer = newCleanerElement.Q<VisualElement>("hours-input-container");
+        CustomInput hoursInput = hoursInputContainer.Q<CustomInput>();
 
-        this.currentJobDetail.AddCleaner(cleaner);
+        this.currentJobDetail.AddCleaner(cleanerJobEntry);
         newCleanerElement.AddToClassList("cleaner-row");
 
         cleanerNameScrollView.contentContainer.Clear();
+        cleanerNameScrollView.focusable = true;
 
-        selectCleanerNameButton.RegisterCallback<ClickEvent>(evt => VisualElementHelper.SetElementDisplay(cleanerNameScrollView, DisplayStyle.Flex));
+        cleanerNameScrollView.RegisterCallback<BlurEvent>(evt =>
+        {
+            VisualElementHelper.SetElementDisplay(cleanerNameScrollView, DisplayStyle.None);
+        });
+
+        selectCleanerNameButton.RegisterCallback<ClickEvent>(evt =>
+        {
+            VisualElementHelper.SetElementDisplay(cleanerNameScrollView, DisplayStyle.Flex);
+            cleanerNameScrollView.Focus();
+        });
 
         foreach (string cleanerName in cleanerNames)
         {
@@ -311,12 +323,23 @@ public class JobDetailsQueryHandler : QueryHandler
 
             cleanerNameLabel.RegisterCallback<ClickEvent>(evt =>
             {
+                cleanerJobEntry.SetName(cleanerNameLabel.text);
                 nameLabel.text = cleanerNameLabel.text;
                 VisualElementHelper.SetElementDisplay(cleanerNameScrollView, DisplayStyle.None);
             });
 
             cleanerNameScrollView.contentContainer.Add(cleanerNameLabel);
         }
+
+        hoursInput.RegisterValueChangedCallback<string>(evt =>
+        {
+            float hours;
+
+            if (float.TryParse(evt.newValue, out hours))
+            {
+                cleanerJobEntry.SetHoursWorked(hours);
+            }
+        });
 
         this.cleanersContent.Add(newCleanerElement);
     }
