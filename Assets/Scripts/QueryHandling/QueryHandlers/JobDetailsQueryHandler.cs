@@ -159,13 +159,6 @@ public class JobDetailsQueryHandler : QueryHandler
         SetupTimeInput(this.startTimeMinuteInput, RegexHelper.MinuteRegex);
         SetupTimeInput(this.finishTimeHourInput, RegexHelper.HourRegex);
         SetupTimeInput(this.finishTimeMinuteInput, RegexHelper.MinuteRegex);
-        // this.startTimeOfDayField
-
-
-        // this.finishTimeOfDayField
-        // this.jobTypeInput
-        // this.paymentTypeInput
-        // this.detailsInput
     }
 
     private void SetupTimeInput(CustomInput input, Regex regex)
@@ -177,7 +170,7 @@ public class JobDetailsQueryHandler : QueryHandler
                 return;
             }
 
-            if (!regex.IsMatch(evt.newValue))
+            if (!regex.IsMatch(evt.newValue.Replace(".", "")))
             {
                 if (regex.IsMatch(evt.previousValue))
                 {
@@ -310,6 +303,22 @@ public class JobDetailsQueryHandler : QueryHandler
         {
             VisualElementHelper.SetElementDisplay(cleanerNameScrollView, DisplayStyle.Flex);
             cleanerNameScrollView.Focus();
+        });
+
+        SetupTimeInput(hoursInput, RegexHelper.FloatRegex);
+
+        hoursInput.RegisterCallback<BlurEvent>(evt =>
+        {
+            float value;
+
+            if (float.TryParse(hoursInput.value, out value))
+            {
+                hoursInput.SetValueWithoutNotify(value.ToString());
+            }
+            else
+            {
+                hoursInput.value = "0";
+            }
         });
 
         foreach (string cleanerName in cleanerNames)
