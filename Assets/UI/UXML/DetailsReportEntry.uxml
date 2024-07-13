@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <ui:Template name="JobDetailsEntry" src="project://database/Assets/UI/UXML/JobDetailsEntry.uxml?fileID=9197481963319205126&amp;guid=578b927db5b55d747be647b56b1738b7&amp;type=3#JobDetailsEntry" />
     <Style src="project://database/Assets/UI/USS/details-report-entry.uss?fileID=7433441132597879392&amp;guid=e42ddeb8475faf04489af6f788d101ad&amp;type=3#details-report-entry" />
-    <CustomVisualElement name="main" class="details-report-main">
+    <CustomVisualElement name="main" class="details-report-main gray1-border">
         <CustomVisualElement name="left-column" style="min-width: 60px; height: 100%;">
             <CustomVisualElement name="expand-collapse-button-container" style="height: 100%;">
                 <CustomButton use-background-color="false" use-border="false" name="CustomButton" style="align-items: center; justify-content: center;">

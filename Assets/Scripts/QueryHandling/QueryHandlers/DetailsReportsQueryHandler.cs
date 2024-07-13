@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Xml;
 using UnityEngine;
 using UnityEngine.Events;
@@ -20,7 +21,6 @@ public class DetailsReportsQueryHandler : QueryHandler
     private ScrollView scrollview;
     private DetailsReport currentlySelectedDetailsReport;
     public DetailsReport CurrentlySelectedDetailsReport => currentlySelectedDetailsReport;
-    private UnityEvent beforeDetailsReportExpandedEvent = new UnityEvent();
 
     #region Initialization
 
@@ -104,7 +104,6 @@ public class DetailsReportsQueryHandler : QueryHandler
     private void RefreshDetailsReports()
     {
         this.scrollview.contentContainer.Clear();
-        beforeDetailsReportExpandedEvent.RemoveAllListeners();
 
         if (ReferenceEquals(AppController.Active.DetailsReportsHandler.DetailsReports, null))
         {
@@ -152,18 +151,21 @@ public class DetailsReportsQueryHandler : QueryHandler
             expandCollapseButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
         }
 
-        expandCollapseButton.RegisterCallback<ClickEvent>(evt => OnReportExpandCollapseButtonPressed(jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon));
+        expandCollapseButton.RegisterCallback<ClickEvent>(evt => ToggleJobDetailsExpandState(jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon));
 
-        if (detailsReport.Details.Count >= 2)
+        if (detailsReport.Details.Count >= 1)
         {
             List<DateTime> dateTimes = detailsReport.Details.Values.Select(dr => dr.StartTime).ToList();
             DateTime earliestTime = dateTimes.Min();
             DateTime latestTime = dateTimes.Max();
-            timeLabel.text = $"{earliestTime} - {latestTime}";
+            string earliestTimeText = earliestTime == DateTime.MinValue ? "--" : earliestTime.ToString("yy/MM/dd");
+            string latestTimeText = latestTime == DateTime.MinValue ? "--" : latestTime.ToString("yy/MM/dd");
+
+            timeLabel.text = $"{earliestTimeText} - {latestTimeText}";
         }
         else
         {
-            timeLabel.text = "--";
+            timeLabel.text = "-- - --";
         }
 
         this.currentlySelectedDetailsReport = detailsReport;
@@ -181,9 +183,9 @@ public class DetailsReportsQueryHandler : QueryHandler
 
         });
 
-        beforeDetailsReportExpandedEvent.AddListener(() => VisualElementHelper.SetElementDisplay(jobDetailsContainer, DisplayStyle.None));
         jobDetailsContainer.Clear();
-        // Populate details
+
+        CollapseJobDetails(jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon);
 
         return mainElement;
     }
@@ -197,6 +199,10 @@ public class DetailsReportsQueryHandler : QueryHandler
         Label jobTypeLabel = mainElement.Q<VisualElement>("job-type-label-container").Q<Label>();
         CustomButton editButton = mainElement.Q<VisualElement>("edit-button-container").Q<CustomButton>();
         CustomButton deleteButton = mainElement.Q<VisualElement>("delete-button-container").Q<CustomButton>();
+        string clientNameText = String.IsNullOrWhiteSpace(jobDetail.ClientName) ? "Unknown Client" : jobDetail.ClientName;
+        string dateText = jobDetail.StartTime == DateTime.MinValue ? "Unknown Date" : $"Date: {jobDetail.StartTime.ToString("yy/MM/dd")}";
+        string jobText = jobDetail.JobType == 0 ? "Unknown" : jobDetail.JobType.ToString();
+        string clientAddressText = String.IsNullOrWhiteSpace(jobDetail.ClientAddress) ? "Unknown Address" : jobDetail.ClientAddress;
         ActionHelper.BoolDelegate responseDelegate = isTrue =>
         {
             if (isTrue)
@@ -215,10 +221,10 @@ public class DetailsReportsQueryHandler : QueryHandler
             AppController.Active.ServerCommunicator.DeleteJobDetails(jobDetail.ObjectId, responseDelegate);
         });
 
-        clientNameLabel.text = jobDetail.ClientName;
-        addressLabel.text = jobDetail.ClientAddress;
-        dateTimeLabel.text = $"Date: {jobDetail.StartTime.ToString("yy/MM/dd")}";
-        jobTypeLabel.text = $"Job Type: {jobDetail.JobType.ToString()}";
+        clientNameLabel.text = clientNameText;
+        addressLabel.text = clientAddressText;
+        dateTimeLabel.text = dateText;
+        jobTypeLabel.text = jobText;
 
         return mainElement;
     }
@@ -227,11 +233,32 @@ public class DetailsReportsQueryHandler : QueryHandler
 
     #region Actions
 
-    private void OnReportExpandCollapseButtonPressed(VisualElement jobDetailsContainer, CustomButton expandCollapseButton, VisualElement expandCollapseButtonIcon)
+    private void ToggleJobDetailsExpandState(VisualElement jobDetailsContainer, CustomButton expandCollapseButton, VisualElement expandCollapseButtonIcon)
     {
         bool expand = jobDetailsContainer.resolvedStyle.display == DisplayStyle.None;
 
-        this.beforeDetailsReportExpandedEvent.Invoke();
+        if (expand)
+        {
+            ExpandJobDetails(jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon);
+        }
+        else
+        {
+            CollapseJobDetails(jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon);
+        }
+    }
+
+    private void ExpandJobDetails(VisualElement jobDetailsContainer, CustomButton expandCollapseButton, VisualElement expandCollapseButtonIcon)
+    {
+        ChangeJobDetailsExpandedState(jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon, true);
+    }
+
+    private void CollapseJobDetails(VisualElement jobDetailsContainer, CustomButton expandCollapseButton, VisualElement expandCollapseButtonIcon)
+    {
+        ChangeJobDetailsExpandedState(jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon, false);
+    }
+
+    private void ChangeJobDetailsExpandedState(VisualElement jobDetailsContainer, CustomButton expandCollapseButton, VisualElement expandCollapseButtonIcon, bool expand)
+    {
         expandCollapseButtonIcon.ClearClassList();
 
         if (expand)
@@ -242,6 +269,7 @@ public class DetailsReportsQueryHandler : QueryHandler
         else
         {
             expandCollapseButtonIcon.AddToClassList("gi-chevron-down");
+            VisualElementHelper.SetElementDisplay(jobDetailsContainer, DisplayStyle.None);
         }
     }
 

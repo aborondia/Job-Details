@@ -196,6 +196,7 @@ public class JobDetailsQueryHandler : QueryHandler
 
     public void OpenExistingJobDetails(JobDetail jobDetail)
     {
+        this.currentJobDetail = new JobDetail();
         // TODO Set up populating inputs with data
         QueryController.Active.ChangeView(MainView.JobDetails, Subview.Default);
     }
