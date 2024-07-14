@@ -97,6 +97,79 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
+    public void GetUserNameReferences(ReturnStringDelegate responseDelegate = null)
+    {
+        StartCoroutine(StartGettingUserNameReferences(responseDelegate));
+    }
+
+    private IEnumerator StartGettingUserNameReferences(ReturnStringDelegate responseDelegate)
+    {
+        string url = $"{this.ClassesUrl}/UserNameReference";
+
+        UnityWebRequest request = UnityWebRequest.Get(url);
+
+        request.SetRequestHeader("X-Parse-Application-Id", this.appId);
+        request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
+        request.SetRequestHeader("X-Parse-Session-Token", this.currentUser.sessionToken);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
+
+            if (!ReferenceEquals(responseDelegate, null))
+            {
+                responseDelegate.Invoke(request.downloadHandler.text);
+            }
+        }
+        else
+        {
+            LogHelper.Active.LogError("Request failed: " + request.error + request.downloadHandler.text);
+        }
+
+        this.OnRequestCompletedEvent.Invoke();
+    }
+
+    public void CreateUserNameReference(UserNameReferenceDTM currentUserReference)
+    {
+        StartCoroutine(StartCreatingUserNameReference(currentUserReference));
+    }
+
+    private IEnumerator StartCreatingUserNameReference(UserNameReferenceDTM currentUserReference)
+    {
+        UnityWebRequest request = new UnityWebRequest($"{this.ClassesUrl}/UserNameReference", "POST");
+
+        string jsonBody = JsonConvert.SerializeObject(currentUserReference);
+        byte[] bodyRaw = new System.Text.UTF8Encoding().GetBytes(jsonBody);
+
+        request.SetRequestHeader("X-Parse-Application-Id", this.appId);
+        request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
+        request.SetRequestHeader("Content-Type", "application/json");
+        request.SetRequestHeader("X-Parse-Revocable-Session", "1");
+
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            LogHelper.Active.Log("User Reference Created: " + request.downloadHandler.text);
+        }
+        else
+        {
+            LogHelper.Active.LogError("Request failed: " + request.error);
+        }
+
+        this.OnRequestCompletedEvent.Invoke();
+    }
+
+    public IEnumerator GetUserNameReferences()
+    {
+        yield break;
+    }
+
     public void SignIn(UserSignInDTM userSignInDTM)
     {
         this.OnRequestStartedEvent.Invoke();

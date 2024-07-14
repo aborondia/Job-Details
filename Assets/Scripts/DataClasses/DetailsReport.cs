@@ -34,6 +34,6 @@ public class DetailsReport
     public void OnPopulatingAllJobDetails()
     {
         this.allJobDetailsAdded = true;
-        DetailsReportsHandler.Active.OnReportsCollectionChangedEvent.Invoke();
+        AppController.Active.DetailsReportsHandler.OnReportsCollectionChangedEvent.Invoke();
     }
 }

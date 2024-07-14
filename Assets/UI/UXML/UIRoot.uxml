@@ -21,8 +21,8 @@
             <CustomVisualElement name="views-container" class="views-container">
                 <ui:Instance template="AppLeftBar" name="AppLeftBar" class="app-left-bar" />
                 <CustomVisualElement name="main-views" class="main-views">
-                    <ui:Instance template="DetailsReportsView" name="DetailsReportsView" class="main-view" />
-                    <ui:Instance template="JobDetailsView" name="JobDetailsView" class="main-view" style="display: none;" />
+                    <ui:Instance template="DetailsReportsView" name="DetailsReportsView" class="main-view" style="display: none;" />
+                    <ui:Instance template="JobDetailsView" name="JobDetailsView" class="main-view" />
                     <ui:Instance template="LoginView" name="LoginView" class="main-view" style="display: none;" />
                 </CustomVisualElement>
                 <ui:Instance template="AppRightBar" name="AppRightBar" class="app-right-bar" />

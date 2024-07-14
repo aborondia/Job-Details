@@ -155,7 +155,7 @@ public class DetailsReportsQueryHandler : QueryHandler
 
         if (detailsReport.Details.Count >= 1)
         {
-            List<DateTime> dateTimes = detailsReport.Details.Values.Select(dr => dr.StartTime).ToList();
+            List<DateTime> dateTimes = detailsReport.Details.Values.Select(dr => dr.JobDate).ToList();
             DateTime earliestTime = dateTimes.Min();
             DateTime latestTime = dateTimes.Max();
             string earliestTimeText = earliestTime == DateTime.MinValue ? "--" : earliestTime.ToString("yy/MM/dd");
@@ -165,7 +165,7 @@ public class DetailsReportsQueryHandler : QueryHandler
         }
         else
         {
-            timeLabel.text = "-- - --";
+            timeLabel.text = "N/A - N/A";
         }
 
         this.currentlySelectedDetailsReport = detailsReport;
@@ -207,7 +207,7 @@ public class DetailsReportsQueryHandler : QueryHandler
         {
             if (isTrue)
             {
-                DetailsReportsHandler.Active.RemoveJobDetails(jobDetail);
+                AppController.Active.DetailsReportsHandler.RemoveJobDetails(jobDetail);
             }
         };
 

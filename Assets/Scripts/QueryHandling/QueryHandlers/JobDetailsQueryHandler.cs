@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using UnityEngine.Events;
 using Newtonsoft.Json;
 using SimpleJSON;
+using System.Linq;
 
 public class JobDetailsQueryHandler : QueryHandler
 {
@@ -50,6 +51,7 @@ public class JobDetailsQueryHandler : QueryHandler
     private JobDetail currentJobDetail;
     public JobDetail CurrentJobDetail => currentJobDetail;
     private DateTime? currentDatePickerDate;
+    private UnityEvent onCurrentJobDetailChanged = new UnityEvent();
 
     #region  Initlialization
 
@@ -189,7 +191,16 @@ public class JobDetailsQueryHandler : QueryHandler
 
     public void OpenNewJobDetails()
     {
+        UserNameReferenceDTM currentUserReference = AppController.Active.CleanerDataHandler.GetCurrentUserReference();
+
+        if (ReferenceEquals(currentUserReference, null))
+        {
+            return;
+        }
+
         this.currentJobDetail = new JobDetail();
+
+        RefreshJobDetail();
 
         QueryController.Active.ChangeView(MainView.JobDetails, Subview.Default);
     }
@@ -222,7 +233,43 @@ public class JobDetailsQueryHandler : QueryHandler
 
     private void RefreshJobDetail()
     {
+        RefreshCleanerRows();
+    }
+
+    private void RefreshCleanerRows()
+    {
         this.cleanersContent.Clear();
+
+        foreach (CleanerJobEntry cleaner in this.currentJobDetail.Cleaners)
+        {
+            CreateCleanerRow(cleaner.CleanerObjectId);
+        }
+    }
+
+    #endregion
+
+    #region Actions
+
+    private List<UserNameReferenceDTM> GetValidCleanerNamesForAdding()
+    {
+        List<string> cleaners = this.currentJobDetail.Cleaners.Select(cleaner => cleaner.CleanerObjectId).ToList();
+
+        return AppController.Active.CleanerDataHandler.UserNameReferences.Values
+        .Where(reference => !cleaners.Contains(reference.userObjectId))
+        .ToList();
+    }
+
+    private void OpenCleanerNameSelect(CleanerJobEntry cleanerJobEntry, Label nameLabel, ScrollView cleanerNameScrollView)
+    {
+        PopulateCleanerRowNameSelect(cleanerJobEntry, nameLabel, cleanerNameScrollView);
+
+        if (cleanerNameScrollView.childCount <= 0)
+        {
+            return;
+        }
+
+        VisualElementHelper.SetElementDisplay(cleanerNameScrollView, DisplayStyle.Flex);
+        cleanerNameScrollView.Focus();
     }
 
     #endregion
@@ -231,6 +278,7 @@ public class JobDetailsQueryHandler : QueryHandler
 
     private bool SetJobDetailProperties()
     {
+        DateTime jobDate = new DateTime();
         DateTime startTime = new DateTime();
         DateTime finishTime = new DateTime();
         double startHoursValue;
@@ -242,14 +290,14 @@ public class JobDetailsQueryHandler : QueryHandler
 
         if (DataValidationChecker.IsDateTimeStringValid(this.dateInput.value))
         {
-            if (double.TryParse(this.startTimeHourInput.value, out startHoursValue)
+            if (DateTime.TryParse(this.dateInput.value, out jobDate)
+            && double.TryParse(this.startTimeHourInput.value, out startHoursValue)
             && double.TryParse(this.startTimeMinuteInput.value, out startMinutesValue)
             && double.TryParse(this.finishTimeHourInput.value, out finishHoursValue)
             && double.TryParse(this.finishTimeMinuteInput.value, out finishMinutesValue))
             {
                 startTime = DateTime.Parse(this.dateInput.value);
                 finishTime = DateTime.Parse(this.dateInput.value);
-
 
                 startHoursModifier = (Enumerations.TimeOfDayEnum)this.startTimeOfDayField.value == Enumerations.TimeOfDayEnum.AM ? 0 : 12;
                 finishHoursModifier = (Enumerations.TimeOfDayEnum)this.finishTimeOfDayField.value == Enumerations.TimeOfDayEnum.AM ? 0 : 12;
@@ -266,6 +314,7 @@ public class JobDetailsQueryHandler : QueryHandler
             QueryController.Active.DetailsReportsQueryHandler.CurrentlySelectedDetailsReport.ObjectId,
             this.clientNameInput.value,
             this.clientAddressInput.value,
+            jobDate,
             startTime,
             finishTime,
             (Enumerations.JobTypeEnum)this.jobTypeInput.value,
@@ -276,7 +325,9 @@ public class JobDetailsQueryHandler : QueryHandler
         return true;
     }
 
-    private void CreateCleanerRow()
+    #region Cleaner Row
+
+    private void CreateCleanerRow(string cleanerId = "")
     {
         VisualElement newCleanerElement = this.cleanerRowBase.Instantiate();
         VisualElement nameLabelContainer = newCleanerElement.Q<VisualElement>("name-label-container");
@@ -284,12 +335,26 @@ public class JobDetailsQueryHandler : QueryHandler
         ScrollView cleanerNameScrollView = newCleanerElement.Q<ScrollView>();
         VisualElement selectCleanerNameButtonContainer = newCleanerElement.Q<VisualElement>("select-cleaner-button-container");
         CustomButton selectCleanerNameButton = selectCleanerNameButtonContainer.Q<CustomButton>();
-        List<string> cleanerNames = new List<string> { "Cleaner 1", "Cleaner 2", "Cleaner 3" }; // TODO replace with actual users in the DB
+        VisualElement deleteCleanerRowButtonContainer = newCleanerElement.Q<VisualElement>("delete-button-container");
+        CustomButton deleteCleanerRowButton = deleteCleanerRowButtonContainer.Q<CustomButton>();
         CleanerJobEntry cleanerJobEntry = new CleanerJobEntry();
         VisualElement hoursInputContainer = newCleanerElement.Q<VisualElement>("hours-input-container");
         CustomInput hoursInput = hoursInputContainer.Q<CustomInput>();
+        Action deleteCleanerRowAction = () =>
+        {
+            this.currentJobDetail.RemoveCleaner(cleanerJobEntry);
+            newCleanerElement.parent.Remove(newCleanerElement);
+        };
+        string cleanerName;
 
-        this.currentJobDetail.AddCleaner(cleanerJobEntry);
+        if (!String.IsNullOrEmpty(cleanerId) && AppController.Active.CleanerDataHandler.UserNameReferences.ContainsKey(cleanerId))
+        {
+            cleanerName = AppController.Active.CleanerDataHandler.UserNameReferences[cleanerId].userName;
+            cleanerJobEntry.SetName(cleanerName);
+            cleanerJobEntry.SetCleanerObjectId(cleanerId);
+            nameLabel.text = cleanerName;
+        }
+
         newCleanerElement.AddToClassList("cleaner-row");
 
         cleanerNameScrollView.contentContainer.Clear();
@@ -298,48 +363,79 @@ public class JobDetailsQueryHandler : QueryHandler
         cleanerNameScrollView.RegisterCallback<BlurEvent>(evt =>
         {
             VisualElementHelper.SetElementDisplay(cleanerNameScrollView, DisplayStyle.None);
+
+            if (String.IsNullOrEmpty(cleanerJobEntry.Name))
+            {
+                deleteCleanerRowAction.Invoke();
+            }
         });
 
-        selectCleanerNameButton.RegisterCallback<ClickEvent>(evt =>
+        if (AppController.Active.ServerCommunicator.CurrentUser.objectId == cleanerJobEntry.CleanerObjectId)
         {
-            VisualElementHelper.SetElementDisplay(cleanerNameScrollView, DisplayStyle.Flex);
-            cleanerNameScrollView.Focus();
-        });
+            selectCleanerNameButtonContainer.style.visibility = Visibility.Hidden;
+            selectCleanerNameButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
+            deleteCleanerRowButtonContainer.style.visibility = Visibility.Hidden;
+            deleteCleanerRowButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
+        }
+        else
+        {
+            deleteCleanerRowButton.RegisterCallback<ClickEvent>(evt => deleteCleanerRowAction.Invoke());
+
+            selectCleanerNameButton.RegisterCallback<ClickEvent>(evt => OpenCleanerNameSelect(cleanerJobEntry, nameLabel, cleanerNameScrollView));
+        }
 
         SetupTimeInput(hoursInput, RegexHelper.FloatRegex);
+        SetupCleanerHoursInput(cleanerJobEntry, hoursInput);
 
-        hoursInput.RegisterCallback<BlurEvent>(evt =>
+        this.cleanersContent.Add(newCleanerElement);
+
+        if (String.IsNullOrEmpty(cleanerId))
         {
-            float value;
+            OpenCleanerNameSelect(cleanerJobEntry, nameLabel, cleanerNameScrollView);
+        }
+    }
 
-            if (float.TryParse(hoursInput.value, out value))
-            {
-                hoursInput.SetValueWithoutNotify(value.ToString());
-            }
-            else
-            {
-                hoursInput.value = "0";
-            }
-        });
+    private void PopulateCleanerRowNameSelect(CleanerJobEntry cleanerJobEntry, Label nameLabel, ScrollView cleanerNameScrollView)
+    {
+        cleanerNameScrollView.contentContainer.Clear();
 
-        foreach (string cleanerName in cleanerNames)
+        foreach (UserNameReferenceDTM entry in GetValidCleanerNamesForAdding())
         {
             CustomLabel cleanerNameLabel = new CustomLabel();
 
             cleanerNameLabel.AddToClassList("regular-font");
             cleanerNameLabel.style.color = Color.black;
 
-            cleanerNameLabel.text = cleanerName;
+            cleanerNameLabel.text = entry.userName;
 
             cleanerNameLabel.RegisterCallback<ClickEvent>(evt =>
             {
                 cleanerJobEntry.SetName(cleanerNameLabel.text);
                 nameLabel.text = cleanerNameLabel.text;
                 VisualElementHelper.SetElementDisplay(cleanerNameScrollView, DisplayStyle.None);
+                this.currentJobDetail.AddCleaner(cleanerJobEntry);
             });
 
             cleanerNameScrollView.contentContainer.Add(cleanerNameLabel);
         }
+    }
+
+    private void SetupCleanerHoursInput(CleanerJobEntry cleanerJobEntry, CustomInput hoursInput)
+    {
+        hoursInput.RegisterCallback<BlurEvent>(evt =>
+            {
+                float value;
+
+                if (float.TryParse(hoursInput.value, out value))
+                {
+                    hoursInput.SetValueWithoutNotify(value.ToString());
+                }
+                else
+                {
+                    hoursInput.value = "0";
+                }
+            });
+
 
         hoursInput.RegisterValueChangedCallback<string>(evt =>
         {
@@ -350,9 +446,8 @@ public class JobDetailsQueryHandler : QueryHandler
                 cleanerJobEntry.SetHoursWorked(hours);
             }
         });
-
-        this.cleanersContent.Add(newCleanerElement);
     }
 
+    #endregion
     #endregion
 }

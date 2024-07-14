@@ -2,13 +2,16 @@ public class CleanerJobEntry
 {
     private string name;
     public string Name => this.name;
+    private string cleanerObjectId;
+    public string CleanerObjectId => this.cleanerObjectId;
     private float hoursWorked;
     public float HoursWorked => this.hoursWorked;
 
     public CleanerJobEntry() { }
 
-    public CleanerJobEntry(string name, float hoursWorked)
+    public CleanerJobEntry(string cleanerObjectId, string name, float hoursWorked)
     {
+        this.cleanerObjectId = cleanerObjectId;
         this.name = name;
         this.hoursWorked = hoursWorked;
     }
@@ -21,5 +24,10 @@ public class CleanerJobEntry
     public void SetHoursWorked(float value)
     {
         this.hoursWorked = value;
+    }
+
+    public void SetCleanerObjectId(string value)
+    {
+        this.cleanerObjectId = value;
     }
 }

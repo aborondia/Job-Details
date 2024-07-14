@@ -7,6 +7,8 @@ public class AppController : MonoBehaviour
     public static AppController Active;
     [SerializeField] private MailSender mailSender;
     public MailSender MailSender => mailSender;
+    [SerializeField] private CleanerDataHandler cleanerDataHandler;
+    public CleanerDataHandler CleanerDataHandler => cleanerDataHandler;
     [SerializeField] private DocumentCreator documentCreator;
     public DocumentCreator DocumentCreator => documentCreator;
     [SerializeField] private DetailsReportsHandler detailsReportsHandler;

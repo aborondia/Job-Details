@@ -14,6 +14,8 @@ public class JobDetail
     public string ClientName => clientName;
     private string clientAddress;
     public string ClientAddress => clientAddress;
+    private DateTime jobDate;
+    public DateTime JobDate => jobDate;
     private DateTime startTime;
     public DateTime StartTime => startTime;
     private DateTime finishTime;
@@ -38,6 +40,7 @@ public class JobDetail
         string detailsReportId,
         string clientName,
         string clientAddress,
+        DateTime jobDate,
         DateTime startTime,
         DateTime finishTime,
         JobTypeEnum jobType,
@@ -50,6 +53,7 @@ public class JobDetail
         this.detailsReportId = detailsReportId;
         this.clientName = clientName;
         this.clientAddress = clientAddress;
+        this.jobDate = jobDate;
         this.startTime = startTime;
         this.finishTime = finishTime;
         this.jobType = jobType;
@@ -73,6 +77,16 @@ public class JobDetail
         }
 
         this.cleaners.Add(cleaner);
+    }
+
+    public void RemoveCleaner(CleanerJobEntry cleaner)
+    {
+        if (ReferenceEquals(this.cleaners, null) || !this.cleaners.Contains(cleaner))
+        {
+            return;
+        }
+
+        this.cleaners.Remove(cleaner);
     }
 
     public List<string> GetCleanersContent(int index)

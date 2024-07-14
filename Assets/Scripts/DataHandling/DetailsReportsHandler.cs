@@ -5,20 +5,12 @@ using UnityEngine.Events;
 
 public class DetailsReportsHandler : MonoBehaviour
 {
-    public static DetailsReportsHandler Active;
     private Dictionary<string, DetailsReport> detailsReports;
     public Dictionary<string, DetailsReport> DetailsReports => detailsReports;
     public UnityEvent OnReportsCollectionChangedEvent = new UnityEvent();
 
     private void Awake()
     {
-        if (Active != null)
-        {
-            GameObject.Destroy(Active);
-        }
-
-        Active = this;
-
         SetReportsOnLogin();
     }
 

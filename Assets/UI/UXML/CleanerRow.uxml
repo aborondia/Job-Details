@@ -16,6 +16,13 @@
                 </CustomButton>
             </CustomVisualElement>
         </CustomVisualElement>
+        <CustomVisualElement name="delete-button-container" style="width: 50px;">
+            <CustomButton use-background-color="false" use-border="false">
+                <CustomVisualElement name="icon-container" style="width: 100%; height: 100%; justify-content: center; align-items: center;">
+                    <CustomVisualElement name="icon" regenerate-in-editor="true" enforce-largest-dimension="true" largest-dimension="30" class="gi-recycle-bin red1-img" />
+                </CustomVisualElement>
+            </CustomButton>
+        </CustomVisualElement>
         <CustomVisualElement name="hours-input-container" class="hours-input-container">
             <CustomInput placeholder-text="Hours" style="width: 100%;" />
         </CustomVisualElement>

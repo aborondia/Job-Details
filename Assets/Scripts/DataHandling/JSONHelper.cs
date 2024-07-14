@@ -158,6 +158,7 @@ public static class JSONHelper
         string detailsReportId = node["DetailsReportId"];
         string clientName = node["ClientName"];
         string clientAddress = node["ClientAddress"];
+        DateTime jobDate = node["JobDate"];
         DateTime startTime = node["StartTime"];
         DateTime finishTime = node["FinishTime"];
         Enumerations.JobTypeEnum jobType = (Enumerations.JobTypeEnum)jobTypeIndex;
@@ -169,6 +170,7 @@ public static class JSONHelper
             detailsReportId,
             clientName,
             clientAddress,
+            jobDate,
             startTime,
             finishTime,
             jobType,
@@ -196,11 +198,35 @@ public static class JSONHelper
     {
         CleanerJobEntry cleanerJobEntry;
         string cleanerName = node["name"];
+        string cleanerObjectId = node["cleanerObjectId"];
         float cleanerHoursWorked = node["hours"];
 
-        cleanerJobEntry = new CleanerJobEntry(cleanerName, cleanerHoursWorked);
+        cleanerJobEntry = new CleanerJobEntry(cleanerObjectId, cleanerName, cleanerHoursWorked);
 
         return cleanerJobEntry;
+    }
+
+    public static List<UserNameReferenceDTM> GetUserNameReferenceDTMs(string response)
+    {
+        List<UserNameReferenceDTM> dtms = new List<UserNameReferenceDTM>();
+        JSONNode result = JSON.Parse(response)["results"];
+
+        foreach (JSONNode node in result.Values)
+        {
+            dtms.Add(GetUserNameReferenceDTM(node));
+        }
+
+        return dtms;
+    }
+
+    private static UserNameReferenceDTM GetUserNameReferenceDTM(JSONNode node)
+    {
+        UserNameReferenceDTM dtm = new UserNameReferenceDTM();
+
+        dtm.userName = node["userName"];
+        dtm.userObjectId = node["userObjectId"];
+
+        return dtm;
     }
 
     private static JobDetailsDTM.JsonFile GetJsonFile(JSONNode node)
