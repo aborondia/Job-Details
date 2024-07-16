@@ -40,9 +40,11 @@ public class CleanerDataHandler : MonoBehaviour
             currentUserReference.userName = currentUser.username;
             currentUserReference.userObjectId = currentUser.objectId;
 
-            this.userNameReferences.Add(currentUser.objectId, currentUserReference);
-
-            AppController.Active.ServerCommunicator.CreateUserNameReference(currentUserReference);
+            if (!this.userNameReferences.ContainsKey(currentUser.objectId))
+            {
+                this.userNameReferences.Add(currentUser.objectId, currentUserReference);
+                AppController.Active.ServerCommunicator.CreateUserNameReference(currentUserReference);
+            }
         }
     }
 

@@ -6,7 +6,6 @@ using Subview = Enumerations.Subview;
 using UnityEngine.UIElements;
 using System.Text.RegularExpressions;
 using UnityEngine.Events;
-using Newtonsoft.Json;
 using SimpleJSON;
 using System.Linq;
 
@@ -63,30 +62,40 @@ public class JobDetailsQueryHandler : QueryHandler
 
         this.clientNameInputContainer = this.inputsContainer.Q<VisualElement>("client-name-input-container");
         this.clientNameInput = this.clientNameInputContainer.Q<CustomInput>();
+        this.clientNameInput.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
 
         this.clientAddressInputContainer = this.inputsContainer.Q<VisualElement>("client-address-input-container");
         this.clientAddressInput = this.clientAddressInputContainer.Q<CustomInput>();
+        this.clientAddressInput.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
 
         this.dateInputContainer = this.inputsContainer.Q<VisualElement>("date-input-container");
         this.dateInput = this.dateInputContainer.Q<CustomInput>();
+        this.dateInput.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
 
         this.startTimeInputsContainer = this.inputsContainer.Q<VisualElement>("start-time-inputs-container");
         this.startTimeInputContainer = this.startTimeInputsContainer.Q<VisualElement>("start-time-input-container");
         this.startTimeHourInput = this.startTimeInputContainer.Q<CustomInput>("hour-input");
+        this.startTimeHourInput.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
+
         this.startTimeMinuteInput = this.startTimeInputContainer.Q<CustomInput>("minute-input");
         this.startTimeOfDayField = this.startTimeInputContainer.Q<CustomEnumField>();
 
         this.finishTimeInputsContainer = this.inputsContainer.Q<VisualElement>("finish-time-inputs-container");
         this.finishTimeInputContainer = this.finishTimeInputsContainer.Q<VisualElement>("finish-time-input-container");
         this.finishTimeHourInput = this.finishTimeInputContainer.Q<CustomInput>("hour-input");
+        this.finishTimeHourInput.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
+
         this.finishTimeMinuteInput = this.finishTimeInputContainer.Q<CustomInput>("minute-input");
         this.finishTimeOfDayField = this.finishTimeInputContainer.Q<CustomEnumField>();
+        this.finishTimeOfDayField.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
 
         this.jobTypeInputContainer = this.inputsContainer.Q<VisualElement>("job-type-input-container");
         this.jobTypeInput = this.jobTypeInputContainer.Q<CustomEnumField>();
+        this.jobTypeInput.RegisterValueChangedCallback(evt => OnJobDetailsChanged());
 
         this.paymentTypeInputContainer = this.inputsContainer.Q<VisualElement>("payment-type-input-container");
         this.paymentTypeInput = this.paymentTypeInputContainer.Q<CustomEnumField>();
+        this.paymentTypeInput.RegisterValueChangedCallback(evt => OnJobDetailsChanged());
 
         this.cleanersContainer = this.inputsContainer.Q<VisualElement>("cleaners-container");
         this.cleanersContent = this.cleanersContainer.Q<VisualElement>("cleaners-content");
@@ -98,6 +107,7 @@ public class JobDetailsQueryHandler : QueryHandler
         this.detailsContentContainer = this.mainContentContainer.Q<VisualElement>("details-content-container");
         this.detailsContentContainer.RegisterCallback<ClickEvent>(evt => this.detailsInput.Focus());
         this.detailsInput = this.detailsContentContainer.Q<CustomInput>();
+        this.detailsInput.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
 
         this.reportsFooter = this.mainContainer.Q<VisualElement>("reports-footer");
 
@@ -191,24 +201,25 @@ public class JobDetailsQueryHandler : QueryHandler
 
     public void OpenNewJobDetails()
     {
-        UserNameReferenceDTM currentUserReference = AppController.Active.CleanerDataHandler.GetCurrentUserReference();
-
-        if (ReferenceEquals(currentUserReference, null))
+        if (ReferenceEquals(AppController.Active.CleanerDataHandler.GetCurrentUserReference(), null))
         {
             return;
         }
 
         this.currentJobDetail = new JobDetail();
-
         RefreshJobDetail();
-
         QueryController.Active.ChangeView(MainView.JobDetails, Subview.Default);
     }
 
     public void OpenExistingJobDetails(JobDetail jobDetail)
     {
-        this.currentJobDetail = new JobDetail();
-        // TODO Set up populating inputs with data
+        if (ReferenceEquals(AppController.Active.CleanerDataHandler.GetCurrentUserReference(), null))
+        {
+            return;
+        }
+
+        this.currentJobDetail = jobDetail;
+        RefreshJobDetail();
         QueryController.Active.ChangeView(MainView.JobDetails, Subview.Default);
     }
 
@@ -219,6 +230,11 @@ public class JobDetailsQueryHandler : QueryHandler
     protected override void OnSubviewChanged()
     {
         base.OnSubviewChanged();
+
+        if (QueryController.Active.CurrentMainView != this.mainView)
+        {
+            return;
+        }
 
         RefreshJobDetail();
     }
@@ -231,19 +247,150 @@ public class JobDetailsQueryHandler : QueryHandler
 
     #region Refresh/Update
 
+    private void OnJobDetailsChanged()
+    {
+        SetJobDetailProperties();
+        RefreshJobDetail();
+    }
+
     private void RefreshJobDetail()
     {
+        RefreshClientName();
+        RefreshClientAddress();
+        RefreshDate();
+        RefreshJobType();
+        RefreshPaymentType();
+        RefreshStartTime();
+        RefreshFinishTime();
         RefreshCleanerRows();
+        RefreshDetailsDescription();
+    }
+
+    private void RefreshClientName()
+    {
+        if (ReferenceEquals(this.currentJobDetail.ClientName, null))
+        {
+            this.clientNameInput.SetValueWithoutNotify(String.Empty);
+        }
+        else
+        {
+            this.clientNameInput.SetValueWithoutNotify(this.currentJobDetail.ClientName);
+        }
+
+    }
+
+    private void RefreshClientAddress()
+    {
+        if (ReferenceEquals(this.currentJobDetail.ClientAddress, null))
+        {
+            this.clientAddressInput.SetValueWithoutNotify(String.Empty);
+        }
+        else
+        {
+            this.clientAddressInput.SetValueWithoutNotify(this.currentJobDetail.ClientAddress);
+        }
+
+    }
+
+    private void RefreshDate()
+    {
+        if (ReferenceEquals(this.currentJobDetail.JobDate, null))
+        {
+            this.dateInput.SetValueWithoutNotify(String.Empty);
+
+            return;
+        }
+
+        if (this.currentJobDetail.JobDate == DateTime.MinValue)
+        {
+            this.dateInput.SetValueWithoutNotify(String.Empty);
+        }
+        else
+        {
+            this.dateInput.SetValueWithoutNotify(this.currentJobDetail.JobDate.ToShortDateString());
+        }
+    }
+
+    private void RefreshJobType()
+    {
+        if (ReferenceEquals(this.currentJobDetail.JobType, null))
+        {
+            this.jobTypeInput.SetValueWithoutNotify((Enumerations.JobTypeEnum)0);
+
+            return;
+        }
+
+        this.jobTypeInput.SetValueWithoutNotify(this.currentJobDetail.JobType);
+    }
+
+    private void RefreshPaymentType()
+    {
+        if (ReferenceEquals(this.currentJobDetail.PaymentType, null))
+        {
+            this.paymentTypeInput.SetValueWithoutNotify((Enumerations.PaymentTypeEnum)0);
+
+            return;
+        }
+
+        this.paymentTypeInput.SetValueWithoutNotify(this.currentJobDetail.PaymentType);
+    }
+
+    private void RefreshStartTime()
+    {
+        bool isPMStartTime;
+        int startHours;
+        int startMinutes;
+        string startHoursString;
+
+        isPMStartTime = this.currentJobDetail.StartTime.Hour > 12;
+        startHours = this.currentJobDetail.StartTime.Hour;
+        startMinutes = this.currentJobDetail.StartTime.Minute;
+        startHoursString = startHours > 12 ? (startHours - 12).ToString() : startHours.ToString();
+
+        this.startTimeOfDayField.SetValueWithoutNotify(isPMStartTime ? Enumerations.TimeOfDayEnum.PM : Enumerations.TimeOfDayEnum.AM);
+        this.startTimeHourInput.SetValueWithoutNotify(startHoursString);
+        this.startTimeMinuteInput.SetValueWithoutNotify(startMinutes.ToString());
+    }
+
+    private void RefreshFinishTime()
+    {
+        bool isPMFinishTime;
+        int finishHours;
+        int finishMinutes;
+        string finishHoursString;
+
+        isPMFinishTime = this.currentJobDetail.FinishTime.Hour > 12;
+        finishHours = this.currentJobDetail.FinishTime.Hour;
+        finishMinutes = this.currentJobDetail.FinishTime.Minute;
+        finishHoursString = finishHours > 12 ? (finishHours - 12).ToString() : finishHours.ToString();
+        this.finishTimeOfDayField.SetValueWithoutNotify(isPMFinishTime ? Enumerations.TimeOfDayEnum.PM : Enumerations.TimeOfDayEnum.AM);
+        this.finishTimeHourInput.SetValueWithoutNotify(finishHoursString);
+        this.finishTimeMinuteInput.SetValueWithoutNotify(finishMinutes.ToString());
     }
 
     private void RefreshCleanerRows()
     {
         this.cleanersContent.Clear();
 
+        if (ReferenceEquals(this.currentJobDetail.Cleaners, null))
+        {
+            return;
+        }
+
         foreach (CleanerJobEntry cleaner in this.currentJobDetail.Cleaners)
         {
             CreateCleanerRow(cleaner.CleanerObjectId);
         }
+    }
+
+    private void RefreshDetailsDescription()
+    {
+        if (ReferenceEquals(this.currentJobDetail.Description, null))
+        {
+            return;
+        }
+
+        this.detailsInput.SetValueWithoutNotify(this.currentJobDetail.Description);
     }
 
     #endregion

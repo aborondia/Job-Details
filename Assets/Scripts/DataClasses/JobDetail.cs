@@ -33,7 +33,20 @@ public class JobDetail
 
     public JobDetail()
     {
+        InitializeDateTimes();
+    }
 
+    private void InitializeDateTimes()
+    {
+        this.jobDate = DateTime.Now;
+
+        this.startTime = DateTime.Now;
+        this.startTime = this.startTime.AddHours(-this.startTime.Hour);
+        this.startTime = this.startTime.AddMinutes(-this.startTime.Minute);
+
+        this.finishTime = DateTime.Now;
+        this.finishTime = this.finishTime.AddHours(-this.finishTime.Hour);
+        this.finishTime = this.finishTime.AddMinutes(-this.finishTime.Minute);
     }
 
     public void SetJobDetailProperties(
