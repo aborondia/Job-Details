@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Events;
@@ -307,7 +308,17 @@ public class LoginQueryHandler : QueryHandler
 
     private void SubmitRegistration()
     {
-        AppController.Active.ServerCommunicator.CreateUser(new UserSignupDTM(this.emailInput.value, this.emailInput.value, this.passwordInput.value));
+        ActionHelper.ExecuteActionWhenTrue(() =>
+        {
+            AppController.Active.ServerCommunicator.CreateUser(new UserSignupDTM(
+                this.emailInput.value,
+                this.emailInput.value,
+                this.passwordInput.value,
+                AppController.Active.UserDataHandler.Roles.FirstOrDefault(entry => entry.Value.name == "RegularUser").Key));
+        }, () =>
+        {
+            return AppController.Active.UserDataHandler.RolesObtained;
+        });
     }
 
     #endregion

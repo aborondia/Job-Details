@@ -10,8 +10,9 @@ namespace Enumerations
         Login = 1,
         JobDetails = 2,
         DetailsReports = 3,
+        Users = 4,
     }
-    
+
     public enum Subview
     {
         Default = 0,
@@ -44,5 +45,11 @@ namespace Enumerations
     {
         AM,
         PM
+    }
+
+    public enum UserRoleEnum
+    {
+        User,
+        Admin,
     }
 }

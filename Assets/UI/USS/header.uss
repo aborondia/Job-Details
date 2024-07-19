@@ -1,0 +1,18 @@
+.main-header {
+    min-height: 60px;
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom-width: 1px;
+    width: 100%;
+}
+
+.header-label-container {
+    width: 100%;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}
+
+.header-label {
+}

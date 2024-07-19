@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/USS/header.uss?fileID=7433441132597879392&amp;guid=74d25f5d6d6c7b841bd210113a760add&amp;type=3#header" />
+    <CustomVisualElement name="reports-header" class="gray1-border main-header">
+        <CustomVisualElement name="header-label-container" class="header-label-container">
+            <CustomLabel text="Job Details" class="white-font x-large-font header-label" />
+        </CustomVisualElement>
+        <CustomVisualElement name="add-button-container" class="add-button-container">
+            <CustomButton name="CustomButton" use-background-color="false" use-border="false" class="add-button">
+                <CustomVisualElement name="icon-container">
+                    <CustomVisualElement name="icon" largest-dimension="40" regenerate-in-editor="true" enforce-largest-dimension="true" class="gi-plus green1-img" />
+                </CustomVisualElement>
+            </CustomButton>
+        </CustomVisualElement>
+    </CustomVisualElement>
+</ui:UXML>

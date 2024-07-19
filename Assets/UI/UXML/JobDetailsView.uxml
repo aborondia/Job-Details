@@ -2,11 +2,6 @@
     <ui:Template name="CleanerRow" src="project://database/Assets/UI/UXML/CleanerRow.uxml?fileID=9197481963319205126&amp;guid=48236067c3f0d7b44ab26632e778212a&amp;type=3#CleanerRow" />
     <Style src="project://database/Assets/UI/USS/job-details-view.uss?fileID=7433441132597879392&amp;guid=70c26b4262b94244aae426f8bb2a51ad&amp;type=3#job-details-view" />
     <CustomVisualElement name="main" class="job-details-view-main">
-        <CustomVisualElement name="reports-header" class="gray1-border details-header">
-            <CustomVisualElement name="header-label-container" class="header-label-container">
-                <CustomLabel text="Job Details" class="white-font x-large-font header-label" />
-            </CustomVisualElement>
-        </CustomVisualElement>
         <CustomVisualElement name="main-content" style="flex-grow: 1; flex-direction: column-reverse;">
             <CustomVisualElement name="details-content-container" class="white-bg" style="flex-grow: 1; margin-bottom: 10px;">
                 <CustomInput multiline="true" placeholder-text="Details" style="white-space: normal; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />

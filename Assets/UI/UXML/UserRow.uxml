@@ -1,0 +1,31 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/USS/user-row.uss?fileID=7433441132597879392&amp;guid=37393c7930cc27846885a0c1ea6c57d9&amp;type=3#user-row" />
+    <CustomVisualElement name="main" style="height: 100%; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px; flex-direction: row; align-items: center; width: 100%;">
+        <CustomVisualElement name="name-label-container" style="flex-grow: 1; height: 100%; justify-content: center;">
+            <CustomLabel text="User Name" class="regular-font" />
+        </CustomVisualElement>
+        <CustomVisualElement name="delete-user-button-container" class="user-row-button-container">
+            <CustomButton class="user-row-button">
+                <CustomVisualElement name="label-container" class="user-row-button-label-container">
+                    <CustomLabel class="user-row-button-label small-font" />
+                </CustomVisualElement>
+                <CustomVisualElement name="icon-container" class="user-row-button-icon-container">
+                    <CustomVisualElement name="icon" enforce-largest-dimension="true" largest-dimension="25" regenerate-in-editor="true" class="user-row-button-icon gi-recycle-bin red1-img" />
+                </CustomVisualElement>
+            </CustomButton>
+        </CustomVisualElement>
+        <CustomVisualElement name="verify-user-button-container" class="user-row-button-container" style="display: none;">
+            <CustomButton class="user-row-button">
+                <CustomVisualElement name="label-container" class="user-row-button-label-container">
+                    <CustomLabel text="Verify User? " class="user-row-button-label small-font" />
+                </CustomVisualElement>
+                <CustomVisualElement name="icon-container" class="user-row-button-icon-container">
+                    <CustomVisualElement name="icon" enforce-largest-dimension="true" largest-dimension="25" regenerate-in-editor="true" class="gi-checkmark green1-img user-row-button-icon" />
+                </CustomVisualElement>
+            </CustomButton>
+        </CustomVisualElement>
+        <CustomVisualElement name="user-type-container" class="user-type-container">
+            <CustomEnumField type="Enumerations.UserRoleEnum, Assembly-CSharp" />
+        </CustomVisualElement>
+    </CustomVisualElement>
+</ui:UXML>

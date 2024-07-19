@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Template name="UserRow" src="project://database/Assets/UI/UXML/UserRow.uxml?fileID=9197481963319205126&amp;guid=189004bcf7790484bb73a87038e4ea35&amp;type=3#UserRow" />
+    <Style src="project://database/Assets/UI/USS/user-view.uss?fileID=7433441132597879392&amp;guid=a10be6253c4c6914a8634d48d69931f2&amp;type=3#user-view" />
+    <CustomVisualElement name="main" style="width: 100%; height: 100%;">
+        <ui:ScrollView class="custom-scrollbar">
+            <ui:Instance template="UserRow" name="UserRow" style="height: 60px; width: 100%;" />
+        </ui:ScrollView>
+    </CustomVisualElement>
+</ui:UXML>

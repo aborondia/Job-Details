@@ -18,6 +18,8 @@ public class QueryController : MonoBehaviour
     public UIDocument RootDocument => rootDocument;
     [SerializeField] private LoginQueryHandler loginQueryHandler;
     public LoginQueryHandler LoginQueryHandler => loginQueryHandler;
+    [SerializeField] private UsersQueryHandler usersQueryHandler;
+    public UsersQueryHandler UsersQueryHandler => usersQueryHandler;
     [SerializeField] private JobDetailsQueryHandler jobDetailsQueryHandler;
     public JobDetailsQueryHandler JobDetailsQueryHandler => jobDetailsQueryHandler;
     [SerializeField] private DetailsReportsQueryHandler detailsReportsQueryHandler;

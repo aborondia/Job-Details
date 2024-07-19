@@ -229,6 +229,55 @@ public static class JSONHelper
         return dtm;
     }
 
+    public static List<RoleDTM> GetRoles(string response)
+    {
+        List<RoleDTM> dtms = new List<RoleDTM>();
+        JSONNode result = JSON.Parse(response)["results"];
+
+        foreach (JSONNode node in result.Values)
+        {
+            dtms.Add(GetRole(node));
+        }
+
+        return dtms;
+    }
+
+    public static RoleDTM GetRole(JSONNode node)
+    {
+        RoleDTM dtm = new RoleDTM();
+        dtm.name = node["name"];
+        dtm.objectId = node["objectId"];
+
+        return dtm;
+    }
+
+    public static List<UserDTM> GetUsers(string response)
+    {
+        List<UserDTM> dtms = new List<UserDTM>();
+        JSONNode result = JSON.Parse(response)["results"];
+
+        foreach (JSONNode node in result.Values)
+        {
+            dtms.Add(GetUser(node));
+        }
+
+        return dtms;
+    }
+
+    public static UserDTM GetUser(JSONNode node)
+    {
+        UserDTM dtm = new UserDTM();
+
+        dtm.objectId = node["objectId"];
+        dtm.username = node["username"];
+        dtm.email = node["email"];
+        // dtm.createdAt = node["createdAt"];
+        // dtm.updatedAt = node["updatedAt"];
+        // dtm.emailVerified = node["emailVerified"];
+
+        return dtm;
+    }
+
     private static JobDetailsDTM.JsonFile GetJsonFile(JSONNode node)
     {
         JobDetailsDTM.JsonFile dtm = new JobDetailsDTM.JsonFile();

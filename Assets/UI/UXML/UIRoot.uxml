@@ -1,9 +1,11 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <ui:Template name="AppHeader" src="project://database/Assets/UI/UXML/AppHeader.uxml?fileID=9197481963319205126&amp;guid=e96c082b699d29a47930603cecf4a056&amp;type=3#AppHeader" />
     <ui:Template name="AppLeftBar" src="project://database/Assets/UI/UXML/AppLeftBar.uxml?fileID=9197481963319205126&amp;guid=30d03542ad77d4641af58debe411ba03&amp;type=3#AppLeftBar" />
+    <ui:Template name="Header" src="project://database/Assets/UI/UXML/Header.uxml?fileID=9197481963319205126&amp;guid=940288ad153f3584284f54df497fc05f&amp;type=3#Header" />
     <ui:Template name="DetailsReportsView" src="project://database/Assets/UI/UXML/DetailsReportsView.uxml?fileID=9197481963319205126&amp;guid=c3f3252bef2995c45b625d4e1b463725&amp;type=3#DetailsReportsView" />
     <ui:Template name="JobDetailsView" src="project://database/Assets/UI/UXML/JobDetailsView.uxml?fileID=9197481963319205126&amp;guid=41924833810c4bc43a312734ef3a0254&amp;type=3#JobDetailsView" />
     <ui:Template name="LoginView" src="project://database/Assets/UI/UXML/LoginView.uxml?fileID=9197481963319205126&amp;guid=89d909090d3f6294da705065ec479b62&amp;type=3#LoginView" />
+    <ui:Template name="UsersView" src="project://database/Assets/UI/UXML/UsersView.uxml?fileID=9197481963319205126&amp;guid=c32e76048e2543d42b27f7be8d793b7d&amp;type=3#UsersView" />
     <ui:Template name="AppRightBar" src="project://database/Assets/UI/UXML/AppRightBar.uxml?fileID=9197481963319205126&amp;guid=f40d3f712aa135043ae0a6fb3d1919d6&amp;type=3#AppRightBar" />
     <ui:Template name="AppFooter" src="project://database/Assets/UI/UXML/AppFooter.uxml?fileID=9197481963319205126&amp;guid=6a36373a0dd81334e8cfceb2b4beeaf8&amp;type=3#AppFooter" />
     <ui:Template name="InteractionBlocker" src="project://database/Assets/UI/UXML/InteractionBlocker.uxml?fileID=9197481963319205126&amp;guid=fe2c3c6167d5e1844a6a716a6c4650c5&amp;type=3#InteractionBlocker" />
@@ -21,9 +23,11 @@
             <CustomVisualElement name="views-container" class="views-container">
                 <ui:Instance template="AppLeftBar" name="AppLeftBar" class="app-left-bar" />
                 <CustomVisualElement name="main-views" class="main-views">
+                    <ui:Instance template="Header" name="Header" style="width: 100%; flex-direction: row; min-height: 60px;" />
                     <ui:Instance template="DetailsReportsView" name="DetailsReportsView" class="main-view" style="display: none;" />
-                    <ui:Instance template="JobDetailsView" name="JobDetailsView" class="main-view" />
+                    <ui:Instance template="JobDetailsView" name="JobDetailsView" class="main-view" style="display: none;" />
                     <ui:Instance template="LoginView" name="LoginView" class="main-view" style="display: none;" />
+                    <ui:Instance template="UsersView" name="UsersView" class="main-view" />
                 </CustomVisualElement>
                 <ui:Instance template="AppRightBar" name="AppRightBar" class="app-right-bar" />
             </CustomVisualElement>

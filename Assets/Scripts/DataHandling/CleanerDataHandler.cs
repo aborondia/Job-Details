@@ -29,7 +29,10 @@ public class CleanerDataHandler : MonoBehaviour
                 currentUserInReferences = true;
             }
 
-            this.userNameReferences.Add(userNameReferenceDTM.userObjectId, userNameReferenceDTM);
+            if (!this.userNameReferences.ContainsKey(userNameReferenceDTM.userObjectId))
+            {
+                this.userNameReferences.Add(userNameReferenceDTM.userObjectId, userNameReferenceDTM);
+            }
         }
 
         if (!currentUserInReferences)

@@ -2,6 +2,10 @@
     background-image: url('project://database/Assets/Icons/download.png?fileID=2800000&guid=24885e418a6792d4cb5c8ced1a7a5976&type=3#download');
 }
 
+.gi-checkmark {
+    background-image: url('project://database/Assets/Icons/checkmark.png');
+}
+
 .gi-chevron-down {
     background-image: url('project://database/Assets/Icons/chevron-down.png?fileID=-7389984456692616958&guid=4cd83756da931e34ea6828e57c80295b&type=3#chevron-down_0');
 }

@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using ResponseDelegateString = ActionHelper.StringDelegate;
 using ResponseDelegateBool = ActionHelper.BoolDelegate;
+using NUnit.Framework.Interfaces;
 public class ServerCommunicator : MonoBehaviour
 {
     private string appId;
@@ -72,7 +73,7 @@ public class ServerCommunicator : MonoBehaviour
         UnityWebRequest request = new UnityWebRequest($"{this.UsersUrl}", "POST");
         string jsonBody = JsonConvert.SerializeObject(userSignupDTM);
         byte[] bodyRaw = new System.Text.UTF8Encoding().GetBytes(jsonBody);
-
+        Debug.Log(jsonBody);
         request.SetRequestHeader("X-Parse-Application-Id", this.appId);
         request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
         request.SetRequestHeader("Content-Type", "application/json");
@@ -92,6 +93,51 @@ public class ServerCommunicator : MonoBehaviour
         {
             LogHelper.Active.LogError("Request failed: " + request.error);
             this.OnRegisterFailedEvent.Invoke();
+        }
+
+        this.OnRequestCompletedEvent.Invoke();
+    }
+
+    public void UpdateUserRole(User user, string roleId)
+    {
+        if (ReferenceEquals(user, null))
+        {
+            LogHelper.Active.LogError("User is null!");
+
+            return;
+        }
+
+        this.OnRequestStartedEvent.Invoke();
+
+        StartCoroutine(StartUpdatingUserRole(user, roleId));
+    }
+
+    private IEnumerator StartUpdatingUserRole(User user, string roleId)
+    {
+        UserDTM dtm = user.DTM;
+
+        dtm.role = new RoleRelation(roleId);
+        string url = $"{this.ClassesUrl}/_User/{user.DTM.objectId}";
+        string jsonBody = JsonConvert.SerializeObject(dtm);
+        byte[] bodyRaw = new UTF8Encoding().GetBytes(jsonBody);
+        UnityWebRequest request = UnityWebRequest.Put(url, bodyRaw);
+        Debug.Log(jsonBody);
+        request.SetRequestHeader("X-Parse-Application-Id", this.appId);
+        request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
+        request.SetRequestHeader("Content-Type", "application/json");
+        request.SetRequestHeader("X-Parse-Session-Token", this.currentUser.sessionToken);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
+        }
+        else
+        {
+            LogHelper.Active.LogError("Request failed: " + request.error + request.downloadHandler.text);
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -165,9 +211,76 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public IEnumerator GetUserNameReferences()
+    public void GetUsers(ReturnStringDelegate responseDelegate = null)
     {
-        yield break;
+        StartCoroutine(StartGettingUsers(responseDelegate));
+    }
+
+    private IEnumerator StartGettingUsers(ReturnStringDelegate responseDelegate)
+    {
+        string url = $"{this.ClassesUrl}/_User";
+
+        UnityWebRequest request = UnityWebRequest.Get(url);
+
+        request.SetRequestHeader("X-Parse-Application-Id", this.appId);
+        request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
+        request.SetRequestHeader("X-Parse-Session-Token", this.currentUser.sessionToken);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
+
+            if (!ReferenceEquals(responseDelegate, null))
+            {
+                responseDelegate.Invoke(request.downloadHandler.text);
+            }
+        }
+        else
+        {
+            LogHelper.Active.LogError("Request failed: " + request.error + request.downloadHandler.text);
+        }
+
+        this.OnRequestCompletedEvent.Invoke();
+    }
+
+    public void GetUsersWithRoles(ReturnStringDelegate responseDelegate, string roleObjectId)
+    {
+        StartCoroutine(StartGettingUsersWithRoles(responseDelegate, roleObjectId));
+    }
+
+    private IEnumerator StartGettingUsersWithRoles(ReturnStringDelegate responseDelegate, string roleObjectId)
+    {
+        Dictionary<string, object> whereDict = new Dictionary<string, object>
+        {
+            { "objectId", roleObjectId },
+        };
+
+        string whereJson = JsonUtility.ToJson(whereDict);
+        string encodedWhere = UnityWebRequest.EscapeURL(whereJson);
+
+        string url = $"{this.ClassesUrl}/_User?where={encodedWhere}";
+
+        UnityWebRequest request = UnityWebRequest.Get(url);
+
+        request.SetRequestHeader("X-Parse-Application-Id", this.appId);
+        request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
+        request.SetRequestHeader("X-Parse-Session-Token", this.currentUser.sessionToken);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
+            responseDelegate?.Invoke(request.downloadHandler.text);
+        }
+        else
+        {
+            LogHelper.Active.LogError("Request failed: " + request.error + request.downloadHandler.text);
+        }
+
+        this.OnRequestCompletedEvent.Invoke();
     }
 
     public void SignIn(UserSignInDTM userSignInDTM)
@@ -192,8 +305,6 @@ public class ServerCommunicator : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            JSONNode node = JSON.Parse(request.downloadHandler.text);
-
             this.currentUser = JsonConvert.DeserializeObject<UserDTM>(request.downloadHandler.text);
             LogHelper.Active.Log("Login successful: " + request.downloadHandler.text);
 
@@ -245,6 +356,43 @@ public class ServerCommunicator : MonoBehaviour
         else
         {
             LogHelper.Active.LogError("Logout failed: " + request.error);
+        }
+
+        this.OnRequestCompletedEvent.Invoke();
+    }
+
+    #endregion
+
+    #region Roles
+
+    public void GetRoles(ReturnStringDelegate responseDelegate = null)
+    {
+        StartCoroutine(StartGettingRoles(responseDelegate));
+    }
+
+    private IEnumerator StartGettingRoles(ReturnStringDelegate responseDelegate)
+    {
+        string url = $"{this.ClassesUrl}/_Role";
+
+        UnityWebRequest request = UnityWebRequest.Get(url);
+
+        request.SetRequestHeader("X-Parse-Application-Id", this.appId);
+        request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
+
+            if (!ReferenceEquals(responseDelegate, null))
+            {
+                responseDelegate.Invoke(request.downloadHandler.text);
+            }
+        }
+        else
+        {
+            LogHelper.Active.LogError("Request failed: " + request.error + request.downloadHandler.text);
         }
 
         this.OnRequestCompletedEvent.Invoke();
