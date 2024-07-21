@@ -245,38 +245,86 @@ public static class JSONHelper
     public static RoleDTM GetRole(JSONNode node)
     {
         RoleDTM dtm = new RoleDTM();
+
         dtm.name = node["name"];
         dtm.objectId = node["objectId"];
 
         return dtm;
     }
 
-    public static List<UserDTM> GetUsers(string response)
+    public static RoleDTM GetRole(string response)
     {
-        List<UserDTM> dtms = new List<UserDTM>();
-        JSONNode result = JSON.Parse(response)["results"];
+        RoleDTM dtm = new RoleDTM();
+        JSONNode result = JSON.Parse(response)["results"].AsArray[0];
 
-        foreach (JSONNode node in result.Values)
-        {
-            dtms.Add(GetUser(node));
-        }
-
-        return dtms;
-    }
-
-    public static UserDTM GetUser(JSONNode node)
-    {
-        UserDTM dtm = new UserDTM();
-
-        dtm.objectId = node["objectId"];
-        dtm.username = node["username"];
-        dtm.email = node["email"];
-        // dtm.createdAt = node["createdAt"];
-        // dtm.updatedAt = node["updatedAt"];
-        // dtm.emailVerified = node["emailVerified"];
+        dtm.name = result["name"];
+        dtm.objectId = result["objectId"];
 
         return dtm;
     }
+
+    public static Dictionary<string, Dictionary<string, User>> GetUsersWithRoles(string response)
+    {
+        Dictionary<string, Dictionary<string, User>> usersWithRoles = new Dictionary<string, Dictionary<string, User>>();
+        JSONNode result = JSON.Parse(response)["result"];
+
+        foreach (JSONNode entryNode in result.Values)
+        {
+            RoleDTM roleDTM = GetRole(entryNode["role"]);
+            JSONNode usersNode = entryNode["users"];
+            List<User> users = GetUsers(usersNode, roleDTM);
+
+            foreach (User user in users)
+            {
+                if (!usersWithRoles.ContainsKey(user.RoleDTM.objectId))
+                {
+                    usersWithRoles.Add(user.RoleDTM.objectId, new Dictionary<string, User>());
+                }
+
+                usersWithRoles[user.RoleDTM.objectId].Add(user.DTM.objectId, user);
+            }
+        }
+
+        return usersWithRoles;
+    }
+
+    private static List<User> GetUsers(JSONNode nodeWithValues, RoleDTM roleDTM)
+    {
+        List<User> users = new List<User>();
+
+        foreach (JSONNode node in nodeWithValues.Values)
+        {
+            UserDTM userDTM = new UserDTM();
+            User user;
+
+            userDTM.objectId = node["objectId"];
+            userDTM.username = node["username"];
+            userDTM.email = node["email"];
+            userDTM.verified = node["verified"];
+
+            user = new User(userDTM, roleDTM);
+
+            users.Add(user);
+        }
+
+        return users;
+    }
+
+    // public static User GetUser(JSONNode node)
+    // {
+    //     UserDTM dtm = new UserDTM();
+
+    //     dtm.objectId = node["objectId"];
+    //     dtm.username = node["username"];
+    //     dtm.email = node["email"];
+    //     dtm.verified = node["verified"];
+    //     dtm.roleId = node["roleId"];
+    //     // dtm.createdAt = node["createdAt"];
+    //     // dtm.updatedAt = node["updatedAt"];
+    //     // dtm.emailVerified = node["emailVerified"];
+
+    //     return dtm;
+    // }
 
     private static JobDetailsDTM.JsonFile GetJsonFile(JSONNode node)
     {

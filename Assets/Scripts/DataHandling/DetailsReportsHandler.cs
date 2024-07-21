@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -18,12 +19,15 @@ public class DetailsReportsHandler : MonoBehaviour
     {
         AppController.Active.ServerCommunicator.OnSignInSuccessEvent.AddListener(() =>
         {
-            ActionHelper.StringDelegate responseDelegate = response =>
+            if (AppController.Active.ServerCommunicator.CurrentUser.verified)
             {
-                PopulateReports(JSONHelper.GetDetailsReports(response));
-            };
+                ActionHelper.StringDelegate responseDelegate = response =>
+                {
+                    PopulateReports(JSONHelper.GetDetailsReports(response));
+                };
 
-            AppController.Active.ServerCommunicator.GetDetailsReports(responseDelegate);
+                AppController.Active.ServerCommunicator.GetDetailsReports(responseDelegate);
+            }
         });
     }
 

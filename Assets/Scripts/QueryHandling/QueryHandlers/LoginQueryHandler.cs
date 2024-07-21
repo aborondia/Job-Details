@@ -46,7 +46,7 @@ public class LoginQueryHandler : QueryHandler
 
         AppController.Active.ServerCommunicator.OnRegisterSuccessEvent.AddListener(() =>
         {
-            SubmitLogin();
+            // Tell them they need to be verified
         });
     }
 

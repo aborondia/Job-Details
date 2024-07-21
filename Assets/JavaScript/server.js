@@ -3,6 +3,22 @@ const { v4: uuidv4 } = require("uuid");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+Parse.Cloud.define("getUsernames", async (request) => {
+    try {
+        const query = new Parse.Query(Parse.User);
+        query.select("username"); // Specify the column you want to retrieve
+        
+        const results = await query.find({ useMasterKey: true });
+        
+        // Extract usernames from results
+        const usernames = results.map(user => user.get("username"));
+        
+        return usernames;
+    } catch (error) {
+        throw new Error("Error retrieving usernames: " + error.message);
+    }
+});
+
 Parse.Cloud.define("sendEmail", async (request) => {
   try {
     const emailData = request.params;
@@ -116,6 +132,40 @@ Parse.Cloud.define("retrieveJobDetails", async (request) => {
   } catch (error) {
     console.error("Error retrieving JobDetails:", error);
     throw new Parse.Error(500, "Error retrieving JobDetails");
+  }
+});
+
+
+Parse.Cloud.define("getRolesWithUsers", async (request) => {
+  const Role = Parse.Object.extend("_Role");
+  const query = new Parse.Query(Role);
+
+  try {
+    const roles = await query.find({ useMasterKey: true });
+    const roleWithUsersPromises = roles.map(async (role) => {
+      const usersRelation = role.relation("users");
+      const usersQuery = usersRelation.query();
+      const users = await usersQuery.find({ useMasterKey: true });
+
+      return {
+        role: {
+          objectId: role.id,
+          name: role.get("name"),
+        },
+        users: users.map(user => ({
+          objectId: user.id,
+          username: user.get("username"),
+          email: user.get("email"),
+          verified: user.get("verified"),
+        })),
+      };
+    });
+
+    const rolesWithUsers = await Promise.all(roleWithUsersPromises);
+    return rolesWithUsers;
+  } catch (error) {
+    console.error("Error in getRolesWithUsers function:", error); // Log the error for debugging
+    throw new Parse.Error(Parse.Error.INTERNAL_SERVER_ERROR, error.message);
   }
 });
 
