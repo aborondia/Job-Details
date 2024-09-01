@@ -51,13 +51,6 @@ public class ServerCommunicator : MonoBehaviour
 
         this.OnSignInSuccessEvent.AddListener(() =>
         {
-            // CreateJobDetails(new JobDetail(), "ANVUxDjPru");
-            // CreateDetailsReport();
-            // GetJobDetails("bY7VbX6fIP");
-            // GetDetailsReports();
-            // DeleteDetailsReport("bnfHqJVG5d");
-            // UpdateJobDetails("8KRnJSC9BK", "bY7VbX6fIP", new JobDetail());
-            // DeleteJobDetails("eKsFih6wE5");
             StartCoroutine(CallGetRolesWithUsersFunction());
         });
     }
@@ -78,11 +71,11 @@ public class ServerCommunicator : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Response: " + request.downloadHandler.text);
+            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
         }
         else
         {
-            Debug.LogError("Request failed: " + request.error);
+            LogHelper.Active.LogError("Request failed: " + request.error);
         }
     }
 
@@ -335,7 +328,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Request failed: " + request.error);
+            LogHelper.Active.LogError("Request failed: " + request.error);
         }
     }
 
@@ -636,7 +629,7 @@ public class ServerCommunicator : MonoBehaviour
             { "createdBy", this.currentUserDTM.objectId },
         };
 
-            string whereJson = JsonUtility.ToJson(whereDict);
+            string whereJson = JsonConvert.SerializeObject(whereDict);
             string encodedWhere = UnityWebRequest.EscapeURL(whereJson);
 
             url = $"{this.ClassesUrl}/DetailsReport?where={encodedWhere}";
@@ -759,16 +752,18 @@ public class ServerCommunicator : MonoBehaviour
 
     private IEnumerator StartGettingJobDetails(string detailsReportObjectId, ResponseDelegateString responseDelegate)
     {
-        Dictionary<string, object> whereDict = new Dictionary<string, object>
-        {
-            { "jsonFile", new { __type = "File", name = "" } },
-            { "createdBy", "" },
-            { "content", "" },
-            { "reportPointer", new { __type = "Pointer", className = "DetailsReport", objectId = detailsReportObjectId } }
-        };
-        string whereJson = JsonUtility.ToJson(whereDict);
-        string encodedWhere = UnityWebRequest.EscapeURL(whereJson);
-        string url = $"{this.ClassesUrl}/JobDetail?where={encodedWhere}";
+        // Dictionary<string, object> whereDict = new Dictionary<string, object>
+        // {
+        //     { "jsonFile", new { __type = "File", name = "" } },
+        //     { "createdBy", "" },
+        //     { "content", "" },
+        //     { "reportPointer", new { __type = "Pointer", className = "DetailsReport", objectId = detailsReportObjectId } }
+        // };
+
+        // string whereJson = JsonConvert.SerializeObject(whereDict);
+        // string encodedWhere = UnityWebRequest.EscapeURL(whereJson);
+        string url = $"{this.ClassesUrl}/JobDetail";
+        // string url = $"{this.ClassesUrl}/JobDetail?where={encodedWhere}";
         UnityWebRequest request = UnityWebRequest.Get(url);
 
         request.SetRequestHeader("X-Parse-Application-Id", this.appId);
@@ -794,7 +789,7 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void UpdateJobDetails(string jobDetailsId, string detailsReportId, JobDetail jobDetails)
+    public void UpdateJobDetails(JobDetail jobDetails, ResponseDelegateString responseDelegate = null)
     {
         if (ReferenceEquals(this.currentUserDTM, null))
         {
@@ -805,13 +800,13 @@ public class ServerCommunicator : MonoBehaviour
 
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartUpdatingJobDetails(jobDetailsId, detailsReportId, jobDetails));
+        StartCoroutine(StartUpdatingJobDetails(jobDetails, responseDelegate));
     }
 
-    private IEnumerator StartUpdatingJobDetails(string jobDetailsId, string detailsReportId, JobDetail jobDetails)
+    private IEnumerator StartUpdatingJobDetails(JobDetail jobDetails, ResponseDelegateString responseDelegate)
     {
-        string url = $"{this.ClassesUrl}/JobDetail/{jobDetailsId}";
-        JobDetailsDTM dtm = new JobDetailsDTM(this.currentUserDTM.objectId, jobDetails, detailsReportId);
+        string url = $"{this.ClassesUrl}/JobDetail/{jobDetails.ObjectId}";
+        JobDetailsDTM dtm = new JobDetailsDTM(this.currentUserDTM.objectId, jobDetails, jobDetails.DetailsReportId);
         string jsonBody = JsonConvert.SerializeObject(dtm);
         byte[] bodyRaw = new UTF8Encoding().GetBytes(jsonBody);
         UnityWebRequest request = UnityWebRequest.Put(url, bodyRaw);
@@ -828,6 +823,8 @@ public class ServerCommunicator : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             LogHelper.Active.Log("Response:  (StartUpdatingJobDetails)" + request.downloadHandler.text);
+
+            responseDelegate?.Invoke(request.downloadHandler.text);
         }
         else
         {

@@ -119,13 +119,14 @@ public class MailSender : MonoBehaviour
 
     #region Setup
 
-    public void CreateEmail()
+    public void CreateEmail(DetailsReport detailsReport)
     {
         pdfDocument pdfDocument;
         MemoryStream memoryStream;
         byte[] fileBytes;
 
-        pdfDocument = DocumentCreator.Active.GetDocument(new DetailsReport(new DetailsReportDTM()));
+        pdfDocument = DocumentCreator.Active.GetDocument(detailsReport);
+        // pdfDocument = DocumentCreator.Active.GetDocument(new DetailsReport(new DetailsReportDTM()));
         memoryStream = new System.IO.MemoryStream();
         fileBytes = new byte[0];
 

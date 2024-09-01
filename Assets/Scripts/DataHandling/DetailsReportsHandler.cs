@@ -94,8 +94,6 @@ public class DetailsReportsHandler : MonoBehaviour
             this.detailsReports[jobDetail.DetailsReportId].Details.Remove(jobDetail.ObjectId);
         }
 
-        AppController.Active.ServerCommunicator.DeleteJobDetails(jobDetail.ObjectId);
-
         OnReportsCollectionChangedEvent.Invoke();
     }
 }

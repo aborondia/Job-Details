@@ -16,6 +16,7 @@ public class JobDetailsDTM
 
     public JobDetailsDTM(string createdBy, JobDetail content, string detailsReportId)
     {
+        this.objectId = content.ObjectId;
         this.jsonFile = new JsonFile();
         this.createdBy = createdBy;
         this.content = content;

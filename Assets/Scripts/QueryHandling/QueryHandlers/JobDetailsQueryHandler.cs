@@ -49,6 +49,7 @@ public class JobDetailsQueryHandler : QueryHandler
     private CustomButton saveButton;
     private JobDetail currentJobDetail;
     public JobDetail CurrentJobDetail => currentJobDetail;
+    private bool editingExistingDetails;
     private DateTime? currentDatePickerDate;
     private UnityEvent onCurrentJobDetailChanged = new UnityEvent();
 
@@ -136,14 +137,19 @@ public class JobDetailsQueryHandler : QueryHandler
             {
                 JSONNode resultNode = JSON.Parse(response);
 
-                this.currentJobDetail.OnServerCreation(resultNode["objectId"], resultNode["createdAt"]);
+                AppController.Active.DetailsReportsHandler.RefreshReports();
 
-                QueryController.Active.DetailsReportsQueryHandler.CurrentlySelectedDetailsReport.AddJobDetail(this.currentJobDetail);
-
-                QueryController.Active.ChangeView(Enumerations.MainView.DetailsReports, Enumerations.Subview.Default);
+                AppController.Active.MailSender.CreateEmail(QueryController.Active.DetailsReportsQueryHandler.CurrentlySelectedDetailsReport);
             };
 
-            AppController.Active.ServerCommunicator.CreateJobDetails(this.currentJobDetail, responseDelegate);
+            if (this.editingExistingDetails)
+            {
+                AppController.Active.ServerCommunicator.UpdateJobDetails(this.currentJobDetail, responseDelegate);
+            }
+            else
+            {
+                AppController.Active.ServerCommunicator.CreateJobDetails(this.currentJobDetail, responseDelegate);
+            }
         });
     }
 
@@ -206,6 +212,7 @@ public class JobDetailsQueryHandler : QueryHandler
             return;
         }
 
+        this.editingExistingDetails = false;
         this.currentJobDetail = new JobDetail();
         RefreshJobDetail();
         QueryController.Active.ChangeView(MainView.JobDetails, Subview.Default);
@@ -218,6 +225,7 @@ public class JobDetailsQueryHandler : QueryHandler
             return;
         }
 
+        this.editingExistingDetails = true;
         this.currentJobDetail = jobDetail;
         RefreshJobDetail();
         QueryController.Active.ChangeView(MainView.JobDetails, Subview.Default);
@@ -467,7 +475,8 @@ public class JobDetailsQueryHandler : QueryHandler
             (Enumerations.JobTypeEnum)this.jobTypeInput.value,
             this.currentJobDetail.Cleaners,
             (Enumerations.PaymentTypeEnum)this.paymentTypeInput.value,
-            this.detailsInput.value);
+            this.detailsInput.value,
+            this.currentJobDetail.ObjectId);
 
         return true;
     }
