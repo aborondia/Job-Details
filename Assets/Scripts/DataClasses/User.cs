@@ -14,4 +14,14 @@ public class User : MonoBehaviour
         this.dtm = dtm;
         this.roleDTM = roleDTM;
     }
+
+    public void UpdateRole(RoleDTM roleDTM)
+    {
+        this.roleDTM = roleDTM;
+
+        if (!ReferenceEquals(this.roleDTM, null))
+        {
+            this.dtm.roleId = this.roleDTM.objectId;
+        }
+    }
 }

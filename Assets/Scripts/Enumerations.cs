@@ -49,7 +49,7 @@ namespace Enumerations
 
     public enum UserRoleEnum
     {
-        User,
         Admin,
+        User,
     }
 }

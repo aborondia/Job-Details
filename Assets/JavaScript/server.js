@@ -4,19 +4,19 @@ const { v4: uuidv4 } = require("uuid");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 Parse.Cloud.define("getUsernames", async (request) => {
-    try {
-        const query = new Parse.Query(Parse.User);
-        query.select("username"); // Specify the column you want to retrieve
-        
-        const results = await query.find({ useMasterKey: true });
-        
-        // Extract usernames from results
-        const usernames = results.map(user => user.get("username"));
-        
-        return usernames;
-    } catch (error) {
-        throw new Error("Error retrieving usernames: " + error.message);
-    }
+  try {
+    const query = new Parse.Query(Parse.User);
+    query.select("username"); // Specify the column you want to retrieve
+
+    const results = await query.find({ useMasterKey: true });
+
+    // Extract usernames from results
+    const usernames = results.map((user) => user.get("username"));
+
+    return usernames;
+  } catch (error) {
+    throw new Error("Error retrieving usernames: " + error.message);
+  }
 });
 
 Parse.Cloud.define("sendEmail", async (request) => {
@@ -135,7 +135,6 @@ Parse.Cloud.define("retrieveJobDetails", async (request) => {
   }
 });
 
-
 Parse.Cloud.define("getRolesWithUsers", async (request) => {
   const Role = Parse.Object.extend("_Role");
   const query = new Parse.Query(Role);
@@ -152,7 +151,7 @@ Parse.Cloud.define("getRolesWithUsers", async (request) => {
           objectId: role.id,
           name: role.get("name"),
         },
-        users: users.map(user => ({
+        users: users.map((user) => ({
           objectId: user.id,
           username: user.get("username"),
           email: user.get("email"),
@@ -164,7 +163,27 @@ Parse.Cloud.define("getRolesWithUsers", async (request) => {
     const rolesWithUsers = await Promise.all(roleWithUsersPromises);
     return rolesWithUsers;
   } catch (error) {
-    console.error("Error in getRolesWithUsers function:", error); // Log the error for debugging
+    console.error("Error in getRolesWithUsers function:", error);
+    throw new Parse.Error(Parse.Error.INTERNAL_SERVER_ERROR, error.message);
+  }
+});
+
+Parse.Cloud.define("getUnverifiedUsers", async (request) => {
+  const User = Parse.Object.extend("_User");
+  const query = new Parse.Query(User);
+  query.equalTo("verified", false);
+
+  try {
+    const unverifiedUsers = await query.find({ useMasterKey: true });
+    const usersData = unverifiedUsers.map((user) => ({
+      objectId: user.id,
+      username: user.get("username"),
+      email: user.get("email"),
+      verified: user.get("verified"),
+    }));
+    return usersData;
+  } catch (error) {
+    console.error("Error in getUnverifiedUsers function:", error);
     throw new Parse.Error(Parse.Error.INTERNAL_SERVER_ERROR, error.message);
   }
 });

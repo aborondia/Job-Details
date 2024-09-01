@@ -17,18 +17,23 @@ public class DetailsReportsHandler : MonoBehaviour
 
     private void SetReportsOnLogin()
     {
-        AppController.Active.ServerCommunicator.OnSignInSuccessEvent.AddListener(() =>
+        AppController.Active.UserDataHandler.OnCurrentUserPopulatedEvent.AddListener(() =>
         {
             if (AppController.Active.ServerCommunicator.CurrentUser.verified)
             {
-                ActionHelper.StringDelegate responseDelegate = response =>
-                {
-                    PopulateReports(JSONHelper.GetDetailsReports(response));
-                };
-
-                AppController.Active.ServerCommunicator.GetDetailsReports(responseDelegate);
+                RefreshReports();
             }
         });
+    }
+
+    public void RefreshReports()
+    {
+        ActionHelper.StringDelegate responseDelegate = response =>
+        {
+            PopulateReports(JSONHelper.GetDetailsReports(response));
+        };
+
+        AppController.Active.ServerCommunicator.GetDetailsReports(responseDelegate);
     }
 
     public void PopulateReports(List<DetailsReport> detailsReports)

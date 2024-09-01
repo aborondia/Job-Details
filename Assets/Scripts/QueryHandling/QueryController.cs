@@ -22,6 +22,8 @@ public class QueryController : MonoBehaviour
     public UsersQueryHandler UsersQueryHandler => usersQueryHandler;
     [SerializeField] private JobDetailsQueryHandler jobDetailsQueryHandler;
     public JobDetailsQueryHandler JobDetailsQueryHandler => jobDetailsQueryHandler;
+    [SerializeField] private HeaderQueryHandler headerQueryHandler;
+    public HeaderQueryHandler HeaderQueryHandler => headerQueryHandler;
     [SerializeField] private DetailsReportsQueryHandler detailsReportsQueryHandler;
     public DetailsReportsQueryHandler DetailsReportsQueryHandler => detailsReportsQueryHandler;
     [SerializeField] private GameObject queryHandlersParent;

@@ -16,16 +16,12 @@ public class UserDataHandler : MonoBehaviour
     public Dictionary<string, RoleDTM> Roles => roles;
     private Dictionary<string, Dictionary<string, User>> usersWithRoles = new Dictionary<string, Dictionary<string, User>>();
     public Dictionary<string, Dictionary<string, User>> UsersWithRoles => usersWithRoles;
+    private List<User> unverifiedUsers = new List<User>();
+    public List<User> UnverifiedUsers => unverifiedUsers;
     private bool rolesObtained = false;
     public bool RolesObtained => rolesObtained;
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            QueryController.Active.ChangeView(Enumerations.MainView.Users, Enumerations.Subview.Default);
-        }
-    }
+    public UnityEvent OnCurrentUserPopulatedEvent = new UnityEvent();
+    public UnityEvent OnUsersPopulatedEvent = new UnityEvent();
 
     #region Initialization
 
@@ -59,20 +55,31 @@ public class UserDataHandler : MonoBehaviour
 
     private void OnSettingRegularUser()
     {
-       AppController.Active.ServerCommunicator.GetDetailsReports();
+        // regular user
     }
 
     private void OnSettingAdvancedUser()
     {
-        AppController.Active.ServerCommunicator.GetUsersWithRoles(response =>
-        {
-            this.usersWithRoles = JSONHelper.GetUsersWithRoles(response);
-        });
+        PopulateUsers();
     }
 
     #endregion
 
     #region Getters/Setters
+
+    public void PopulateUsers()
+    {
+        AppController.Active.ServerCommunicator.GetUsersWithRoles(response =>
+        {
+            this.usersWithRoles = JSONHelper.GetUsersWithRoles(response);
+
+            AppController.Active.ServerCommunicator.GetUnverifiedUsers(response =>
+            {
+                this.unverifiedUsers = JSONHelper.GetUnverifiedUsers(response);
+                this.OnUsersPopulatedEvent.Invoke();
+            });
+        });
+    }
 
     private void SetCurrentUser()
     {
@@ -83,6 +90,8 @@ public class UserDataHandler : MonoBehaviour
             currentUserRole = JSONHelper.GetRole(response);
 
             this.currentUser = new User(AppController.Active.ServerCommunicator.CurrentUser, currentUserRole);
+
+            this.OnCurrentUserPopulatedEvent.Invoke();
 
             if (_UserRoleServerName == this.currentUser.RoleDTM.name)
             {
@@ -109,51 +118,17 @@ public class UserDataHandler : MonoBehaviour
         this.rolesObtained = true;
     }
 
-    // private void PopulateUsers(List<UserDTM> userDTMs, RoleDTM roleDTM)
-    // {
-    //     Debug.Log(userDTMs.Count);
-    //     foreach (UserDTM dtm in userDTMs)
-    //     {
-    //         if (!this.usersWithRoles.ContainsKey(dtm.objectId))
-    //         {
-    //             User newUser = new User(dtm, roleDTM);
-    //             Debug.Log($"{dtm.username} - {roleDTM.name} ");
-
-    //             this.usersWithRoles.Add(dtm.objectId, newUser);
-
-    //             if (dtm.objectId == AppController.Active.ServerCommunicator.CurrentUser.objectId)
-    //             {
-    //                 this.currentUser = newUser;
-    //             }
-    //         }
-    //     }
-    // }
-
-    // public User GetCurrentUser()
-    // {
-    //     string currentUserId = AppController.Active.ServerCommunicator.CurrentUser.objectId;
-
-    //     if (this.usersWithRoles.ContainsKey(currentUserId))
-    //     {
-    //         return this.usersWithRoles[currentUserId];
-    //     }
-    //     else
-    //     {
-    //         return null;
-    //     }
-    // }
-
-    // public User GetUser(string userObjectId)
-    // {
-    //     if (this.usersWithRoles.ContainsKey(userObjectId))
-    //     {
-    //         return this.usersWithRoles[userObjectId];
-    //     }
-    //     else
-    //     {
-    //         return null;
-    //     }
-    // }
+    public void OnUserDeleted(User user)
+    {
+        if (user.DTM.verified)
+        {
+            this.usersWithRoles[user.RoleDTM.objectId].Remove(user.DTM.objectId);
+        }
+        else
+        {
+            this.unverifiedUsers.Remove(user);
+        }
+    }
 
     #endregion
 }

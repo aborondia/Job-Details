@@ -29,3 +29,11 @@
 .gi-recycle-bin {
     background-image: url('project://database/Assets/Icons/recycle-bin.png?fileID=-7477415332684337147&guid=cc7f0c5e4d6c53d4dbb6a21c2c33dc85&type=3#recycle-bin_0');
 }
+
+.gi-team {
+    background-image: url('project://database/Assets/Icons/team.png');
+}
+
+.gi-user {
+    background-image: url('project://database/Assets/Icons/user.png');
+}

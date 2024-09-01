@@ -288,26 +288,46 @@ public static class JSONHelper
         return usersWithRoles;
     }
 
+    public static List<User> GetUnverifiedUsers(string response)
+    {
+        List<User> users = new List<User>();
+        JSONNode result = JSON.Parse(response)["result"];
+
+        foreach (JSONNode node in result.Values)
+        {
+            User user = new User(GetUserDTM(node), new RoleDTM());
+
+            users.Add(user);
+        }
+
+        return users;
+    }
+
     private static List<User> GetUsers(JSONNode nodeWithValues, RoleDTM roleDTM)
     {
         List<User> users = new List<User>();
 
         foreach (JSONNode node in nodeWithValues.Values)
         {
-            UserDTM userDTM = new UserDTM();
-            User user;
-
-            userDTM.objectId = node["objectId"];
-            userDTM.username = node["username"];
-            userDTM.email = node["email"];
-            userDTM.verified = node["verified"];
-
-            user = new User(userDTM, roleDTM);
+            UserDTM userDTM = GetUserDTM(node);
+            User user = new User(userDTM, roleDTM);
 
             users.Add(user);
         }
 
         return users;
+    }
+
+    private static UserDTM GetUserDTM(JSONNode node)
+    {
+        UserDTM dtm = new UserDTM();
+
+        dtm.objectId = node["objectId"];
+        dtm.username = node["username"];
+        dtm.email = node["email"];
+        dtm.verified = node["verified"];
+
+        return dtm;
     }
 
     // public static User GetUser(JSONNode node)

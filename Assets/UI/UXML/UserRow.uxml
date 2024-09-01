@@ -5,7 +5,7 @@
             <CustomLabel text="User Name" class="regular-font" />
         </CustomVisualElement>
         <CustomVisualElement name="delete-user-button-container" class="user-row-button-container">
-            <CustomButton class="user-row-button">
+            <CustomButton use-background-color="false" use-border="false" class="user-row-button">
                 <CustomVisualElement name="label-container" class="user-row-button-label-container">
                     <CustomLabel class="user-row-button-label small-font" />
                 </CustomVisualElement>
@@ -15,7 +15,7 @@
             </CustomButton>
         </CustomVisualElement>
         <CustomVisualElement name="verify-user-button-container" class="user-row-button-container" style="display: none;">
-            <CustomButton class="user-row-button">
+            <CustomButton use-background-color="false" use-border="false" class="user-row-button">
                 <CustomVisualElement name="label-container" class="user-row-button-label-container">
                     <CustomLabel text="Verify User? " class="user-row-button-label small-font" />
                 </CustomVisualElement>

@@ -314,7 +314,8 @@ public class LoginQueryHandler : QueryHandler
                 this.emailInput.value,
                 this.emailInput.value,
                 this.passwordInput.value,
-                AppController.Active.UserDataHandler.Roles.FirstOrDefault(entry => entry.Value.name == "RegularUser").Key));
+                AppController.Active.UserDataHandler.Roles
+                .FirstOrDefault(entry => entry.Value.name == UserDataHandler._UserRoleServerName).Key));
         }, () =>
         {
             return AppController.Active.UserDataHandler.RolesObtained;

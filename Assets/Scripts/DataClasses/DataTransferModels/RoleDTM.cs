@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class RoleDTM
@@ -13,16 +14,32 @@ public class RoleDTM
 [Serializable]
 public class RelationOperation
 {
-    public string __op = "AddRelation";
+    public enum RelationOperations
+    {
+        Add,
+        Remove,
+    }
+
+    public string __op;
     public List<Pointer> objects;
 
-    public RelationOperation(List<string> userIds)
+    public RelationOperation(List<string> userIds, RelationOperations operation)
     {
         this.objects = new List<Pointer>();
 
         foreach (var userId in userIds)
         {
             this.objects.Add(new Pointer(userId));
+        }
+
+        switch (operation)
+        {
+            case RelationOperations.Add:
+                this.__op = "AddRelation";
+                break;
+            case RelationOperations.Remove:
+                this.__op = "RemoveRelation";
+                break;
         }
     }
 

@@ -10,7 +10,7 @@ public abstract class QueryHandler : MonoBehaviour
     [SerializeField] protected MainView mainView;
     protected VisualElement parentElement;
     public VisualElement ParentElement => parentElement;
-    protected List<VisualElement> mainViewElements;
+    protected Dictionary<MainView, List<VisualElement>> mainViewElements;
     protected Dictionary<Subview, List<VisualElement>> subviewElements;
     protected bool initialized;
     public bool Initialized => initialized;
@@ -55,13 +55,17 @@ public abstract class QueryHandler : MonoBehaviour
     {
         this.parentElement = QueryController.Active.RootDocument.rootVisualElement.Q<TemplateContainer>(this.parentBaseElement.name);
 
-        this.mainViewElements = new List<VisualElement>();
+        this.mainViewElements = new Dictionary<MainView, List<VisualElement>>();
         this.subviewElements = new Dictionary<Subview, List<VisualElement>>();
     }
 
-    protected void AddMainViewElement(VisualElement element)
+    protected void AddMainViewElement(MainView mainView, VisualElement element)
     {
-        this.mainViewElements.Add(element);
+        if (!this.mainViewElements.ContainsKey(mainView))
+        {
+            this.mainViewElements.Add(mainView, new List<VisualElement>());
+        }
+        this.mainViewElements[mainView].Add(element);
     }
 
     protected void AddSubviewElement(Subview subview, VisualElement element)
@@ -80,6 +84,9 @@ public abstract class QueryHandler : MonoBehaviour
 
     protected virtual void OnMainViewChanged()
     {
+        MainView? previousView;
+        MainView currentView;
+
         if (this.mainView != MainView.None)
         {
             if (QueryController.Active.CurrentMainView == this.mainView)
@@ -89,8 +96,20 @@ public abstract class QueryHandler : MonoBehaviour
             else
             {
                 HideParent();
+
+                return;
             }
         }
+
+        previousView = QueryController.Active.PreviousView.MainView;
+        currentView = QueryController.Active.CurrentMainView;
+
+        if (previousView.HasValue && this.mainViewElements.ContainsKey(previousView.Value))
+        {
+            HideMainViewElements(previousView.Value);
+        }
+
+        ShowMainViewElements(currentView);
     }
 
     protected virtual void OnSubviewChanged()
@@ -160,6 +179,32 @@ public abstract class QueryHandler : MonoBehaviour
     public void HideParent()
     {
         VisualElementHelper.SetElementDisplay(this.parentElement, DisplayStyle.None);
+    }
+
+    protected void ShowMainViewElements(MainView mainView)
+    {
+        if (!this.mainViewElements.ContainsKey(mainView))
+        {
+            return;
+        }
+
+        foreach (VisualElement element in this.mainViewElements[mainView])
+        {
+            ShowElement(element);
+        }
+    }
+
+    protected void HideMainViewElements(MainView mainView)
+    {
+        if (!this.mainViewElements.ContainsKey(mainView))
+        {
+            return;
+        }
+
+        foreach (VisualElement element in this.mainViewElements[mainView])
+        {
+            HideElement(element);
+        }
     }
 
     protected void ShowSubviewElements(Subview subview)
