@@ -131,25 +131,27 @@ public class JobDetailsQueryHandler : QueryHandler
 
         this.saveButton.RegisterCallback<ClickEvent>(evt =>
         {
-            SetJobDetailProperties();
+            // SetJobDetailProperties();
 
-            ActionHelper.StringDelegate responseDelegate = (string response) =>
-            {
-                JSONNode resultNode = JSON.Parse(response);
+            // ActionHelper.StringDelegate responseDelegate = (string response) =>
+            // {
+            //     JSONNode resultNode = JSON.Parse(response);
 
-                AppController.Active.DetailsReportsHandler.RefreshReports();
+            //     AppController.Active.DetailsReportsHandler.RefreshReports();
 
-                AppController.Active.MailSender.CreateEmail(QueryController.Active.DetailsReportsQueryHandler.CurrentlySelectedDetailsReport);
-            };
+            //     AppController.Active.MailSender.CreateEmail(QueryController.Active.DetailsReportsQueryHandler.CurrentlySelectedDetailsReport);
+            // };
 
-            if (this.editingExistingDetails)
-            {
-                AppController.Active.ServerCommunicator.UpdateJobDetails(this.currentJobDetail, responseDelegate);
-            }
-            else
-            {
-                AppController.Active.ServerCommunicator.CreateJobDetails(this.currentJobDetail, responseDelegate);
-            }
+            // if (this.editingExistingDetails)
+            // {
+            //     AppController.Active.ServerCommunicator.UpdateJobDetails(this.currentJobDetail, responseDelegate);
+            // }
+            // else
+            // {
+            //     AppController.Active.ServerCommunicator.CreateJobDetails(this.currentJobDetail, responseDelegate);
+            // }
+
+            // AppController.Active.MailSender.CreateEmail(QueryController.Active.DetailsReportsQueryHandler.CurrentlySelectedDetailsReport);
         });
     }
 

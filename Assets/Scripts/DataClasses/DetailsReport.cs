@@ -17,6 +17,7 @@ public class DetailsReport
     {
         this.createdBy = dtm.createdBy;
         this.objectId = dtm.objectId;
+        this.details.Add("blah", new JobDetail());
     }
 
     public void AddJobDetail(JobDetail jobDetail)

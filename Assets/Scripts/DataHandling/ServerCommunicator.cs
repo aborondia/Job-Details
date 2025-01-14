@@ -12,6 +12,7 @@ using ResponseDelegateString = ActionHelper.StringDelegate;
 using ResponseDelegateBool = ActionHelper.BoolDelegate;
 using NUnit.Framework.Interfaces;
 using Newtonsoft.Json.Linq;
+
 public class ServerCommunicator : MonoBehaviour
 {
     private string appId;
@@ -44,6 +45,7 @@ public class ServerCommunicator : MonoBehaviour
         {
             this.appId = PlayerPrefs.GetString("AppId");
         }
+        
         if (String.IsNullOrEmpty(this.restKey))
         {
             this.restKey = PlayerPrefs.GetString("RestKey");
@@ -53,6 +55,8 @@ public class ServerCommunicator : MonoBehaviour
         {
             StartCoroutine(CallGetRolesWithUsersFunction());
         });
+
+        // Login("One", "Two");
     }
 
     private IEnumerator CallGetRolesWithUsersFunction()
@@ -346,6 +350,7 @@ public class ServerCommunicator : MonoBehaviour
         form.AddField("password", userSignInDTM.password);
 
         UnityWebRequest request = UnityWebRequest.Post(this.LoginUrl, form);
+        request.SetRequestHeader("Access-Control-Allow-Origin", "*");
         request.SetRequestHeader("X-Parse-Application-Id", appId);
         request.SetRequestHeader("X-Parse-REST-API-Key", restKey);
         request.SetRequestHeader("X-Parse-Revocable-Session", "1");
@@ -423,8 +428,9 @@ public class ServerCommunicator : MonoBehaviour
     {
         string url = $"{this.ClassesUrl}/_Role";
 
+        // UnityWebRequest request = new UnityWebRequest(url, "POST");
         UnityWebRequest request = UnityWebRequest.Get(url);
-
+        request.SetRequestHeader("Access-Control-Allow-Origin", "*");
         request.SetRequestHeader("X-Parse-Application-Id", this.appId);
         request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
 
@@ -433,7 +439,7 @@ public class ServerCommunicator : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             LogHelper.Active.Log("Response:  (StartGettingRoles)" + request.downloadHandler.text);
-
+            Debug.Log("Yas");
             if (!ReferenceEquals(responseDelegate, null))
             {
                 responseDelegate.Invoke(request.downloadHandler.text);
@@ -441,6 +447,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
+            Debug.Log("Nah");
             LogHelper.Active.LogError("Request failed: " + request.error + request.downloadHandler.text);
         }
 
@@ -889,17 +896,18 @@ public class ServerCommunicator : MonoBehaviour
 
     private IEnumerator StartSendingEmail(CustomMailMessage customMailMessage)
     {
-        UnityWebRequest request = new UnityWebRequest($"{apiUrl}/sendEmail", "POST");
+        UnityWebRequest request = new UnityWebRequest($"{this.FunctionsUrl}/sendEmail", "POST");
         string jsonBody = JsonConvert.SerializeObject(customMailMessage);
         byte[] bodyRaw = new System.Text.UTF8Encoding().GetBytes(jsonBody);
 
         request.SetRequestHeader("X-Parse-Application-Id", this.appId);
         request.SetRequestHeader("X-Parse-REST-API-Key", this.restKey);
-        // request.SetRequestHeader("X-Parse-Session-Token", this.currentUser.sessionToken);
+        request.SetRequestHeader("X-Parse-Session-Token", AppController.Active.ServerCommunicator.CurrentUser.sessionToken);
+        request.SetRequestHeader("Content-Type", "application/json");
 
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
-
+        Debug.Log(request.uri);
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
@@ -917,4 +925,23 @@ public class ServerCommunicator : MonoBehaviour
     #endregion
 
     #endregion
+
+
+    public void Login(string userName, string password)
+    {
+        // Call the Blazor JavaScript function
+        Application.ExternalCall("UnityCallBlazorLogin", userName, password, this.name);
+    }
+
+    // Called by Blazor on successful login
+    public void OnLoginSuccess(string result)
+    {
+        Debug.Log($"Login Success: {result}");
+    }
+
+    // Called by Blazor if login fails
+    public void OnLoginError(string error)
+    {
+        Debug.LogError($"Login Error: {error}");
+    }
 }

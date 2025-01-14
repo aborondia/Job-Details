@@ -9,8 +9,4 @@ public class UserDTM
     public bool verified { get; set; }
     public string sessionToken { get; set; }
     public string roleId { get; set; }
-    // public RoleRelation role { get; set; }
-    // public DateTime createdAt { get; set; }
-    // public DateTime updatedAt { get; set; }
-    // public bool emailVerified { get; set; }
 }

@@ -27,10 +27,10 @@ public class UserDataHandler : MonoBehaviour
 
     private void Start()
     {
-        AppController.Active.ServerCommunicator.GetRoles(response =>
-        {
-            PopulateRoles(JSONHelper.GetRoles(response));
-        });
+        // AppController.Active.ServerCommunicator.GetRoles(response =>
+        // {
+        //     PopulateRoles(JSONHelper.GetRoles(response));
+        // });
 
         AppController.Active.ServerCommunicator.OnSignInSuccessEvent.AddListener(() =>
         {

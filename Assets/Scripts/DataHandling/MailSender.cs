@@ -21,112 +21,19 @@ public class MailSender : MonoBehaviour
 
     public void StartSendingEmail()
     {
-        // CreateEmail();
-        // StartCoroutine(SendEmail());
-        // StartCoroutine(GetUniqueId());
+        CreateEmail();
+        AppController.Active.ServerCommunicator.SendEmail(this.mailMessage);
     }
-
-    #region Sending
-
-    private IEnumerator GetUniqueId()
-    {
-        UnityWebRequest request = new UnityWebRequest($"{AppController.Active.ServerCommunicator.FunctionsUrl}/getUniqueId", "POST");
-        string jsonBody = "{}";
-        byte[] bodyRaw = new System.Text.UTF8Encoding().GetBytes(jsonBody);
-
-        request.SetRequestHeader("X-Parse-Application-Id", AppController.Active.ServerCommunicator.AppId);
-        request.SetRequestHeader("X-Parse-REST-API-Key", AppController.Active.ServerCommunicator.RestKey);
-
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            JSONNode node = JSON.Parse(request.downloadHandler.text);
-            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
-
-            StartCoroutine(CreateJobDetails(node["result"]["objectId"]));
-        }
-        else
-        {
-            LogHelper.Active.LogError("Request failed: " + request.error);
-        }
-    }
-
-    public class Test
-    {
-        public string CustomId { get; set; }
-        public string Content { get; set; }
-
-        public Test(string customId, string content)
-        {
-            this.CustomId = customId;
-            this.Content = content;
-        }
-    }
-
-    private IEnumerator CreateJobDetails(string id)
-    {
-        UnityWebRequest request = new UnityWebRequest($"{AppController.Active.ServerCommunicator.FunctionsUrl}/uploadJobDetail", "POST");
-        string jsonBody = JsonConvert.SerializeObject(new Test(id, "{data: test}"));
-        byte[] bodyRaw = new UTF8Encoding().GetBytes(jsonBody);
-
-        request.SetRequestHeader("X-Parse-Application-Id", AppController.Active.ServerCommunicator.AppId);
-        request.SetRequestHeader("X-Parse-REST-API-Key", AppController.Active.ServerCommunicator.RestKey);
-
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
-        }
-        else
-        {
-            LogHelper.Active.LogError("Request failed: " + request.error);
-        }
-    }
-
-    private IEnumerator SendEmail()
-    {
-        UnityWebRequest request = new UnityWebRequest($"{AppController.Active.ServerCommunicator.FunctionsUrl}/sendEmail", "POST");
-        string jsonBody = JsonConvert.SerializeObject(this.mailMessage);
-        byte[] bodyRaw = new System.Text.UTF8Encoding().GetBytes(jsonBody);
-
-        request.SetRequestHeader("X-Parse-Application-Id", AppController.Active.ServerCommunicator.AppId);
-        request.SetRequestHeader("X-Parse-REST-API-Key", AppController.Active.ServerCommunicator.RestKey);
-
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            LogHelper.Active.Log("Response: " + request.downloadHandler.text);
-        }
-        else
-        {
-            LogHelper.Active.LogError("Request failed: " + request.error);
-        }
-    }
-
-    #endregion
 
     #region Setup
 
-    public void CreateEmail(DetailsReport detailsReport)
+    public void CreateEmail()
     {
         pdfDocument pdfDocument;
         MemoryStream memoryStream;
         byte[] fileBytes;
 
-        pdfDocument = DocumentCreator.Active.GetDocument(detailsReport);
-        // pdfDocument = DocumentCreator.Active.GetDocument(new DetailsReport(new DetailsReportDTM()));
+        pdfDocument = DocumentCreator.Active.GetDocument(new DetailsReport(new DetailsReportDTM()));
         memoryStream = new System.IO.MemoryStream();
         fileBytes = new byte[0];
 
@@ -190,6 +97,6 @@ public class MailSender : MonoBehaviour
 
     private void DisplayError(string value)
     {
-        LogHelper.Active.LogError(value);
+        Debug.LogError(value);
     }
 }

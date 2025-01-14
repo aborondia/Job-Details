@@ -36,6 +36,14 @@ public class DocumentCreator : MonoBehaviour
     public static int DefaultPageWidth = 612;
     public static int DefaultPageHeight = 792;
     private bool sent = false;
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.S) && !this.sent)
+        {
+            this.sent = true;
+            AppController.Active.MailSender.StartSendingEmail();
+        }
+    }
 
     private void Awake()
     {
@@ -69,9 +77,8 @@ public class DocumentCreator : MonoBehaviour
 
     public pdfDocument GetDocument(DetailsReport report)
     {
-        foreach (var entry in report.Details)
+        foreach (JobDetail jobDetail in report.Details.Values)
         {
-            JobDetail jobDetail = entry.Value;
             PDFPage detailPage = new PDFPage(this.document);
             List<string> timeContent = this.jobDetailsContentCreator.GetTimeContentText(jobDetail);
             List<string> paymentOptionsText = this.jobDetailsContentCreator.GetPaymentText();
@@ -122,9 +129,9 @@ public class DocumentCreator : MonoBehaviour
             this.jobDetailsContentCreator.StopCreatingPDFPage();
         }
 
-        document.createPDF(@"C:\Users\MZ-admin\Desktop\Notes\test.pdf");
+        // document.createPDF(@"C:\Users\MZ-admin\Desktop\Notes\test.pdf");
 
-        LogHelper.Active.Log("PDF Created!");
+        Debug.Log("PDF Created!");
         return document;
     }
 }

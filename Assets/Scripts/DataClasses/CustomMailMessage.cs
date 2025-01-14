@@ -20,7 +20,10 @@ public class CustomMailMessage
         this.Body = body;
         this.CC = new List<string>();
 
-        SetAttachment(attachment.Content, attachment.FileName, attachment.Type, attachment.Disposition);
+        if (!ReferenceEquals(attachment, null))
+        {
+            SetAttachment(attachment.Content, attachment.FileName, attachment.Type, attachment.Disposition);
+        }
     }
 
     private void SetAttachment(string content, string fileName, string type, string dispositon)

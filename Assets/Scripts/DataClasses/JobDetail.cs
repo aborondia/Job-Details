@@ -24,7 +24,7 @@ public class JobDetail
     public DateTime CreatedAt => createdAt;
     private JobTypeEnum jobType;
     public JobTypeEnum JobType => jobType;
-    private List<CleanerJobEntry> cleaners;
+    private List<CleanerJobEntry> cleaners = new List<CleanerJobEntry>();
     public List<CleanerJobEntry> Cleaners => cleaners;
     private PaymentTypeEnum paymentType;
     public PaymentTypeEnum PaymentType => paymentType;
@@ -131,6 +131,4 @@ public class JobDetail
 
         return cleanerContent;
     }
-
-
 }
