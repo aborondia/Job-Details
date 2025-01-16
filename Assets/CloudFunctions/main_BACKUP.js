@@ -3,6 +3,24 @@ const { v4: uuidv4 } = require("uuid");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+Parse.Cloud.define("userLogin", async (request) => {
+  const { username, password } = request.params;
+
+  if (!username || !password) {
+    throw new Error("Username and password are required.");
+  }
+
+  try {
+    const user = await Parse.User.logIn(username, password);
+    return {
+      sessionToken: user.getSessionToken(),
+      user: user.toJSON(),
+    };
+  } catch (error) {
+    throw new Error(`Login failed: ${error.message}`);
+  }
+});
+
 Parse.Cloud.define("getUsernames", async (request) => {
   try {
     const query = new Parse.Query(Parse.User);
@@ -20,42 +38,13 @@ Parse.Cloud.define("getUsernames", async (request) => {
 });
 
 Parse.Cloud.define("sendEmail", async (request) => {
-  try {
-    const emailData = request.params;
-
-    const msg = {
-      to: { email: emailData.To },
-      from: { email: emailData.From },
-      subject: emailData.Subject,
-      html: emailData.Body,
-      attachments: [
-        {
-          content: emailData.Content,
-          filename: emailData.FileName,
-          type: emailData.Type,
-          disposition: emailData.Disposition,
-        },
-      ],
-    };
-
-    await sgMail.send(msg);
-
-    return { result: "Email sent successfully" };
-  } catch (error) {
-    console.error("Error sending email:", error);
-
-    if (error.response && error.response.body && error.response.body.errors) {
-      console.error("SendGrid API Errors:", error.response.body.errors);
-    }
-    throw new Parse.Error(500, "Error sending email");
-  }
-});
-
-Parse.Cloud.define("sendEmail", async (request) => {
   // Check if the user is signed in
   const user = request.user;
   if (!user) {
-    throw new Parse.Error(401, "User must be signed in to perform this action.");
+    throw new Parse.Error(
+      401,
+      "User must be signed in to perform this action."
+    );
   }
 
   try {
@@ -147,6 +136,20 @@ Parse.Cloud.define("updateJobDetail", async (request) => {
   }
 });
 
+Parse.Cloud.define("getRole", async (request) => {
+  try {
+    const roleObjectId = request.params.objectId;
+
+    const Role = Parse.Object.extend("_Role");
+    const existingRole = await new Parse.Query(Role).get(roleObjectId);
+
+    return { existingRole };
+  } catch (error) {
+    console.error("Error getting role:", error);
+    throw new Parse.Error(500, "Error getting role");
+  }
+});
+
 Parse.Cloud.define("retrieveJobDetails", async (request) => {
   try {
     const userId = request.params.userId;
@@ -201,7 +204,7 @@ Parse.Cloud.define("getRolesWithUsers", async (request) => {
     const rolesWithUsers = await Promise.all(roleWithUsersPromises);
     return rolesWithUsers;
   } catch (error) {
-    console.error("Error in getRolesWithUsers function:", error);
+    console.error("Error in getRolesWithUsers function:", error); // Log the error for debugging
     throw new Parse.Error(Parse.Error.INTERNAL_SERVER_ERROR, error.message);
   }
 });

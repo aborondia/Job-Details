@@ -173,14 +173,18 @@ public class DetailsReportsQueryHandler : QueryHandler
 
         deleteReportButton.RegisterCallback<ClickEvent>(evt =>
         {
+            int jobDetailsCount = detailsReport.Details.Count;
+
             foreach (var entry in detailsReport.Details)
             {
-                AppController.Active.ServerCommunicator.DeleteJobDetails(entry.Key);
+                AppController.Active.ServerCommunicator.DeleteJobDetails(entry.Key, (response) => jobDetailsCount--);
             }
 
-            AppController.Active.ServerCommunicator.DeleteDetailsReport(detailsReport.ObjectId);
-            AppController.Active.DetailsReportsHandler.RemoveDetailsReports(detailsReport.ObjectId);
-
+            ActionHelper.ExecuteActionWhenTrue(() =>
+            {
+                AppController.Active.ServerCommunicator.DeleteDetailsReport(detailsReport.ObjectId);
+                AppController.Active.DetailsReportsHandler.RemoveDetailsReports(detailsReport.ObjectId);
+            }, () => jobDetailsCount <= 0);
         });
 
         jobDetailsContainer.Clear();

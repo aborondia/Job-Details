@@ -24,4 +24,9 @@ public class User : MonoBehaviour
             this.dtm.roleId = this.roleDTM.objectId;
         }
     }
+
+    public void PopulateRole(RoleDTM roleDTM)
+    {
+        this.roleDTM = roleDTM;
+    }
 }

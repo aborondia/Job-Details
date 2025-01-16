@@ -19,6 +19,11 @@ public class MailSender : MonoBehaviour
     CustomMailAttachment attachment;
     Regex emailRegex = new Regex(@"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
 
+    private void Awake()
+    {
+        // AppController.Active.ServerCommunicator.OnSignInSuccessEvent.AddListener(() => StartSendingEmail());
+    }
+
     public void StartSendingEmail()
     {
         CreateEmail();

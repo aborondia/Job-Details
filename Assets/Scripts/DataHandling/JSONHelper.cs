@@ -7,6 +7,14 @@ using UnityEngine;
 
 public static class JSONHelper
 {
+    public static UserDTM GetUserDTM(string result)
+    {
+        JSONNode resultsNode = JSON.Parse(result)["result"];
+        UserDTM userDTM = JsonConvert.DeserializeObject<UserDTM>(resultsNode["user"].ToString());
+
+        return userDTM;
+    }
+
     public static DetailsReport GetDetailsReportFromCreate(string createdBy, string result)
     {
         DetailsReport detailsReport;

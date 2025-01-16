@@ -27,10 +27,10 @@ public class UserDataHandler : MonoBehaviour
 
     private void Start()
     {
-        // AppController.Active.ServerCommunicator.GetRoles(response =>
-        // {
-        //     PopulateRoles(JSONHelper.GetRoles(response));
-        // });
+        AppController.Active.ServerCommunicator.GetRoles(response =>
+        {
+            PopulateRoles(JSONHelper.GetRoles(response));
+        });
 
         AppController.Active.ServerCommunicator.OnSignInSuccessEvent.AddListener(() =>
         {
@@ -44,13 +44,13 @@ public class UserDataHandler : MonoBehaviour
 
     private void OnSignInComplete()
     {
-        ActionHelper.ExecuteActionWhenTrue(() =>
-        {
+        // ActionHelper.ExecuteActionWhenTrue(() =>
+        // {
             SetCurrentUser();
-        }, () =>
-        {
-            return this.rolesObtained;
-        });
+        // }, () =>
+        // {
+        //     return this.rolesObtained;
+        // });
     }
 
     private void OnSettingRegularUser()
@@ -83,14 +83,9 @@ public class UserDataHandler : MonoBehaviour
 
     private void SetCurrentUser()
     {
-        RoleDTM currentUserRole = null;
-
-        AppController.Active.ServerCommunicator.GetUserRole(response =>
+        AppController.Active.ServerCommunicator.GetRole(AppController.Active.ServerCommunicator.CurrentUser.roleId, response =>
         {
-            currentUserRole = JSONHelper.GetRole(response);
-
-            this.currentUser = new User(AppController.Active.ServerCommunicator.CurrentUser, currentUserRole);
-
+            this.currentUser = new User(AppController.Active.ServerCommunicator.CurrentUser, JSONHelper.GetRole(response));
             this.OnCurrentUserPopulatedEvent.Invoke();
 
             if (_UserRoleServerName == this.currentUser.RoleDTM.name)
@@ -101,8 +96,7 @@ public class UserDataHandler : MonoBehaviour
             {
                 OnSettingAdvancedUser();
             }
-
-        }, AppController.Active.ServerCommunicator.CurrentUser.objectId);
+        });
     }
 
     private void PopulateRoles(List<RoleDTM> roleDTMs)

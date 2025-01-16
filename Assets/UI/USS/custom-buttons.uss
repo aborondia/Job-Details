@@ -1,5 +1,5 @@
 .show-cursor {
-    cursor: url('project://database/Assets/Images/pointer.png?fileID=2800000&guid=f804b400b5d41f34991691e77c4a9a71&type=3#pointer') 45 0;
+    /* cursor: url('project://database/Assets/Images/pointer.png?fileID=2800000&guid=f804b400b5d41f34991691e77c4a9a71&type=3#pointer') 45 0; */
 }
 
 .custom-button {
