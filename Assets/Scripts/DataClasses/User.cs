@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,11 +9,13 @@ public class User : MonoBehaviour
     public RoleDTM RoleDTM => roleDTM;
     private UserDTM dtm;
     public UserDTM DTM => dtm;
+    private int roleInHierarchy = -1;
+    public int RoleInHierarchy => roleInHierarchy;
 
     public User(UserDTM dtm, RoleDTM roleDTM)
     {
         this.dtm = dtm;
-        this.roleDTM = roleDTM;
+        UpdateRole(roleDTM);
     }
 
     public void UpdateRole(RoleDTM roleDTM)
@@ -22,11 +25,12 @@ public class User : MonoBehaviour
         if (!ReferenceEquals(this.roleDTM, null))
         {
             this.dtm.roleId = this.roleDTM.objectId;
+            UpdateRoleHierarchy();
         }
     }
 
-    public void PopulateRole(RoleDTM roleDTM)
+    private void UpdateRoleHierarchy()
     {
-        this.roleDTM = roleDTM;
+        this.roleInHierarchy = (int)AppController.Active.UserDataHandler.GetRoleEnum(this.roleDTM.name);
     }
 }

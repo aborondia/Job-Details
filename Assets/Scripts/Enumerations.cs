@@ -49,7 +49,9 @@ namespace Enumerations
 
     public enum UserRoleEnum
     {
-        Admin,
-        User,
+        // These correspond to the server side role names and should not change
+        Admin = 1,
+        Owner = 2,
+        RegularUser = 0,
     }
 }

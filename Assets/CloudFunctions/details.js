@@ -1,6 +1,14 @@
 const { v4: uuidv4 } = require("uuid");
 
 Parse.Cloud.define("createJobDetail", async (request) => {
+  const user = request.user;
+  if (!user) {
+    throw new Parse.Error(
+      401,
+      "User must be signed in to perform this action."
+    );
+  }
+
   try {
     const data = request.params;
     const FileObject = Parse.Object.extend("JobDetail");
@@ -27,6 +35,14 @@ Parse.Cloud.define("createJobDetail", async (request) => {
 });
 
 Parse.Cloud.define("updateJobDetail", async (request) => {
+  const user = request.user;
+  if (!user) {
+    throw new Parse.Error(
+      401,
+      "User must be signed in to perform this action."
+    );
+  }
+
   try {
     const objectId = request.params.objectId;
     const data = request.params;
@@ -59,6 +75,14 @@ Parse.Cloud.define("updateJobDetail", async (request) => {
 });
 
 Parse.Cloud.define("retrieveJobDetails", async (request) => {
+  const user = request.user;
+  if (!user) {
+    throw new Parse.Error(
+      401,
+      "User must be signed in to perform this action."
+    );
+  }
+
   try {
     const userId = request.params.userId;
 
@@ -85,6 +109,14 @@ Parse.Cloud.define("retrieveJobDetails", async (request) => {
 });
 
 Parse.Cloud.define("deleteJobDetail", async (request) => {
+  const user = request.user;
+  if (!user) {
+    throw new Parse.Error(
+      401,
+      "User must be signed in to perform this action."
+    );
+  }
+
   try {
     const objectId = request.params.objectId;
 

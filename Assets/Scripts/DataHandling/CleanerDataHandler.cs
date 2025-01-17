@@ -24,7 +24,7 @@ public class CleanerDataHandler : MonoBehaviour
 
         foreach (UserNameReferenceDTM userNameReferenceDTM in userNameReferenceDTMs)
         {
-            if (userNameReferenceDTM.userObjectId == AppController.Active.ServerCommunicator.CurrentUser.objectId)
+            if (userNameReferenceDTM.userObjectId == AppController.Active.ServerCommunicator.CurrentUserDTM.objectId)
             {
                 currentUserInReferences = true;
             }
@@ -37,7 +37,7 @@ public class CleanerDataHandler : MonoBehaviour
 
         if (!currentUserInReferences)
         {
-            UserDTM currentUser = AppController.Active.ServerCommunicator.CurrentUser;
+            UserDTM currentUser = AppController.Active.ServerCommunicator.CurrentUserDTM;
             UserNameReferenceDTM currentUserReference = new UserNameReferenceDTM();
 
             currentUserReference.userName = currentUser.username;
@@ -53,7 +53,7 @@ public class CleanerDataHandler : MonoBehaviour
 
     public UserNameReferenceDTM GetCurrentUserReference()
     {
-        return GetUserReference(AppController.Active.ServerCommunicator.CurrentUser.objectId);
+        return GetUserReference(AppController.Active.ServerCommunicator.CurrentUserDTM.objectId);
     }
 
     public UserNameReferenceDTM GetUserReference(string userObjectId)

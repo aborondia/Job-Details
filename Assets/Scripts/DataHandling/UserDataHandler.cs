@@ -14,14 +14,17 @@ public class UserDataHandler : MonoBehaviour
     public User CurrentUser => currentUser;
     private Dictionary<string, RoleDTM> roles = new Dictionary<string, RoleDTM>();
     public Dictionary<string, RoleDTM> Roles => roles;
-    private Dictionary<string, Dictionary<string, User>> usersWithRoles = new Dictionary<string, Dictionary<string, User>>();
-    public Dictionary<string, Dictionary<string, User>> UsersWithRoles => usersWithRoles;
-    private List<User> unverifiedUsers = new List<User>();
-    public List<User> UnverifiedUsers => unverifiedUsers;
+    private Dictionary<string, User> users = new Dictionary<string, User>();
+    public Dictionary<string, User> Users => users;
+    // private Dictionary<string, Dictionary<string, User>> users = new Dictionary<string, Dictionary<string, User>>();
+    // public Dictionary<string, Dictionary<string, User>> Users => users;
+    // private List<User> unverifiedUsers = new List<User>();
+    // public List<User> UnverifiedUsers => unverifiedUsers;
     private bool rolesObtained = false;
     public bool RolesObtained => rolesObtained;
     public UnityEvent OnCurrentUserPopulatedEvent = new UnityEvent();
     public UnityEvent OnUsersPopulatedEvent = new UnityEvent();
+    public UnityEvent OnRolesPopulatedEvent = new UnityEvent();
 
     #region Initialization
 
@@ -44,21 +47,10 @@ public class UserDataHandler : MonoBehaviour
 
     private void OnSignInComplete()
     {
-        // ActionHelper.ExecuteActionWhenTrue(() =>
-        // {
-            SetCurrentUser();
-        // }, () =>
-        // {
-        //     return this.rolesObtained;
-        // });
+        ActionHelper.ExecuteActionWhenTrue(() => SetCurrentUser(), () => this.rolesObtained);
     }
 
-    private void OnSettingRegularUser()
-    {
-        // regular user
-    }
-
-    private void OnSettingAdvancedUser()
+    private void OnSettingUser()
     {
         PopulateUsers();
     }
@@ -67,36 +59,64 @@ public class UserDataHandler : MonoBehaviour
 
     #region Getters/Setters
 
+    public RoleDTM GetRoleById(string roleId)
+    {
+        if (!this.roles.ContainsKey(roleId))
+        {
+            return null;
+        }
+
+        return this.roles[roleId];
+    }
+
+    public RoleDTM GetRoleByName(string roleName)
+    {
+        return this.roles.Values.FirstOrDefault(role => role.name == roleName);
+    }
+
+    public Enumerations.UserRoleEnum GetRoleEnum(string roleName)
+    {
+        switch (roleName)
+        {
+            case UserDataHandler._AdminRoleServerName:
+                return Enumerations.UserRoleEnum.Admin;
+            case UserDataHandler._OwnerRoleServerName:
+                return Enumerations.UserRoleEnum.Owner;
+            default:
+                return Enumerations.UserRoleEnum.RegularUser;
+        }
+    }
+
     public void PopulateUsers()
     {
-        AppController.Active.ServerCommunicator.GetUsersWithRoles(response =>
+        if (this.currentUser.RoleDTM.name == _UserRoleServerName)
         {
-            this.usersWithRoles = JSONHelper.GetUsersWithRoles(response);
-
-            AppController.Active.ServerCommunicator.GetUnverifiedUsers(response =>
+            AppController.Active.ServerCommunicator.GetUsersForRegularUser(response =>
             {
-                this.unverifiedUsers = JSONHelper.GetUnverifiedUsers(response);
+                this.users = JSONHelper.GetUsers(response);
                 this.OnUsersPopulatedEvent.Invoke();
             });
-        });
+        }
+        else
+        {
+            AppController.Active.ServerCommunicator.GetUsersForAdmin(response =>
+            {
+                this.users = JSONHelper.GetUsers(response);
+                this.OnUsersPopulatedEvent.Invoke();
+            });
+        }
     }
 
     private void SetCurrentUser()
     {
-        AppController.Active.ServerCommunicator.GetRole(AppController.Active.ServerCommunicator.CurrentUser.roleId, response =>
-        {
-            this.currentUser = new User(AppController.Active.ServerCommunicator.CurrentUser, JSONHelper.GetRole(response));
-            this.OnCurrentUserPopulatedEvent.Invoke();
+        UserDTM currentUserDTM = AppController.Active.ServerCommunicator.CurrentUserDTM;
+        RoleDTM userRole = this.roles[currentUserDTM.roleId];
 
-            if (_UserRoleServerName == this.currentUser.RoleDTM.name)
-            {
-                OnSettingRegularUser();
-            }
-            else
-            {
-                OnSettingAdvancedUser();
-            }
-        });
+        this.currentUser = new User(currentUserDTM, userRole);
+
+        this.OnCurrentUserPopulatedEvent.Invoke();
+
+        OnSettingUser();
     }
 
     private void PopulateRoles(List<RoleDTM> roleDTMs)
@@ -109,19 +129,13 @@ public class UserDataHandler : MonoBehaviour
             }
         }
 
+        this.OnRolesPopulatedEvent.Invoke();
         this.rolesObtained = true;
     }
 
     public void OnUserDeleted(User user)
     {
-        if (user.DTM.verified)
-        {
-            this.usersWithRoles[user.RoleDTM.objectId].Remove(user.DTM.objectId);
-        }
-        else
-        {
-            this.unverifiedUsers.Remove(user);
-        }
+        this.users.Remove(user.DTM.username);
     }
 
     #endregion

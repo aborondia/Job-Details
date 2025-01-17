@@ -252,48 +252,52 @@ public static class JSONHelper
 
     public static RoleDTM GetRole(JSONNode node)
     {
-        RoleDTM dtm = new RoleDTM();
+        string name = node["name"];
+        string objectId = node["objectId"];
 
-        dtm.name = node["name"];
-        dtm.objectId = node["objectId"];
-
-        return dtm;
+        return new RoleDTM(name, objectId);
     }
 
     public static RoleDTM GetRole(string response)
     {
-        RoleDTM dtm = new RoleDTM();
         JSONNode result = JSON.Parse(response)["results"].AsArray[0];
+        string name = result["name"];
+        string objectId = result["objectId"];
 
-        dtm.name = result["name"];
-        dtm.objectId = result["objectId"];
-
-        return dtm;
+        return new RoleDTM(name, objectId);
     }
 
-    public static Dictionary<string, Dictionary<string, User>> GetUsersWithRoles(string response)
+    public static Dictionary<string, User> GetUsers(string response)
     {
-        Dictionary<string, Dictionary<string, User>> usersWithRoles = new Dictionary<string, Dictionary<string, User>>();
+        Dictionary<string, User> users = new Dictionary<string, User>();
         JSONNode result = JSON.Parse(response)["result"];
+        UserDTM userDTM;
+        RoleDTM roleDTM;
 
-        foreach (JSONNode entryNode in result.Values)
+        foreach (JSONNode node in result.Values)
         {
-            RoleDTM roleDTM = GetRole(entryNode["role"]);
-            JSONNode usersNode = entryNode["users"];
-            List<User> users = GetUsers(usersNode, roleDTM);
+            userDTM = new UserDTM();
+            userDTM.objectId = node["objectId"];
+            userDTM.username = node["username"];
+            userDTM.email = node["email"];
+            userDTM.verified = node["verified"];
+            userDTM.roleId = node["roleId"];
 
-            foreach (User user in users)
+            if (!String.IsNullOrEmpty(userDTM.roleId))
             {
-                if (!usersWithRoles.ContainsKey(user.RoleDTM.objectId))
-                {
-                    usersWithRoles.Add(user.RoleDTM.objectId, new Dictionary<string, User>());
-                }
-
-                usersWithRoles[user.RoleDTM.objectId].Add(user.DTM.objectId, user);
+                roleDTM = AppController.Active.UserDataHandler.GetRoleById(userDTM.roleId);
             }
+            else
+            {
+                roleDTM = null;
+            }
+
+            User user = new User(userDTM, roleDTM);
+
+            users.Add(user.DTM.username, user);
         }
 
-        return usersWithRoles;
+        return users;
     }
 
     public static List<User> GetUnverifiedUsers(string response)
@@ -303,7 +307,7 @@ public static class JSONHelper
 
         foreach (JSONNode node in result.Values)
         {
-            User user = new User(GetUserDTM(node), new RoleDTM());
+            User user = new User(GetUserDTM(node), null);
 
             users.Add(user);
         }

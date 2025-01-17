@@ -19,7 +19,7 @@ public class DetailsReportsHandler : MonoBehaviour
     {
         AppController.Active.UserDataHandler.OnCurrentUserPopulatedEvent.AddListener(() =>
         {
-            if (AppController.Active.ServerCommunicator.CurrentUser.verified)
+            if (AppController.Active.ServerCommunicator.CurrentUserDTM.verified)
             {
                 RefreshReports();
             }

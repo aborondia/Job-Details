@@ -11,7 +11,23 @@ public class UsersQueryHandler : QueryHandler
     [SerializeField] private VisualTreeAsset userRowBase;
     ScrollView usersScrollView;
     VisualElement usersScrollViewContentContainer;
+    private List<Enumerations.UserRoleEnum> roleInputDropdownValues = new List<Enumerations.UserRoleEnum>();
     private UnityEvent onUserDataChange = new UnityEvent();
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        foreach (Enumerations.UserRoleEnum roleType in Enum.GetValues(typeof(Enumerations.UserRoleEnum)))
+        {
+            if (roleType == Enumerations.UserRoleEnum.Owner)
+            {
+                continue;
+            }
+
+            this.roleInputDropdownValues.Add(roleType);
+        }
+    }
 
     protected override void InitializeElements()
     {
@@ -54,22 +70,9 @@ public class UsersQueryHandler : QueryHandler
     {
         this.usersScrollViewContentContainer.Clear();
 
-        foreach (User user in AppController.Active.UserDataHandler.UnverifiedUsers)
+        foreach (User user in AppController.Active.UserDataHandler.Users.Values)
         {
             AddUserRow(user);
-        }
-
-        foreach (var entry in AppController.Active.UserDataHandler.UsersWithRoles)
-        {
-            foreach (User user in entry.Value.Values)
-            {
-                if (user.RoleDTM.name == UserDataHandler._OwnerRoleServerName)
-                {
-                    continue;
-                }
-
-                AddUserRow(user);
-            }
         }
     }
 
@@ -83,12 +86,14 @@ public class UsersQueryHandler : QueryHandler
         VisualElement verifyUserButtonContainer = baseElement.Q<VisualElement>("verify-user-button-container");
         CustomButton verifyUserButton = verifyUserButtonContainer.Q<CustomButton>();
         VisualElement userTypeContainer = baseElement.Q<VisualElement>("user-type-container");
-        CustomEnumField userTypeEnumField = baseElement.Q<CustomEnumField>();
+        // CustomEnumField userTypeEnumField = baseElement.Q<CustomEnumField>();
+        DropdownField userTypeDropdownField = baseElement.Q<DropdownField>();
+        VisualElement userTypeLabelContainer = baseElement.Q<VisualElement>("user-role-label-container");
         Action onDataChangeAction = () => this.onUserDataChange.Invoke();
         nameLabel.text = $"{user.DTM.username} - {user.DTM.email}";
 
         SetupDeleteUserButton(deleteUserButton, user, onDataChangeAction);
-        SetupUserRoleInput(userTypeEnumField, user, onDataChangeAction);
+        SetupUserRoleInput(userTypeDropdownField, userTypeLabelContainer, user, onDataChangeAction);
         SetupVerifyUserButton(verifyUserButtonContainer, verifyUserButton, user, onDataChangeAction);
 
         this.usersScrollViewContentContainer.Add(baseElement);
@@ -136,94 +141,89 @@ public class UsersQueryHandler : QueryHandler
         }
     }
 
-    private void SetupUserRoleInput(CustomEnumField userTypeEnumField, User user, Action onDataChangeAction)
+    private void SetupUserRoleInput(
+        DropdownField userTypeDropdownField,
+        VisualElement userTypeLabelContainer,
+        User user,
+        Action onDataChangeAction)
     {
         bool canChangeRoles;
+        Enumerations.UserRoleEnum userRole;
+        CustomLabel userTypeLabel;
 
         if (!user.DTM.verified)
         {
-            VisualElementHelper.SetElementDisplay(userTypeEnumField.parent, DisplayStyle.None);
-
+            VisualElementHelper.SetElementDisplay(userTypeDropdownField.parent, DisplayStyle.None);
             return;
         }
 
-        canChangeRoles = AppController.Active.UserDataHandler.CurrentUser.RoleDTM.name == UserDataHandler._OwnerRoleServerName;
-
-        switch (user.RoleDTM?.name)
+        switch (user.RoleDTM.name)
         {
             case UserDataHandler._AdminRoleServerName:
-                userTypeEnumField.value = Enumerations.UserRoleEnum.Admin;
-                userTypeEnumField.SetEnabled(true);
+                userRole = Enumerations.UserRoleEnum.Admin;
+                break;
+            case UserDataHandler._OwnerRoleServerName:
+                userRole = Enumerations.UserRoleEnum.Owner;
                 break;
             case UserDataHandler._UserRoleServerName:
-                userTypeEnumField.value = Enumerations.UserRoleEnum.User;
-                userTypeEnumField.SetEnabled(true);
+                userRole = Enumerations.UserRoleEnum.RegularUser;
                 break;
             default:
-                userTypeEnumField.value = Enumerations.UserRoleEnum.User;
-                userTypeEnumField.SetEnabled(true);
-                return;
+                userRole = Enumerations.UserRoleEnum.RegularUser;
+                break;
         }
 
-        userTypeEnumField.SetEnabled(canChangeRoles);
+        canChangeRoles = (int)AppController.Active.UserDataHandler.CurrentUser.RoleInHierarchy == (int)Enumerations.UserRoleEnum.Owner;
 
-        if (!canChangeRoles)
+        if (canChangeRoles && user.RoleDTM.name != UserDataHandler._OwnerRoleServerName)
         {
-            return;
-        }
+            userTypeDropdownField.choices = this.roleInputDropdownValues.Select(role => role.ToString()).ToList();
+            userTypeDropdownField.value = AppController.Active.UserDataHandler.GetRoleEnum(user.RoleDTM.name).ToString();
+            VisualElementHelper.SetElementDisplay(userTypeLabelContainer, DisplayStyle.None);
+            VisualElementHelper.SetElementDisplay(userTypeDropdownField, DisplayStyle.Flex);
 
-        if (user.DTM.verified)
-        {
-            userTypeEnumField.RegisterValueChangedCallback(evt =>
+            userTypeDropdownField.RegisterValueChangedCallback(evt =>
             {
                 string newRoleId;
-                string roleName;
+                string newRoleName = evt.newValue;
+                RoleUpdateDTM roleUpdateDTM;
+                RoleDTM newRoleDTM;
 
-                switch (evt.newValue)
+                switch (newRoleName)
                 {
-                    case Enumerations.UserRoleEnum.Admin:
-                        roleName = UserDataHandler._AdminRoleServerName;
+                    case UserDataHandler._AdminRoleServerName:
                         newRoleId = AppController.Active.UserDataHandler.Roles
-                        .FirstOrDefault(role => String.Equals(role.Value.name, roleName)).Value.objectId;
+                        .FirstOrDefault(roleEntry => String.Equals(roleEntry.Value.name, newRoleName)).Value.objectId;
                         break;
-                    case Enumerations.UserRoleEnum.User:
-                        roleName = UserDataHandler._UserRoleServerName;
+                    case UserDataHandler._UserRoleServerName:
                         newRoleId = AppController.Active.UserDataHandler.Roles
-                        .FirstOrDefault(role => String.Equals(role.Value.name, roleName)).Value.objectId;
+                        .FirstOrDefault(roleEntry => String.Equals(roleEntry.Value.name, newRoleName)).Value.objectId;
                         break;
                     default:
                         return;
                 }
 
-                if (String.IsNullOrEmpty(roleName) || user.RoleDTM.objectId == newRoleId)
+                if (user.RoleDTM.objectId == newRoleId)
                 {
                     return;
                 }
 
-                RoleDTM oldRoleDTM = new RoleDTM();
-                RoleDTM newRoleDTM = new RoleDTM();
+                roleUpdateDTM = new RoleUpdateDTM(user.DTM.objectId, newRoleId, user.RoleDTM.objectId);
+                newRoleDTM = AppController.Active.UserDataHandler.GetRoleById(newRoleId);
 
-                oldRoleDTM.name = user.RoleDTM.name;
-                oldRoleDTM.objectId = user.RoleDTM.objectId;
-                oldRoleDTM.users = new RelationOperation(new List<string> { user.DTM.objectId }, RelationOperation.RelationOperations.Remove);
-
-                newRoleDTM.name = roleName;
-                newRoleDTM.objectId = newRoleId;
-                newRoleDTM.users = new RelationOperation(new List<string> { user.DTM.objectId }, RelationOperation.RelationOperations.Add);
-
-                AppController.Active.ServerCommunicator.RemoveUserRole(oldRoleDTM, () =>
+                AppController.Active.ServerCommunicator.UpdateRole(roleUpdateDTM, () =>
                 {
-                    AppController.Active.ServerCommunicator.UpdateRole(newRoleDTM, () =>
-                    {
-                        user.UpdateRole(newRoleDTM);
-                        AppController.Active.ServerCommunicator.UpdateUser(user, onDataChangeAction);
-                    });
+                    user.UpdateRole(newRoleDTM);
                 });
             });
         }
         else
         {
-            VisualElementHelper.SetElementDisplay(userTypeEnumField, DisplayStyle.None);
+            VisualElementHelper.SetElementDisplay(userTypeLabelContainer, DisplayStyle.Flex);
+            VisualElementHelper.SetElementDisplay(userTypeDropdownField, DisplayStyle.None);
+
+            userTypeLabel = userTypeLabelContainer.Q<CustomLabel>();
+            userTypeLabel.text = userRole.ToString();
         }
     }
 
@@ -243,18 +243,12 @@ public class UsersQueryHandler : QueryHandler
 
             verifyUserButton.RegisterCallback<ClickEvent>(evt =>
             {
-                RoleDTM roleDTM = new RoleDTM();
-
-                roleDTM.name = UserDataHandler._UserRoleServerName;
-                roleDTM.objectId = AppController.Active.UserDataHandler.Roles
-                .First(entry => entry.Value.name == roleDTM.name).Key;
-                roleDTM.users = new RelationOperation(new List<string> { user.DTM.objectId }, RelationOperation.RelationOperations.Add);
-                user.DTM.verified = true;
-
-                AppController.Active.ServerCommunicator.UpdateRole(roleDTM, () =>
+                AppController.Active.ServerCommunicator.VerifyUser(user.DTM.objectId, () =>
                 {
-                    user.UpdateRole(roleDTM);
-                    AppController.Active.ServerCommunicator.UpdateUser(user, onDataChangeAction);
+                    user.DTM.verified = true;
+                    user.UpdateRole(AppController.Active.UserDataHandler.GetRoleByName(UserDataHandler._UserRoleServerName));
+
+                    onDataChangeAction?.Invoke();
                 });
             });
         }

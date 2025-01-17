@@ -522,7 +522,7 @@ public class JobDetailsQueryHandler : QueryHandler
             }
         });
 
-        if (AppController.Active.ServerCommunicator.CurrentUser.objectId == cleanerJobEntry.CleanerObjectId)
+        if (AppController.Active.ServerCommunicator.CurrentUserDTM.objectId == cleanerJobEntry.CleanerObjectId)
         {
             selectCleanerNameButtonContainer.style.visibility = Visibility.Hidden;
             selectCleanerNameButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);

@@ -1,14 +1,18 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using UnityEngine;
 
+[Serializable]
 public class RoleDTM
 {
     public string objectId { get; set; }
     public string name { get; set; }
     public RelationOperation users { get; set; }
+
+    public RoleDTM(string name, string objectId)
+    {
+        this.objectId = objectId;
+        this.name = name;
+    }
 }
 
 [Serializable]

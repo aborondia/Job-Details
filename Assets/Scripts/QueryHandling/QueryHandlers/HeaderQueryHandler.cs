@@ -37,8 +37,6 @@ public class HeaderQueryHandler : QueryHandler
         this.teamButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
         VisualElementHelper.SetElementDisplay(this.viewUsersNotificationContainer, DisplayStyle.None);
 
-        this.teamButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
-
         AppController.Active.UserDataHandler.OnCurrentUserPopulatedEvent.AddListener(() =>
         {
             if (AppController.Active.UserDataHandler.CurrentUser.RoleDTM.name != UserDataHandler._UserRoleServerName)
@@ -57,7 +55,8 @@ public class HeaderQueryHandler : QueryHandler
             {
                 this.teamButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
 
-                int unverifiedUserCount = AppController.Active.UserDataHandler.UnverifiedUsers.Count;
+                int unverifiedUserCount = AppController.Active.UserDataHandler.Users.Values
+                .Where(user => !user.DTM.verified).Count();
 
                 this.teamButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
                 VisualElementHelper.SetElementDisplay(this.teamButtonContainer, DisplayStyle.Flex);
@@ -83,7 +82,7 @@ public class HeaderQueryHandler : QueryHandler
         {
             ActionHelper.StringDelegate responseDelegate = (string response) =>
             {
-                DetailsReport newReport = JSONHelper.GetDetailsReportFromCreate(AppController.Active.ServerCommunicator.CurrentUser.objectId, response);
+                DetailsReport newReport = JSONHelper.GetDetailsReportFromCreate(AppController.Active.ServerCommunicator.CurrentUserDTM.objectId, response);
 
                 AppController.Active.DetailsReportsHandler.AddDetailsReports(newReport);
             };

@@ -6,7 +6,7 @@
         </CustomVisualElement>
         <CustomVisualElement name="delete-user-button-container" class="user-row-button-container">
             <CustomButton use-background-color="false" use-border="false" class="user-row-button">
-                <CustomVisualElement name="label-container" class="user-row-button-label-container">
+                <CustomVisualElement name="label-container" class="user-row-button-label-container" style="display: none;">
                     <CustomLabel class="user-row-button-label small-font" />
                 </CustomVisualElement>
                 <CustomVisualElement name="icon-container" class="user-row-button-icon-container">
@@ -14,7 +14,7 @@
                 </CustomVisualElement>
             </CustomButton>
         </CustomVisualElement>
-        <CustomVisualElement name="verify-user-button-container" class="user-row-button-container" style="display: none;">
+        <CustomVisualElement name="verify-user-button-container" class="verify-user-button-container" style="display: none;">
             <CustomButton use-background-color="false" use-border="false" class="user-row-button">
                 <CustomVisualElement name="label-container" class="user-row-button-label-container">
                     <CustomLabel text="Verify User? " class="user-row-button-label small-font" />
@@ -25,7 +25,11 @@
             </CustomButton>
         </CustomVisualElement>
         <CustomVisualElement name="user-type-container" class="user-type-container">
-            <CustomEnumField type="Enumerations.UserRoleEnum, Assembly-CSharp" />
+            <CustomVisualElement name="user-role-label-container" class="user-role-label-container" style="display: none;">
+                <CustomLabel text="Role" class="regular-font" style="-unity-text-align: middle-center;" />
+            </CustomVisualElement>
+            <CustomEnumField type="Enumerations.UserRoleEnum, Assembly-CSharp" name="user-role-input" style="display: none;" />
+            <ui:DropdownField index="-1" />
         </CustomVisualElement>
     </CustomVisualElement>
 </ui:UXML>
