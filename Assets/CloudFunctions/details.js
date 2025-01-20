@@ -67,6 +67,7 @@ Parse.Cloud.define("deleteDetailReport", async (request) => {
     const reportToDelete = await detailsReportQuery.get(objectId, {
       useMasterKey: true,
     });
+
     if (!reportToDelete) {
       throw new Parse.Error(500, "DetailsReport not found!");
     }
@@ -78,7 +79,7 @@ Parse.Cloud.define("deleteDetailReport", async (request) => {
 
     if (jobDetails.length) {
       for (const jobDetail of jobDetails) {
-        await jobDetail.destroy();
+        await jobDetail.destroy({ useMasterKey: true });
       }
     }
 

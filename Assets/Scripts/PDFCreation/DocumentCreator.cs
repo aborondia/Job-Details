@@ -116,12 +116,10 @@ public class DocumentCreator : MonoBehaviour
             this.jobDetailsContentCreator.AddMultiText(paymentOptionsText, paymentOptionBorders, true, (int)jobDetail.PaymentType);
 
             detailPage.OnTextLineAdded();
-            this.jobDetailsContentCreator.AddParagraph("Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum ");
+            this.jobDetailsContentCreator.AddParagraph(jobDetail.Description);
 
             this.jobDetailsContentCreator.StopCreatingPDFPage();
         }
-
-        // document.createPDF(@"C:\Users\MZ-admin\Desktop\Notes\test.pdf");
 
         Debug.Log("PDF Created!");
         return document;

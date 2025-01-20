@@ -199,9 +199,7 @@ public static class JSONHelper
 
         foreach (JSONNode node in nodeWithValues.Values)
         {
-            Debug.Log(node.ToString());
             cleaners.Add(GetCleaner(node));
-            Debug.Log(GetCleaner(node).CleanerObjectId);
         }
 
         return cleaners;
@@ -210,36 +208,12 @@ public static class JSONHelper
     private static CleanerJobEntry GetCleaner(JSONNode node)
     {
         CleanerJobEntry cleanerJobEntry;
-        string cleanerName = node["name"];
-        string cleanerObjectId = node["cleanerObjectId"];
-        float cleanerHoursWorked = node["hours"];
+        string cleanerName = node["Name"];
+        float cleanerHoursWorked = node["HoursWorked"];
 
-        cleanerJobEntry = new CleanerJobEntry(cleanerObjectId, cleanerName, cleanerHoursWorked);
+        cleanerJobEntry = new CleanerJobEntry(cleanerName, cleanerHoursWorked);
 
         return cleanerJobEntry;
-    }
-
-    public static List<UserNameReferenceDTM> GetUserNameReferenceDTMs(string response)
-    {
-        List<UserNameReferenceDTM> dtms = new List<UserNameReferenceDTM>();
-        JSONNode result = JSON.Parse(response)["results"];
-
-        foreach (JSONNode node in result.Values)
-        {
-            dtms.Add(GetUserNameReferenceDTM(node));
-        }
-
-        return dtms;
-    }
-
-    private static UserNameReferenceDTM GetUserNameReferenceDTM(JSONNode node)
-    {
-        UserNameReferenceDTM dtm = new UserNameReferenceDTM();
-
-        dtm.userName = node["userName"];
-        dtm.userObjectId = node["userObjectId"];
-
-        return dtm;
     }
 
     public static List<RoleDTM> GetRoles(string response)
@@ -346,30 +320,4 @@ public static class JSONHelper
 
         return dtm;
     }
-
-    // public static User GetUser(JSONNode node)
-    // {
-    //     UserDTM dtm = new UserDTM();
-
-    //     dtm.objectId = node["objectId"];
-    //     dtm.username = node["username"];
-    //     dtm.email = node["email"];
-    //     dtm.verified = node["verified"];
-    //     dtm.roleId = node["roleId"];
-    //     // dtm.createdAt = node["createdAt"];
-    //     // dtm.updatedAt = node["updatedAt"];
-    //     // dtm.emailVerified = node["emailVerified"];
-
-    //     return dtm;
-    // }
-
-    // private static JobDetailsDTM.JsonFile GetJsonFile(JSONNode node)
-    // {
-    //     JobDetailsDTM.JsonFile dtm = new JobDetailsDTM.JsonFile();
-
-    //     dtm.__type = node["__type"];
-    //     dtm.name = node["name"];
-
-    //     return dtm;
-    // }
 }

@@ -40,9 +40,6 @@ public class DetailsReportsQueryHandler : QueryHandler
 
     protected override void InitializeElements()
     {
-        // this.header = this.parentElement.Q<VisualElement>("reports-header");
-        // this.addReportButtonContainer = this.header.Q<VisualElement>("add-button-container");
-        // this.addReportButton = this.addReportButtonContainer.Q<CustomButton>();
         this.scrollviewContainer = this.parentElement.Q<VisualElement>("details-scrollview-container");
         this.scrollview = this.scrollviewContainer.Q<ScrollView>();
     }
@@ -53,17 +50,7 @@ public class DetailsReportsQueryHandler : QueryHandler
 
     protected override void SetupButtons()
     {
-        // this.addReportButton.RegisterCallback<ClickEvent>(evt =>
-        // {
-        //     ActionHelper.StringDelegate responseDelegate = (string response) =>
-        //     {
-        //         DetailsReport newReport = JSONHelper.GetDetailsReportFromCreate(AppController.Active.ServerCommunicator.CurrentUser.objectId, response);
 
-        //         AppController.Active.DetailsReportsHandler.AddDetailsReports(newReport);
-        //     };
-
-        //     AppController.Active.ServerCommunicator.CreateDetailsReport(responseDelegate);
-        // });
     }
 
     protected override void SetupInputs()
@@ -170,18 +157,13 @@ public class DetailsReportsQueryHandler : QueryHandler
 
         deleteReportButton.RegisterCallback<ClickEvent>(evt =>
         {
-            int jobDetailsCount = detailsReport.Details.Count;
-
-            foreach (var entry in detailsReport.Details)
+            AppController.Active.ServerCommunicator.DeleteDetailsReport(detailsReport.ObjectId, successful =>
             {
-                AppController.Active.ServerCommunicator.DeleteJobDetails(entry.Key, (response) => jobDetailsCount--);
-            }
-
-            ActionHelper.ExecuteActionWhenTrue(() =>
-            {
-                AppController.Active.ServerCommunicator.DeleteDetailsReport(detailsReport.ObjectId);
-                AppController.Active.DetailsReportsHandler.RemoveDetailsReports(detailsReport.ObjectId);
-            }, () => jobDetailsCount <= 0);
+                if (successful)
+                {
+                    AppController.Active.DetailsReportsHandler.RemoveDetailsReports(detailsReport.ObjectId);
+                }
+            });
         });
 
         emailReportButton.RegisterCallback<ClickEvent>(evt =>

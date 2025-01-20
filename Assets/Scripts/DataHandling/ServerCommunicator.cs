@@ -10,16 +10,10 @@ using System;
 using System.Collections.Generic;
 using ResponseDelegateString = ActionHelper.StringDelegate;
 using ResponseDelegateBool = ActionHelper.BoolDelegate;
-using NUnit.Framework.Interfaces;
-using Newtonsoft.Json.Linq;
 
 public class ServerCommunicator : MonoBehaviour
 {
     private const string apiUrl = "https://parseapi.back4app.com";
-    // [SerializeField] private string appId;
-    // public string AppId => appId;
-    // [SerializeField] private string javaScriptKey;
-    // public string JavaScriptKey => javaScriptKey;
     [SerializeField] private bool showSuccessLogs = true;
     [SerializeField] private bool showFailureLogs = true;
     public string FunctionsUrl => $"{apiUrl}/functions";
@@ -210,40 +204,6 @@ public class ServerCommunicator : MonoBehaviour
         else
         {
             ShowFailureLog("Request failed: " + request.error + request.downloadHandler.text);
-        }
-
-        this.OnRequestCompletedEvent.Invoke();
-    }
-
-    public void CreateUserNameReference(UserNameReferenceDTM currentUserReference)
-    {
-        StartCoroutine(StartCreatingUserNameReference(currentUserReference));
-    }
-
-    private IEnumerator StartCreatingUserNameReference(UserNameReferenceDTM currentUserReference)
-    {
-        UnityWebRequest request = new UnityWebRequest($"{this.ClassesUrl}/UserNameReference", "POST");
-
-        string jsonBody = JsonConvert.SerializeObject(currentUserReference);
-        byte[] bodyRaw = new System.Text.UTF8Encoding().GetBytes(jsonBody);
-
-        request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
-        request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
-        request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
-        request.SetRequestHeader("Content-Type", "application/json");
-
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            ShowSuccessLog("Response (StartCreatingUserNameReference): " + request.downloadHandler.text);
-        }
-        else
-        {
-            ShowFailureLog("Request failed (StartCreatingUserNameReference): " + request.error);
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -683,22 +643,20 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void DeleteDetailsReport(string id)
+    public void DeleteDetailsReport(string id, ResponseDelegateBool responseDelegate = null)
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartDeletingDetailsReport(id));
+        StartCoroutine(StartDeletingDetailsReport(id, responseDelegate));
     }
 
-    private IEnumerator StartDeletingDetailsReport(string id)
+    private IEnumerator StartDeletingDetailsReport(string id, ResponseDelegateBool responseDelegate)
     {
         string url = $"{this.FunctionsUrl}/deleteDetailReport";
         WWWForm form = new WWWForm();
         form.AddField("objectId", id);
-        // string url = $"{this.ClassesUrl}/DetailsReport/{id}";
 
         UnityWebRequest request = UnityWebRequest.Post(url, form);
-        // UnityWebRequest request = UnityWebRequest.Delete(url);
 
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
@@ -709,10 +667,12 @@ public class ServerCommunicator : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             ShowSuccessLog("Success (StartDeletingDetailsReport): " + request.downloadHandler.text);
+            responseDelegate?.Invoke(true);
         }
         else
         {
             ShowFailureLog("Request failed (StartDeletingDetailsReport): " + request.error);
+            responseDelegate?.Invoke(false);
         }
 
         this.OnRequestCompletedEvent.Invoke();

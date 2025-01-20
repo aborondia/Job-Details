@@ -16,10 +16,6 @@ public class UserDataHandler : MonoBehaviour
     public Dictionary<string, RoleDTM> Roles => roles;
     private Dictionary<string, User> users = new Dictionary<string, User>();
     public Dictionary<string, User> Users => users;
-    // private Dictionary<string, Dictionary<string, User>> users = new Dictionary<string, Dictionary<string, User>>();
-    // public Dictionary<string, Dictionary<string, User>> Users => users;
-    // private List<User> unverifiedUsers = new List<User>();
-    // public List<User> UnverifiedUsers => unverifiedUsers;
     private bool rolesObtained = false;
     public bool RolesObtained => rolesObtained;
     public UnityEvent OnCurrentUserPopulatedEvent = new UnityEvent();

@@ -9,8 +9,6 @@ public class AppController : MonoBehaviour
     public MailSender MailSender => mailSender;
     [SerializeField] private UserDataHandler userDataHandler;
     public UserDataHandler UserDataHandler => userDataHandler;
-    [SerializeField] private CleanerDataHandler cleanerDataHandler;
-    public CleanerDataHandler CleanerDataHandler => cleanerDataHandler;
     [SerializeField] private DocumentCreator documentCreator;
     public DocumentCreator DocumentCreator => documentCreator;
     [SerializeField] private DetailsReportsHandler detailsReportsHandler;

@@ -203,24 +203,15 @@ public class JobDetailsQueryHandler : QueryHandler
 
     public void OpenNewJobDetails()
     {
-        if (ReferenceEquals(AppController.Active.CleanerDataHandler.GetCurrentUserReference(), null))
-        {
-            return;
-        }
-
         this.editingExistingDetails = false;
         this.currentJobDetail = new JobDetail();
+        this.currentJobDetail.AddCleaner(new CleanerJobEntry(AppController.Active.UserDataHandler.CurrentUser.DTM.username, 0));
         RefreshJobDetail();
         QueryController.Active.ChangeView(MainView.JobDetails, Subview.Default);
     }
 
     public void OpenExistingJobDetails(JobDetail jobDetail)
     {
-        if (ReferenceEquals(AppController.Active.CleanerDataHandler.GetCurrentUserReference(), null))
-        {
-            return;
-        }
-
         this.editingExistingDetails = true;
         this.currentJobDetail = jobDetail;
         RefreshJobDetail();
@@ -383,7 +374,7 @@ public class JobDetailsQueryHandler : QueryHandler
 
         foreach (CleanerJobEntry cleaner in this.currentJobDetail.Cleaners)
         {
-            CreateCleanerRow(cleaner.CleanerObjectId);
+            CreateCleanerRow(cleaner);
         }
     }
 
@@ -400,15 +391,6 @@ public class JobDetailsQueryHandler : QueryHandler
     #endregion
 
     #region Actions
-
-    private List<UserNameReferenceDTM> GetValidCleanerNamesForAdding()
-    {
-        List<string> cleaners = this.currentJobDetail.Cleaners.Select(cleaner => cleaner.CleanerObjectId).ToList();
-
-        return AppController.Active.CleanerDataHandler.UserNameReferences.Values
-        .Where(reference => !cleaners.Contains(reference.userObjectId))
-        .ToList();
-    }
 
     private void OpenCleanerNameSelect(CleanerJobEntry cleanerJobEntry, Label nameLabel, ScrollView cleanerNameScrollView)
     {
@@ -479,7 +461,7 @@ public class JobDetailsQueryHandler : QueryHandler
 
     #region Cleaner Row
 
-    private void CreateCleanerRow(string cleanerId = "")
+    private void CreateCleanerRow(CleanerJobEntry cleanerJobEntry = null)
     {
         VisualElement newCleanerElement = this.cleanerRowBase.Instantiate();
         VisualElement nameLabelContainer = newCleanerElement.Q<VisualElement>("name-label-container");
@@ -489,22 +471,24 @@ public class JobDetailsQueryHandler : QueryHandler
         CustomButton selectCleanerNameButton = selectCleanerNameButtonContainer.Q<CustomButton>();
         VisualElement deleteCleanerRowButtonContainer = newCleanerElement.Q<VisualElement>("delete-button-container");
         CustomButton deleteCleanerRowButton = deleteCleanerRowButtonContainer.Q<CustomButton>();
-        CleanerJobEntry cleanerJobEntry = new CleanerJobEntry();
         VisualElement hoursInputContainer = newCleanerElement.Q<VisualElement>("hours-input-container");
         CustomInput hoursInput = hoursInputContainer.Q<CustomInput>();
         Action deleteCleanerRowAction = () =>
         {
             this.currentJobDetail.RemoveCleaner(cleanerJobEntry);
+
             newCleanerElement.parent.Remove(newCleanerElement);
         };
-        string cleanerName;
 
-        if (!String.IsNullOrEmpty(cleanerId) && AppController.Active.CleanerDataHandler.UserNameReferences.ContainsKey(cleanerId))
+        if (ReferenceEquals(cleanerJobEntry, null))
         {
-            cleanerName = AppController.Active.CleanerDataHandler.UserNameReferences[cleanerId].userName;
-            cleanerJobEntry.SetName(cleanerName);
-            cleanerJobEntry.SetCleanerObjectId(cleanerId);
-            nameLabel.text = cleanerName;
+            cleanerJobEntry = new CleanerJobEntry();
+        }
+
+        if (!String.IsNullOrEmpty(cleanerJobEntry.Name) && AppController.Active.UserDataHandler.Users.ContainsKey(cleanerJobEntry.Name))
+        {
+            cleanerJobEntry.SetName(cleanerJobEntry.Name);
+            nameLabel.text = cleanerJobEntry.Name;
         }
 
         newCleanerElement.AddToClassList("cleaner-row");
@@ -516,32 +500,21 @@ public class JobDetailsQueryHandler : QueryHandler
         {
             VisualElementHelper.SetElementDisplay(cleanerNameScrollView, DisplayStyle.None);
 
-            if (String.IsNullOrEmpty(cleanerJobEntry.Name))
+            if (String.IsNullOrEmpty(cleanerJobEntry?.Name))
             {
                 deleteCleanerRowAction.Invoke();
             }
         });
 
-        if (AppController.Active.ServerCommunicator.CurrentUserDTM.objectId == cleanerJobEntry.CleanerObjectId)
-        {
-            selectCleanerNameButtonContainer.style.visibility = Visibility.Hidden;
-            selectCleanerNameButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
-            deleteCleanerRowButtonContainer.style.visibility = Visibility.Hidden;
-            deleteCleanerRowButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
-        }
-        else
-        {
-            deleteCleanerRowButton.RegisterCallback<ClickEvent>(evt => deleteCleanerRowAction.Invoke());
-
-            selectCleanerNameButton.RegisterCallback<ClickEvent>(evt => OpenCleanerNameSelect(cleanerJobEntry, nameLabel, cleanerNameScrollView));
-        }
+        deleteCleanerRowButton.RegisterCallback<ClickEvent>(evt => deleteCleanerRowAction.Invoke());
+        selectCleanerNameButton.RegisterCallback<ClickEvent>(evt => OpenCleanerNameSelect(cleanerJobEntry, nameLabel, cleanerNameScrollView));
 
         SetupTimeInput(hoursInput, RegexHelper.FloatRegex);
         SetupCleanerHoursInput(cleanerJobEntry, hoursInput);
 
         this.cleanersContent.Add(newCleanerElement);
 
-        if (String.IsNullOrEmpty(cleanerId))
+        if (String.IsNullOrEmpty(cleanerJobEntry.Name))
         {
             OpenCleanerNameSelect(cleanerJobEntry, nameLabel, cleanerNameScrollView);
         }
@@ -551,14 +524,14 @@ public class JobDetailsQueryHandler : QueryHandler
     {
         cleanerNameScrollView.contentContainer.Clear();
 
-        foreach (UserNameReferenceDTM entry in GetValidCleanerNamesForAdding())
+        foreach (var entry in AppController.Active.UserDataHandler.Users)
         {
             CustomLabel cleanerNameLabel = new CustomLabel();
 
             cleanerNameLabel.AddToClassList("regular-font");
             cleanerNameLabel.style.color = Color.black;
 
-            cleanerNameLabel.text = entry.userName;
+            cleanerNameLabel.text = entry.Key;
 
             cleanerNameLabel.RegisterCallback<ClickEvent>(evt =>
             {

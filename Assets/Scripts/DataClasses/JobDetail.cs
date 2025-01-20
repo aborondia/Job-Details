@@ -21,11 +21,11 @@ public class JobDetail
     public DateTime FinishTime => finishTime;
     private DateTime createdAt;
     public DateTime CreatedAt => createdAt;
-    private JobTypeEnum jobType;
+    private JobTypeEnum jobType = JobTypeEnum.BiWeekly;
     public JobTypeEnum JobType => jobType;
     private List<CleanerJobEntry> cleaners = new List<CleanerJobEntry>();
     public List<CleanerJobEntry> Cleaners => cleaners;
-    private PaymentTypeEnum paymentType;
+    private PaymentTypeEnum paymentType = PaymentTypeEnum.NoPayment;
     public PaymentTypeEnum PaymentType => paymentType;
     private string description;
     public string Description => description;
@@ -122,7 +122,6 @@ public class JobDetail
             cleanerFirstLine = "Cleaners:";
         }
 
-        Debug.Log($"{index + 1}){this.cleaners[index].Name} - Hrs={this.cleaners[index].HoursWorked}");
         cleanerContent = new List<string>{
         cleanerFirstLine,
         $"{index + 1}){this.cleaners[index].Name}",
