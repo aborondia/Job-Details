@@ -68,6 +68,8 @@ public class DocumentCreator : MonoBehaviour
 
     public pdfDocument GetDocument(DetailsReport report)
     {
+        this.document = new pdfDocument(this.documentTitle, this.author);
+
         foreach (JobDetail jobDetail in report.Details.Values)
         {
             PDFPage detailPage = new PDFPage(this.document);
@@ -120,8 +122,6 @@ public class DocumentCreator : MonoBehaviour
             this.jobDetailsContentCreator.StopCreatingPDFPage();
         }
 
-        this.document = new pdfDocument(this.documentTitle, this.author);
-        
         Debug.Log("PDF Created!");
 
         return document;

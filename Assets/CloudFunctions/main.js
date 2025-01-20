@@ -1,5 +1,5 @@
-require('./details.js');
-require('./users.js');
+require("./details.js");
+require("./users.js");
 
 const sgMail = require("@sendgrid/mail");
 const { v4: uuidv4 } = require("uuid");
@@ -15,12 +15,14 @@ Parse.Cloud.define("sendEmail", async (request) => {
     );
   }
 
+  const from = process.env.SENDGRID_EMAIL;
+  
   try {
     const emailData = request.params;
 
     const msg = {
       to: { email: emailData.To },
-      from: { email: emailData.From },
+      from: { email: from },
       subject: emailData.Subject,
       html: emailData.Body,
       attachments: [
@@ -33,7 +35,7 @@ Parse.Cloud.define("sendEmail", async (request) => {
       ],
     };
 
-    await sgMail.send(msg);
+    await sgMail.send(msg, { useMasterKey: true });
 
     return { result: "Email sent successfully" };
   } catch (error) {

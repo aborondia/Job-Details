@@ -145,6 +145,7 @@ Parse.Cloud.define("getUsersForRegularUser", async (request) => {
 
     const sanitizedUsers = users.map((user) => ({
       username: user.get("username"),
+      email: user.get("email"),
     }));
 
     return sanitizedUsers;

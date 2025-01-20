@@ -8,38 +8,39 @@ using sharpPDF;
 using Newtonsoft.Json;
 using SimpleJSON;
 using System.Text;
+using System.Linq;
 
 public class MailSender : MonoBehaviour
 {
-    [SerializeField] private string from;
-    [SerializeField] private string to;
-    [SerializeField] private string subject;
-    [SerializeField] private string body;
+    [SerializeField] private string debugEmail;
     private CustomMailMessage mailMessage;
     CustomMailAttachment attachment;
-    Regex emailRegex = new Regex(@"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
 
-    private void Awake()
+    public void StartSendingEmail(DetailsReport detailsReport, User recipient, string body = "")
     {
-        // AppController.Active.ServerCommunicator.OnSignInSuccessEvent.AddListener(() => StartSendingEmail());
-    }
-
-    public void StartSendingEmail(DetailsReport detailsReport)
-    {
-        CreateEmail(detailsReport);
+        CreateEmail(detailsReport, recipient, body);
         AppController.Active.ServerCommunicator.SendEmail(this.mailMessage);
     }
 
     #region Setup
 
-    public void CreateEmail(DetailsReport detailsReport)
+    // K-E-JobDetails@outlook.com
+    // aborondia@gmail.com
+    // Default Subject
+    // Job details.
+    public void CreateEmail(DetailsReport detailsReport, User recipient, string body)
     {
         pdfDocument pdfDocument;
         MemoryStream memoryStream;
         byte[] fileBytes;
+        string from = AppController.Active.UserDataHandler.CurrentUser.DTM.email;
+        string to = ReferenceEquals(recipient, null) ? this.debugEmail : recipient.DTM.email;
+        DateTime startDate = detailsReport.Details.Values.Select(dr => dr.JobDate).Min();
+        DateTime endDate = detailsReport.Details.Values.Select(dr => dr.JobDate).Max();
+        string subject = $"{from} Details:  {startDate.ToShortDateString()} - {endDate.ToShortDateString()}";
 
         pdfDocument = DocumentCreator.Active.GetDocument(detailsReport);
-        memoryStream = new System.IO.MemoryStream();
+        memoryStream = new MemoryStream();
         fileBytes = new byte[0];
 
         pdfDocument.createPDF(memoryStream, (BufferedStream bufferedStream) =>
@@ -49,53 +50,18 @@ public class MailSender : MonoBehaviour
         });
 
         CreateAttachment(Convert.ToBase64String(fileBytes));
-        this.mailMessage = new CustomMailMessage(this.to, this.from, this.subject, this.body, this.attachment);
+
+        if (String.IsNullOrEmpty(body))
+        {
+            body = "Job details";
+        }
+
+        this.mailMessage = new CustomMailMessage(to, from, subject, body, this.attachment);
     }
 
     public void CreateAttachment(string content)
     {
         this.attachment = new CustomMailAttachment(content, "JobDetails.pdf", "attachment/pdf", "attachment");
-    }
-
-    #endregion
-
-    #region Validation
-
-    private bool ValidateAll()
-    {
-        return ValidateMailMessage() && ValidateCredentials();
-    }
-
-    private bool ValidateCredentials()
-    {
-        if (!ValidateEmail())
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    private bool ValidateMailMessage()
-    {
-        if (ReferenceEquals(this.mailMessage, null))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    private bool ValidateEmail()
-    {
-        if (!this.emailRegex.IsMatch(this.from))
-        {
-            DisplayError("The from email is invalid!");
-
-            return false;
-        }
-
-        return true;
     }
 
     #endregion
