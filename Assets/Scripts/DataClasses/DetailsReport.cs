@@ -1,6 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Linq;
 
 public class DetailsReport
 {
@@ -12,6 +11,12 @@ public class DetailsReport
     public string ObjectId => objectId;
     private Dictionary<string, JobDetail> details = new Dictionary<string, JobDetail>();
     public Dictionary<string, JobDetail> Details => details;
+
+    public DetailsReport(string createdBy, string objectId)
+    {
+        this.createdBy = createdBy;
+        this.objectId = objectId;
+    }
 
     public DetailsReport(DetailsReportDTM dtm)
     {
@@ -29,6 +34,11 @@ public class DetailsReport
         }
 
         this.details.Add(jobDetail.ObjectId, jobDetail);
+    }
+
+    public void PopulateJobDetails(List<JobDetailsDTM> jobDetailsDTMs)
+    {
+        this.details = jobDetailsDTMs.ToDictionary(jd => jd.objectId, jd => jd.content);
     }
 
     public void OnPopulatingAllJobDetails()

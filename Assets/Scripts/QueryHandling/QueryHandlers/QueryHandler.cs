@@ -65,6 +65,7 @@ public abstract class QueryHandler : MonoBehaviour
         {
             this.mainViewElements.Add(mainView, new List<VisualElement>());
         }
+
         this.mainViewElements[mainView].Add(element);
     }
 
@@ -185,6 +186,7 @@ public abstract class QueryHandler : MonoBehaviour
     {
         if (!this.mainViewElements.ContainsKey(mainView))
         {
+
             return;
         }
 

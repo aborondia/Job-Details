@@ -3,56 +3,16 @@ using Newtonsoft.Json.Serialization;
 
 public class JobDetailsDTM
 {
-    public string objectId;
-    public JsonFile jsonFile;
-    public string createdBy;
-    public JobDetail content;
-    public ReportPointer reportPointer;
+    public string objectId { get; set; }
+    public string detailsReportId { get; set; }
+    public string createdBy { get; set; }
+    public JobDetail content { get; set; }
 
-    public JobDetailsDTM()
-    {
-
-    }
-
-    public JobDetailsDTM(string createdBy, JobDetail content, string detailsReportId)
+    public JobDetailsDTM(string createdBy, JobDetail content)
     {
         this.objectId = content.ObjectId;
-        this.jsonFile = new JsonFile();
+        this.detailsReportId = content.DetailsReportId;
         this.createdBy = createdBy;
         this.content = content;
-        this.reportPointer = new ReportPointer(detailsReportId);
-    }
-
-    public class JsonFile
-    {
-        public string __type = "File";
-        public string name = "JobDetails";
-    }
-
-    public class ReportPointer
-    {
-        public string __type = "Pointer";
-        public string className = "DetailsReport";
-        public string objectId;
-
-        public ReportPointer(string objectId)
-        {
-            this.objectId = objectId;
-        }
-    }
-
-    public string SerializeToJson()
-    {
-        var json = JsonConvert.SerializeObject(this, new JsonSerializerSettings
-        {
-            NullValueHandling = NullValueHandling.Ignore,
-            Formatting = Formatting.None,
-            ContractResolver = new DefaultContractResolver
-            {
-                NamingStrategy = new CamelCaseNamingStrategy()
-            }
-        });
-
-        return json;
     }
 }

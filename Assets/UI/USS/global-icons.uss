@@ -14,12 +14,20 @@
     background-image: url('project://database/Assets/Icons/chevron-up.png?fileID=-2422963001753501272&guid=d2aa5c7ec57ed1146bb6dbcb3d79bfec&type=3#chevron-up_0');
 }
 
+.gi-close {
+    background-image: url('project://database/Assets/Icons/close.png');
+}
+
 .gi-envelope {
     background-image: url('project://database/Assets/Icons/download.png?fileID=2800000&guid=24885e418a6792d4cb5c8ced1a7a5976&type=3#download');
 }
 
 .gi-edit {
     background-image: url('project://database/Assets/Icons/edit.png?fileID=5050237576729777607&guid=124a3d39198b0ba49a4d6f46e847254f&type=3#edit_0');
+}
+
+.gi-mail {
+    background-image: url('project://database/Assets/Icons/mail.png');
 }
 
 .gi-plus {

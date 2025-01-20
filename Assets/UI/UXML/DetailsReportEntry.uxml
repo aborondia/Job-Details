@@ -22,6 +22,13 @@
                     </CustomVisualElement>
                 </CustomVisualElement>
                 <CustomVisualElement name="option-buttons-container" class="option-buttons-container">
+                    <CustomVisualElement name="email-button-container" class="option-button-container">
+                        <CustomButton use-background-color="false" use-border="false" class="option-button">
+                            <CustomVisualElement name="icon-container">
+                                <CustomVisualElement name="icon" largest-dimension="30" enforce-largest-dimension="true" regenerate-in-editor="true" class="gi-mail" />
+                            </CustomVisualElement>
+                        </CustomButton>
+                    </CustomVisualElement>
                     <CustomVisualElement name="add-details-button-container" class="option-button-container">
                         <CustomButton use-background-color="false" use-border="false" class="option-button">
                             <CustomVisualElement name="icon-container">

@@ -1,72 +1,182 @@
 const { v4: uuidv4 } = require("uuid");
 
-Parse.Cloud.define("createJobDetail", async (request) => {
+Parse.Cloud.define("retrieveDetailReports", async (request) => {
   const user = request.user;
+
   if (!user) {
     throw new Parse.Error(
-      401,
-      "User must be signed in to perform this action."
+      Parse.Error.SESSION_MISSING,
+      "User must be logged in to perform this action."
     );
   }
 
   try {
-    const data = request.params;
-    const FileObject = Parse.Object.extend("JobDetail");
-    const newJsonFile = new Parse.File("stuff.json", {
-      base64: Buffer.from(data.content).toString("base64"),
+    const createdBy = request.params.createdBy;
+    const DetailsReport = Parse.Object.extend("DetailsReport");
+    const detailsReportQuery = new Parse.Query(DetailsReport);
+
+    detailsReportQuery.equalTo("createdBy", createdBy);
+    detailsReportQuery.include("jobDetails");
+
+    const detailsReports = await detailsReportQuery.find({
+      useMasterKey: true,
     });
-    await newJsonFile.save();
+    const results = [];
 
-    const newFileObject = new FileObject();
-    newFileObject.set("jsonFile", newJsonFile);
-    newFileObject.set("content", data.content);
-    newFileObject.set("userId", data.userId);
+    for (const detailsReport of detailsReports) {
+      const relation = detailsReport.relation("jobDetails");
+      const jobDetailsQuery = relation.query();
 
-    const result = await newFileObject.save();
+      const jobDetails = await jobDetailsQuery.find({ useMasterKey: true });
 
-    return {
-      objectId: result.id,
-      createdAt: result.createdAt,
-    };
+      results.push({
+        detailsReport: {
+          objectId: detailsReport.id,
+          createdBy: detailsReport.get("createdBy"),
+        },
+        jobDetails: jobDetails.map((jobDetail) => ({
+          objectId: jobDetail.id,
+          createdBy: jobDetail.get("createdBy"),
+          content: jobDetail.get("content"),
+          detailsReportId: jobDetail.get("detailsReportId"),
+        })),
+      });
+    }
+    return results;
   } catch (error) {
-    console.error("Error creating JobDetail:", error);
-    throw new Parse.Error(500, "Error creating JobDetail");
+    console.error("Error retrieving DetailsReports:", error);
+    throw new Parse.Error(500, "Error retrieving DetailsReports");
+  }
+});
+
+Parse.Cloud.define("deleteDetailReport", async (request) => {
+  const user = request.user;
+
+  if (!user) {
+    throw new Parse.Error(
+      Parse.Error.SESSION_MISSING,
+      "User must be logged in to perform this action."
+    );
+  }
+
+  try {
+    const { objectId } = request.params;
+    const DetailsReport = Parse.Object.extend("DetailsReport");
+    const detailsReportQuery = new Parse.Query(DetailsReport);
+    detailsReportQuery.include("jobDetails");
+    const reportToDelete = await detailsReportQuery.get(objectId, {
+      useMasterKey: true,
+    });
+    if (!reportToDelete) {
+      throw new Parse.Error(500, "DetailsReport not found!");
+    }
+
+    const results = [];
+    const relation = reportToDelete.relation("jobDetails");
+    const jobDetailsQuery = relation.query();
+    const jobDetails = await jobDetailsQuery.find({ useMasterKey: true });
+
+    if (jobDetails.length) {
+      for (const jobDetail of jobDetails) {
+        await jobDetail.destroy();
+      }
+    }
+
+    await reportToDelete.destroy({ useMasterKey: true });
+
+    return { Message: "DetailsReport deleted" };
+  } catch (error) {
+    console.error("Error deleting DetailsReport:", error);
+    throw new Parse.Error(500, "Error deleting DetailsReport");
+  }
+});
+
+Parse.Cloud.define("createDetailsReport", async (request) => {
+  const user = request.user;
+  const { createdBy } = request.params;
+
+  if (!user) {
+    throw new Parse.Error(
+      Parse.Error.SESSION_MISSING,
+      "User must be logged in to perform this action."
+    );
+  }
+
+  try {
+    const DetailsReport = Parse.Object.extend("DetailsReport");
+    const detailsReport = new DetailsReport();
+
+    detailsReport.set("createdBy", createdBy);
+
+    await detailsReport.save(null, { useMasterKey: true });
+
+    return detailsReport;
+  } catch (error) {
+    throw new Parse.Error(
+      error.code || 500,
+      error.message || "An error occurred while creating DetailsReport."
+    );
+  }
+});
+
+Parse.Cloud.define("createJobDetail", async (request) => {
+  const { createdBy, content, detailsReportId } = request.params;
+  const user = request.user;
+
+  if (!user) {
+    throw new Parse.Error(
+      Parse.Error.SESSION_MISSING,
+      "User must be logged in to perform this action."
+    );
+  }
+
+  if (!createdBy || !content || !detailsReportId) {
+    throw new Parse.Error(400, "Missing required parameters.");
+  }
+
+  try {
+    const DetailsReport = Parse.Object.extend("DetailsReport");
+    const query = new Parse.Query(DetailsReport);
+    const detailsReport = await query.get(detailsReportId, {
+      useMasterKey: true,
+    });
+
+    if (!detailsReport) {
+      throw new Parse.Error(404, "DetailsReport not found.");
+    }
+
+    const JobDetail = Parse.Object.extend("JobDetail");
+    const jobDetail = new JobDetail();
+
+    jobDetail.set("createdBy", createdBy);
+    jobDetail.set("content", content);
+    jobDetail.set("detailsReportId", detailsReportId);
+
+    await jobDetail.save(null, { useMasterKey: true });
+
+    const relation = detailsReport.relation("jobDetails");
+    relation.add(jobDetail);
+
+    await detailsReport.save(null, { useMasterKey: true });
+
+    return jobDetail;
+  } catch (error) {
+    throw new Parse.Error(
+      error.code || 500,
+      error.message || "An error occurred while creating JobDetail."
+    );
   }
 });
 
 Parse.Cloud.define("updateJobDetail", async (request) => {
-  const user = request.user;
-  if (!user) {
-    throw new Parse.Error(
-      401,
-      "User must be signed in to perform this action."
-    );
-  }
-
   try {
-    const objectId = request.params.objectId;
-    const data = request.params;
-
     const JobDetail = Parse.Object.extend("JobDetail");
-    const existingJobDetail = await new Parse.Query(JobDetail).get(objectId);
+    const jobDetail = ParseClass.fromJSON(request.params);
 
-    existingJobDetail.set("content", data.content);
-    existingJobDetail.set("userId", data.userId);
-
-    const contentBuffer = Buffer.from(data.content, "utf-8");
-    const base64Content = contentBuffer.toString("base64");
-
-    existingJobDetail.set(
-      "jsonFile",
-      new Parse.File("resume.txt", { base64: base64Content })
-    );
-    existingJobDetail.set("userId", data.userId);
-
-    const result = await existingJobDetail.save();
+    const result = await jobDetail.save(null, { useMasterKey: true });
 
     return {
-      objectId: result.id,
-      updatedAt: result.updatedAt,
+      result: result,
     };
   } catch (error) {
     console.error("Error updating JobDetail:", error);
@@ -75,14 +185,6 @@ Parse.Cloud.define("updateJobDetail", async (request) => {
 });
 
 Parse.Cloud.define("retrieveJobDetails", async (request) => {
-  const user = request.user;
-  if (!user) {
-    throw new Parse.Error(
-      401,
-      "User must be signed in to perform this action."
-    );
-  }
-
   try {
     const userId = request.params.userId;
 
@@ -91,17 +193,18 @@ Parse.Cloud.define("retrieveJobDetails", async (request) => {
 
     query.equalTo("userId", userId);
 
-    const results = await query.find();
+    const results = await query.find({
+      useMasterKey: true,
+    });
     const jobDetails = results.map((result) => {
       return {
         objectId: result.id,
-        jsonFile: result.get("jsonFile"),
         userId: result.get("userId"),
         content: result.get("content"),
       };
     });
 
-    return { jobDetails };
+    return jobDetails;
   } catch (error) {
     console.error("Error retrieving JobDetails:", error);
     throw new Parse.Error(500, "Error retrieving JobDetails");
@@ -109,23 +212,19 @@ Parse.Cloud.define("retrieveJobDetails", async (request) => {
 });
 
 Parse.Cloud.define("deleteJobDetail", async (request) => {
-  const user = request.user;
-  if (!user) {
-    throw new Parse.Error(
-      401,
-      "User must be signed in to perform this action."
-    );
-  }
-
   try {
     const objectId = request.params.objectId;
 
     const JobDetail = Parse.Object.extend("JobDetail");
     const query = new Parse.Query(JobDetail);
 
-    const jobDetail = await query.get(objectId);
+    const jobDetail = await query.get(objectId, {
+      useMasterKey: true,
+    });
 
-    await jobDetail.destroy();
+    await jobDetail.destroy({
+      useMasterKey: true,
+    });
 
     return { result: "JobDetail deleted successfully" };
   } catch (error) {

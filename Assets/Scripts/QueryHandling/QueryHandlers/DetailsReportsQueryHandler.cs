@@ -1,11 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Xml;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UIElements;
 using MainView = Enumerations.MainView;
 using Subview = Enumerations.Subview;
@@ -140,6 +136,7 @@ public class DetailsReportsQueryHandler : QueryHandler
         VisualElement optionButtonsContainer = reportDetailsContainer.Q<VisualElement>("option-buttons-container");
         CustomButton addDetailsButton = optionButtonsContainer.Q<VisualElement>("add-details-button-container").Q<CustomButton>();
         CustomButton deleteReportButton = optionButtonsContainer.Q<VisualElement>("delete-report-button-container").Q<CustomButton>();
+        CustomButton emailReportButton = optionButtonsContainer.Q<VisualElement>("email-button-container").Q<CustomButton>();
         VisualElement jobDetailsContainer = rightColumn.Q<VisualElement>("job-details-container");
 
         if (detailsReport.Details.Count <= 0)
@@ -185,6 +182,11 @@ public class DetailsReportsQueryHandler : QueryHandler
                 AppController.Active.ServerCommunicator.DeleteDetailsReport(detailsReport.ObjectId);
                 AppController.Active.DetailsReportsHandler.RemoveDetailsReports(detailsReport.ObjectId);
             }, () => jobDetailsCount <= 0);
+        });
+
+        emailReportButton.RegisterCallback<ClickEvent>(evt =>
+        {
+            AppController.Active.MailSender.StartSendingEmail(detailsReport);
         });
 
         jobDetailsContainer.Clear();

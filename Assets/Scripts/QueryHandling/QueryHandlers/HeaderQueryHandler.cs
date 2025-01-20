@@ -13,6 +13,8 @@ public class HeaderQueryHandler : QueryHandler
     private VisualElement detailsReportRightHeaderContainer;
     private VisualElement addDetailsReportButtonContainer;
     private CustomButton addDetailsReportButton;
+    private VisualElement closeButtonContainer;
+    private CustomButton closeButton;
     private VisualElement teamButtonContainer;
     private CustomButton teamButton;
     private VisualElement viewUsersNotificationContainer;
@@ -28,8 +30,12 @@ public class HeaderQueryHandler : QueryHandler
         this.addDetailsReportButton = this.addDetailsReportButtonContainer.Q<CustomButton>();
         this.teamButtonContainer = this.detailsReportRightHeaderContainer.Q<VisualElement>("team-button-container");
         this.teamButton = this.teamButtonContainer.Q<CustomButton>();
+        this.closeButtonContainer = this.rightHeaderContainer.Q<VisualElement>("close-button-container");
+        this.closeButton = this.closeButtonContainer.Q<CustomButton>();
         this.viewUsersNotificationContainer = this.teamButton.Q<VisualElement>("notification-container");
         this.viewUsersNotificationLabel = this.viewUsersNotificationContainer.Q<Label>("notification-label");
+
+        VisualElementHelper.SetElementDisplay(this.closeButtonContainer, DisplayStyle.None);
     }
 
     protected override void SetupButtons()
@@ -82,7 +88,7 @@ public class HeaderQueryHandler : QueryHandler
         {
             ActionHelper.StringDelegate responseDelegate = (string response) =>
             {
-                DetailsReport newReport = JSONHelper.GetDetailsReportFromCreate(AppController.Active.ServerCommunicator.CurrentUserDTM.objectId, response);
+                DetailsReport newReport = JSONHelper.GetDetailsReportFromCreate(response);
 
                 AppController.Active.DetailsReportsHandler.AddDetailsReports(newReport);
             };
@@ -91,6 +97,8 @@ public class HeaderQueryHandler : QueryHandler
 
             AppController.Active.DetailsReportsHandler.RefreshReports();
         });
+
+        this.closeButton.RegisterCallback<ClickEvent>(evt => QueryController.Active.ReturnToPreviousView());
     }
 
     protected override void SetupInputs()
@@ -99,8 +107,10 @@ public class HeaderQueryHandler : QueryHandler
 
     protected override void SetViewElements()
     {
-        AddMainViewElement(Enumerations.MainView.DetailsReports, this.teamButtonContainer);
+        // AddMainViewElement(Enumerations.MainView.DetailsReports, this.teamButtonContainer);
         AddMainViewElement(Enumerations.MainView.DetailsReports, this.detailsReportRightHeaderContainer);
+        AddMainViewElement(Enumerations.MainView.Users, this.closeButtonContainer);
+        AddMainViewElement(Enumerations.MainView.JobDetails, this.closeButtonContainer);
     }
 
     protected override void OnAnyViewChanged()

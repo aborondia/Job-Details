@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Enumerations;
@@ -123,6 +122,7 @@ public class JobDetail
             cleanerFirstLine = "Cleaners:";
         }
 
+        Debug.Log($"{index + 1}){this.cleaners[index].Name} - Hrs={this.cleaners[index].HoursWorked}");
         cleanerContent = new List<string>{
         cleanerFirstLine,
         $"{index + 1}){this.cleaners[index].Name}",

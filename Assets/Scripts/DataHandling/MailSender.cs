@@ -24,21 +24,21 @@ public class MailSender : MonoBehaviour
         // AppController.Active.ServerCommunicator.OnSignInSuccessEvent.AddListener(() => StartSendingEmail());
     }
 
-    public void StartSendingEmail()
+    public void StartSendingEmail(DetailsReport detailsReport)
     {
-        CreateEmail();
+        CreateEmail(detailsReport);
         AppController.Active.ServerCommunicator.SendEmail(this.mailMessage);
     }
 
     #region Setup
 
-    public void CreateEmail()
+    public void CreateEmail(DetailsReport detailsReport)
     {
         pdfDocument pdfDocument;
         MemoryStream memoryStream;
         byte[] fileBytes;
 
-        pdfDocument = DocumentCreator.Active.GetDocument(new DetailsReport(new DetailsReportDTM()));
+        pdfDocument = DocumentCreator.Active.GetDocument(detailsReport);
         memoryStream = new System.IO.MemoryStream();
         fileBytes = new byte[0];
 

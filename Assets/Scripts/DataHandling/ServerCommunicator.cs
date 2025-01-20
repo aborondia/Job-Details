@@ -618,7 +618,7 @@ public class ServerCommunicator : MonoBehaviour
 
     private IEnumerator StartCreatingDetailsReport(ResponseDelegateString responseDelegate)
     {
-        UnityWebRequest request = new UnityWebRequest($"https://parseapi.back4app.com/classes/DetailsReport", "POST");
+        UnityWebRequest request = new UnityWebRequest($"{this.FunctionsUrl}/createDetailsReport", "POST");
         string jsonBody = $"{{\"createdBy\":\"{this.currentUserDTM.objectId}\"}}";
         byte[] bodyRaw = new UTF8Encoding().GetBytes(jsonBody);
 
@@ -657,26 +657,11 @@ public class ServerCommunicator : MonoBehaviour
 
     private IEnumerator StartGettingDetailsReports(ResponseDelegateString responseDelegate)
     {
-        string url;
+        string url = $"{this.FunctionsUrl}/retrieveDetailReports";
+        WWWForm form = new WWWForm();
+        form.AddField("createdBy", this.currentUserDTM.objectId);
 
-        if (AppController.Active.UserDataHandler.CurrentUser.RoleDTM.name == UserDataHandler._UserRoleServerName)
-        {
-            Dictionary<string, object> whereDict = new Dictionary<string, object>
-        {
-            { "createdBy", this.currentUserDTM.objectId },
-        };
-
-            string whereJson = JsonConvert.SerializeObject(whereDict);
-            string encodedWhere = UnityWebRequest.EscapeURL(whereJson);
-
-            url = $"{this.ClassesUrl}/DetailsReport?where={encodedWhere}";
-        }
-        else
-        {
-            url = $"{this.ClassesUrl}/DetailsReport";
-        }
-
-        UnityWebRequest request = UnityWebRequest.Get(url);
+        UnityWebRequest request = UnityWebRequest.Post(url, form);
 
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
@@ -688,10 +673,7 @@ public class ServerCommunicator : MonoBehaviour
         {
             ShowSuccessLog("Response (StartGettingDetailsReports): " + request.downloadHandler.text);
 
-            if (!ReferenceEquals(responseDelegate, null))
-            {
-                responseDelegate.Invoke(request.downloadHandler.text);
-            }
+            responseDelegate?.Invoke(request.downloadHandler.text);
         }
         else
         {
@@ -710,9 +692,13 @@ public class ServerCommunicator : MonoBehaviour
 
     private IEnumerator StartDeletingDetailsReport(string id)
     {
-        string url = $"{this.ClassesUrl}/DetailsReport/{id}";
+        string url = $"{this.FunctionsUrl}/deleteDetailReport";
+        WWWForm form = new WWWForm();
+        form.AddField("objectId", id);
+        // string url = $"{this.ClassesUrl}/DetailsReport/{id}";
 
-        UnityWebRequest request = UnityWebRequest.Delete(url);
+        UnityWebRequest request = UnityWebRequest.Post(url, form);
+        // UnityWebRequest request = UnityWebRequest.Delete(url);
 
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
@@ -722,7 +708,7 @@ public class ServerCommunicator : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            ShowSuccessLog("Success (StartDeletingDetailsReport): " + id);
+            ShowSuccessLog("Success (StartDeletingDetailsReport): " + request.downloadHandler.text);
         }
         else
         {
@@ -752,9 +738,9 @@ public class ServerCommunicator : MonoBehaviour
 
     private IEnumerator StartCreatingJobDetails(JobDetail jobDetails, ResponseDelegateString responseDelegate = null)
     {
-        string url = $"https://parseapi.back4app.com/classes/JobDetail";
+        string url = $"{this.FunctionsUrl}/createJobDetail";
         UnityWebRequest request = new UnityWebRequest(url, "POST");
-        JobDetailsDTM dtm = new JobDetailsDTM(this.currentUserDTM.objectId, jobDetails, jobDetails.DetailsReportId);
+        JobDetailsDTM dtm = new JobDetailsDTM(this.currentUserDTM.objectId, jobDetails);
         string jsonBody = JsonConvert.SerializeObject(dtm);
         byte[] bodyRaw = new UTF8Encoding().GetBytes(jsonBody);
 
@@ -832,7 +818,7 @@ public class ServerCommunicator : MonoBehaviour
     private IEnumerator StartUpdatingJobDetails(JobDetail jobDetails, ResponseDelegateString responseDelegate)
     {
         string url = $"{this.ClassesUrl}/JobDetail/{jobDetails.ObjectId}";
-        JobDetailsDTM dtm = new JobDetailsDTM(this.currentUserDTM.objectId, jobDetails, jobDetails.DetailsReportId);
+        JobDetailsDTM dtm = new JobDetailsDTM(this.currentUserDTM.objectId, jobDetails);
         string jsonBody = JsonConvert.SerializeObject(dtm);
         byte[] bodyRaw = new UTF8Encoding().GetBytes(jsonBody);
         UnityWebRequest request = UnityWebRequest.Put(url, bodyRaw);

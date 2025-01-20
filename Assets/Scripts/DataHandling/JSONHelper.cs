@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using SimpleJSON;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public static class JSONHelper
@@ -15,10 +16,11 @@ public static class JSONHelper
         return userDTM;
     }
 
-    public static DetailsReport GetDetailsReportFromCreate(string createdBy, string result)
+    public static DetailsReport GetDetailsReportFromCreate(string response)
     {
         DetailsReport detailsReport;
-        DetailsReportDTM dtm = GetDetailsReportDTM(createdBy, result);
+        JSONNode result = JSON.Parse(response)["result"];
+        DetailsReportDTM dtm = JsonConvert.DeserializeObject<DetailsReportDTM>(result.ToString());
 
         detailsReport = new DetailsReport(dtm);
 
@@ -27,25 +29,31 @@ public static class JSONHelper
 
     public static List<DetailsReport> GetDetailsReports(string result)
     {
-        List<DetailsReportDTM> detailsReportDTMs;
         List<DetailsReport> detailsReports = new List<DetailsReport>();
-        JSONNode resultsNode = JSON.Parse(result)["results"];
+        JSONNode resultsNode = JSON.Parse(result)["result"];
 
-        detailsReportDTMs = GetDetailsReportDTMs(resultsNode);
-
-        foreach (DetailsReportDTM detailsReportDTM in detailsReportDTMs)
+        foreach (JSONNode node in resultsNode.Values)
         {
-            DetailsReport detailsReport = new DetailsReport(detailsReportDTM);
-            List<JobDetail> jobDetails = new List<JobDetail>();
+            JSONNode reportNode = node["detailsReport"];
+            JSONNode detailsNode = node["jobDetails"];
+            DetailsReport detailsReport = GetDetailsReport(reportNode);
+            List<JobDetailsDTM> jobDetails = GetJobDetailDTMs(detailsNode);
+            detailsReport.PopulateJobDetails(jobDetails);
 
             detailsReports.Add(detailsReport);
-
-            ActionHelper.StringDelegate responseDelegate = GetDetailsReponseDelegate(detailsReport, jobDetails);
-
-            AppController.Active.ServerCommunicator.GetJobDetails(detailsReportDTM.objectId, responseDelegate);
         }
 
         return detailsReports;
+    }
+
+    private static DetailsReport GetDetailsReport(JSONNode node)
+    {
+        string createdBy = node["createdBy"];
+        string objectId = node["objectId"];
+        DetailsReportDTM detailsReportDTM = JsonConvert.DeserializeObject<DetailsReportDTM>(node.ToString());
+        DetailsReport detailsReport = new DetailsReport(detailsReportDTM);
+
+        return detailsReport;
     }
 
     private static ActionHelper.StringDelegate GetDetailsReponseDelegate(DetailsReport detailsReport, List<JobDetail> jobDetails)
@@ -119,8 +127,10 @@ public static class JSONHelper
     {
         DetailsReportDTM dtm = new DetailsReportDTM();
         JSONNode node = JSON.Parse(result);
+        DateTime createdAt;
 
-        dtm.createdAt = DateTime.Parse(node["createdAt"]);
+        DateTime.TryParse(node["createdAt"], out createdAt);
+        dtm.createdAt = createdAt;
         dtm.createdBy = createdBy;
         dtm.objectId = node["objectId"];
         dtm.updatedAt = dtm.createdAt;
@@ -144,15 +154,8 @@ public static class JSONHelper
 
     private static JobDetailsDTM GetJobDetailDTM(JSONNode node)
     {
-        JobDetailsDTM dtm = new JobDetailsDTM();
-        string objectId = node["objectId"];
-
-        dtm.objectId = objectId;
-        dtm.jsonFile = GetJsonFile(node["jsonFile"]);
-        dtm.createdBy = node["createdBy"];
-        dtm.content = GetJobDetailsDTMContent(objectId, node["content"]);
-        // dtm.content = node["content"];
-        // dtm.reportPointer = node["reportPointer"];
+        JobDetailsDTM dtm = JsonConvert.DeserializeObject<JobDetailsDTM>(node.ToString());
+        dtm.content = GetJobDetailsDTMContent(dtm.objectId, node["content"]);
 
         return dtm;
     }
@@ -196,7 +199,9 @@ public static class JSONHelper
 
         foreach (JSONNode node in nodeWithValues.Values)
         {
+            Debug.Log(node.ToString());
             cleaners.Add(GetCleaner(node));
+            Debug.Log(GetCleaner(node).CleanerObjectId);
         }
 
         return cleaners;
@@ -358,13 +363,13 @@ public static class JSONHelper
     //     return dtm;
     // }
 
-    private static JobDetailsDTM.JsonFile GetJsonFile(JSONNode node)
-    {
-        JobDetailsDTM.JsonFile dtm = new JobDetailsDTM.JsonFile();
+    // private static JobDetailsDTM.JsonFile GetJsonFile(JSONNode node)
+    // {
+    //     JobDetailsDTM.JsonFile dtm = new JobDetailsDTM.JsonFile();
 
-        dtm.__type = node["__type"];
-        dtm.name = node["name"];
+    //     dtm.__type = node["__type"];
+    //     dtm.name = node["name"];
 
-        return dtm;
-    }
+    //     return dtm;
+    // }
 }
