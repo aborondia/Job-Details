@@ -34,29 +34,21 @@ public class ServerCommunicator : MonoBehaviour
     public UnityEvent OnRegisterFailedEvent;
     public UnityEvent OnRequestStartedEvent;
     public UnityEvent OnRequestCompletedEvent;
+    private int instanceId;
 
-    private IEnumerator CallGetRolesWithUsersFunction()
+    private void Awake()
     {
-        UnityWebRequest request = new UnityWebRequest(this.FunctionsUrl + "/getRolesWithUsers", "POST");
-        request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
-        request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
-        request.SetRequestHeader("Content-Type", "application/json");
-        request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
+        this.instanceId = this.GetInstanceID();
 
-        byte[] bodyRaw = new System.Text.UTF8Encoding().GetBytes("{}");
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
+        this.OnRequestStartedEvent.AddListener(() =>
         {
-            ShowSuccessLog($"Response (CallGetRolesWithUsersFunction):{request.downloadHandler.text}");
-        }
-        else
+            QueryController.Active.BlockInteractions(this.instanceId);
+        });
+
+        this.OnRequestCompletedEvent.AddListener(() =>
         {
-            ShowFailureLog($"Request failed (CallGetRolesWithUsersFunction): {request.error}");
-        }
+            QueryController.Active.UnblockInteractions(this.instanceId);
+        });
     }
 
     #region Communication
@@ -175,42 +167,10 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void GetUserNameReferences(ReturnStringDelegate responseDelegate = null)
-    {
-        StartCoroutine(StartGettingUserNameReferences(responseDelegate));
-    }
-
-    private IEnumerator StartGettingUserNameReferences(ReturnStringDelegate responseDelegate)
-    {
-        string url = $"{this.ClassesUrl}/UserNameReference";
-
-        UnityWebRequest request = UnityWebRequest.Get(url);
-
-        request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
-        request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
-        request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
-
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            ShowSuccessLog("Response:  (StartGettingUserNameReferences)" + request.downloadHandler.text);
-
-            if (!ReferenceEquals(responseDelegate, null))
-            {
-                responseDelegate.Invoke(request.downloadHandler.text);
-            }
-        }
-        else
-        {
-            ShowFailureLog("Request failed: " + request.error + request.downloadHandler.text);
-        }
-
-        this.OnRequestCompletedEvent.Invoke();
-    }
-
     public void GetUsersForRegularUser(ReturnStringDelegate responseDelegate)
     {
+        this.OnRequestStartedEvent.Invoke();
+
         StartCoroutine(StartGettingUsersForRegularUser(responseDelegate));
     }
 
@@ -238,10 +198,14 @@ public class ServerCommunicator : MonoBehaviour
         {
             ShowFailureLog("Request failed (StartGettingUsersForRegularUser): " + request.error);
         }
+
+        this.OnRequestCompletedEvent.Invoke();
     }
 
     public void GetUsersForAdmin(ReturnStringDelegate responseDelegate)
     {
+        this.OnRequestStartedEvent.Invoke();
+
         StartCoroutine(StartGettingUsersForAdmin(responseDelegate));
     }
 
@@ -269,6 +233,8 @@ public class ServerCommunicator : MonoBehaviour
         {
             ShowFailureLog("Request failed (StartGettingUsersWithRoles): " + request.error);
         }
+
+        this.OnRequestCompletedEvent.Invoke();
     }
 
     public void SignIn(UserSignInDTM userSignInDTM)
@@ -383,6 +349,8 @@ public class ServerCommunicator : MonoBehaviour
 
     public void GetRoles(ReturnStringDelegate responseDelegate = null)
     {
+        this.OnRequestStartedEvent.Invoke();
+
         StartCoroutine(StartGettingRoles(responseDelegate));
     }
 
@@ -415,6 +383,8 @@ public class ServerCommunicator : MonoBehaviour
 
     public void GetUserRole(ReturnStringDelegate responseDelegate, string userObjectId)
     {
+        this.OnRequestStartedEvent.Invoke();
+
         StartCoroutine(StartGettingUserRole(responseDelegate, userObjectId));
     }
 
@@ -459,6 +429,8 @@ public class ServerCommunicator : MonoBehaviour
 
     public void RemoveUserRole(RoleDTM dtm, Action successAction = null)
     {
+        this.OnRequestStartedEvent.Invoke();
+
         StartCoroutine(StartRemovingUserRole(dtm, successAction));
     }
 
@@ -493,6 +465,8 @@ public class ServerCommunicator : MonoBehaviour
 
     public void UpdateRole(RoleUpdateDTM dtm, Action successAction = null)
     {
+        this.OnRequestStartedEvent.Invoke();
+
         StartCoroutine(StartUpdatingRole(dtm, successAction));
     }
 
@@ -527,6 +501,8 @@ public class ServerCommunicator : MonoBehaviour
 
     public void VerifyUser(string userId, Action successAction = null)
     {
+        this.OnRequestStartedEvent.Invoke();
+
         StartCoroutine(StartVerifyingUser(userId, successAction));
     }
 

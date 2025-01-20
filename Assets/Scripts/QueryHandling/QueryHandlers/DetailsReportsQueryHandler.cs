@@ -157,12 +157,15 @@ public class DetailsReportsQueryHandler : QueryHandler
 
         deleteReportButton.RegisterCallback<ClickEvent>(evt =>
         {
-            AppController.Active.ServerCommunicator.DeleteDetailsReport(detailsReport.ObjectId, successful =>
+            QueryController.Active.PopupsQueryHandler.OpenConfirmationPopup(() =>
             {
-                if (successful)
+                AppController.Active.ServerCommunicator.DeleteDetailsReport(detailsReport.ObjectId, successful =>
                 {
-                    AppController.Active.DetailsReportsHandler.RemoveDetailsReports(detailsReport.ObjectId);
-                }
+                    if (successful)
+                    {
+                        AppController.Active.DetailsReportsHandler.RemoveDetailsReports(detailsReport.ObjectId);
+                    }
+                });
             });
         });
 
@@ -206,7 +209,8 @@ public class DetailsReportsQueryHandler : QueryHandler
 
         deleteButton.RegisterCallback<ClickEvent>(evt =>
         {
-            AppController.Active.ServerCommunicator.DeleteJobDetails(jobDetail.ObjectId, responseDelegate);
+            QueryController.Active.PopupsQueryHandler
+            .OpenConfirmationPopup(() => AppController.Active.ServerCommunicator.DeleteJobDetails(jobDetail.ObjectId, responseDelegate));
         });
 
         clientNameLabel.text = clientNameText;

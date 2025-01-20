@@ -1,0 +1,30 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/USS/popups.uss?fileID=7433441132597879392&amp;guid=49860d6f707b08b4dbc136bf00cbb0a5&amp;type=3#popups" />
+    <CustomVisualElement name="main" class="popups-main">
+        <CustomVisualElement name="confirmation-popup" class="gray1-border confirmation-popup">
+            <CustomVisualElement name="top" class="confirmation-popup-top">
+                <CustomVisualElement name="display-message-container" class="confirmation-popup-display-message-container">
+                    <CustomLabel text="This action cannot be undone" class="regular-font display-message-label" />
+                </CustomVisualElement>
+            </CustomVisualElement>
+            <CustomVisualElement name="bottom" class="confirmation-popup-bottom">
+                <CustomVisualElement name="buttons-container" class="confirmation-popup-buttons-container">
+                    <CustomVisualElement name="cancel-button-container" class="confirmation-popup-button-container">
+                        <CustomButton button-type="Warning" class="confirmation-popup-button">
+                            <CustomVisualElement name="label-container" class="confirmation-popup-button-label-container">
+                                <CustomLabel text="CANCEL" class="regular-font" />
+                            </CustomVisualElement>
+                        </CustomButton>
+                    </CustomVisualElement>
+                    <CustomVisualElement name="confirm-button-container" class="confirmation-popup-button-container">
+                        <CustomButton button-type="Primary" class="confirmation-popup-button">
+                            <CustomVisualElement name="label-container" class="confirmation-popup-button-label-container">
+                                <CustomLabel text="CONFIRM" class="regular-font" />
+                            </CustomVisualElement>
+                        </CustomButton>
+                    </CustomVisualElement>
+                </CustomVisualElement>
+            </CustomVisualElement>
+        </CustomVisualElement>
+    </CustomVisualElement>
+</ui:UXML>

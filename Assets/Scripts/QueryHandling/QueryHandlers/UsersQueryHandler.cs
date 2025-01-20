@@ -85,7 +85,6 @@ public class UsersQueryHandler : QueryHandler
         VisualElement verifyUserButtonContainer = baseElement.Q<VisualElement>("verify-user-button-container");
         CustomButton verifyUserButton = verifyUserButtonContainer.Q<CustomButton>();
         VisualElement userTypeContainer = baseElement.Q<VisualElement>("user-type-container");
-        // CustomEnumField userTypeEnumField = baseElement.Q<CustomEnumField>();
         DropdownField userTypeDropdownField = baseElement.Q<DropdownField>();
         VisualElement userTypeLabelContainer = baseElement.Q<VisualElement>("user-role-label-container");
         Action onDataChangeAction = () => this.onUserDataChange.Invoke();
@@ -134,8 +133,11 @@ public class UsersQueryHandler : QueryHandler
         {
             deleteUserButton.RegisterCallback<ClickEvent>(evt =>
             {
-                onDataChangeAction += () => AppController.Active.UserDataHandler.PopulateUsers();
-                AppController.Active.ServerCommunicator.DeleteUser(user.DTM.objectId, onDataChangeAction);
+                QueryController.Active.PopupsQueryHandler.OpenConfirmationPopup(() =>
+                {
+                    onDataChangeAction += () => AppController.Active.UserDataHandler.PopulateUsers();
+                    AppController.Active.ServerCommunicator.DeleteUser(user.DTM.objectId, onDataChangeAction);
+                });
             });
         }
     }

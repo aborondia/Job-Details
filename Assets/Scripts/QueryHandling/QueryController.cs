@@ -26,6 +26,8 @@ public class QueryController : MonoBehaviour
     public HeaderQueryHandler HeaderQueryHandler => headerQueryHandler;
     [SerializeField] private DetailsReportsQueryHandler detailsReportsQueryHandler;
     public DetailsReportsQueryHandler DetailsReportsQueryHandler => detailsReportsQueryHandler;
+    [SerializeField] private PopupsQueryHandler popupsQueryHandler;
+    public PopupsQueryHandler PopupsQueryHandler => popupsQueryHandler;
     [SerializeField] private GameObject queryHandlersParent;
     [SerializeField] private QueryHandler[] queryhandlers;
     private VisualElement interactionBlocker;
@@ -194,11 +196,18 @@ public class QueryController : MonoBehaviour
     {
         int blockingId = this.interactionBlockerIds.Count <= 0 ? 0 : this.interactionBlockerIds.Max() + 1;
 
-        StartCoroutine(UnblockIntereractionsAfterTimeout(blockingId));
 
+        this.interactionBlockerIds.Add(blockingId);
         UpdateInteractionBlocker();
 
         return blockingId;
+    }
+
+    public void BlockInteractions(int blockingId)
+    {
+        this.interactionBlockerIds.Add(blockingId);
+
+        UpdateInteractionBlocker();
     }
 
     public void UnblockInteractions(int blockingId)
@@ -220,17 +229,17 @@ public class QueryController : MonoBehaviour
         }
     }
 
-    private IEnumerator UnblockIntereractionsAfterTimeout(int blockingId, float timeout = 5f)
-    {
-        float elapsedTime = 0;
+    // private IEnumerator UnblockIntereractionsAfterTimeout(int blockingId, float timeout = 5f)
+    // {
+    //     float elapsedTime = 0;
 
-        yield return new WaitUntil(() =>
-        {
-            elapsedTime += Time.deltaTime;
+    //     yield return new WaitUntil(() =>
+    //     {
+    //         elapsedTime += Time.deltaTime;
 
-            return elapsedTime >= timeout;
-        });
-    }
+    //         return elapsedTime >= timeout;
+    //     });
+    // }
 
     #endregion
 }
