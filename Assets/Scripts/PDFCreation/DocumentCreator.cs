@@ -35,7 +35,6 @@ public class DocumentCreator : MonoBehaviour
     public static int XMargin = 50;
     public static int DefaultPageWidth = 612;
     public static int DefaultPageHeight = 792;
-    private bool sent = false;
 
     private void Awake()
     {
@@ -121,7 +120,10 @@ public class DocumentCreator : MonoBehaviour
             this.jobDetailsContentCreator.StopCreatingPDFPage();
         }
 
+        this.document = new pdfDocument(this.documentTitle, this.author);
+        
         Debug.Log("PDF Created!");
+
         return document;
     }
 }

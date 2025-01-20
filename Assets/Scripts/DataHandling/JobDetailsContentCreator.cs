@@ -31,7 +31,7 @@ public class JobDetailsContentCreator : MonoBehaviour
 
     public List<string> GetPaymentOptionsText()
     {
-        List<string> paymentOptionsText = new List<string> { "Cash", "Cheque", "No Payment Method", "Premium", };
+        List<string> paymentOptionsText = new List<string> { "Cash", "Cheque", "None", "Premium", };
 
         return paymentOptionsText;
     }
@@ -51,7 +51,7 @@ public class JobDetailsContentCreator : MonoBehaviour
         {
             "Cash:",
             "Cheque:",
-            "No Payment Method:",
+            "None:",
             "Premium:",
         };
     }
@@ -84,6 +84,11 @@ public class JobDetailsContentCreator : MonoBehaviour
             BorderLineWidthCollection.GetBorderLineWidth(BorderLineType.CleanersName),
             BorderLineWidthCollection.GetBorderLineWidth(BorderLineType.CleanersHours),
         };
+    }
+
+    private int GetWidthWithMargins()
+    {
+        return this.currentPDFPage.Width - (DC.XMargin * 2);
     }
 
     #endregion
@@ -134,7 +139,7 @@ public class JobDetailsContentCreator : MonoBehaviour
 
     public void AddMultiText(List<string> content, bool addLine = false, int checkedBoxIndex = -1, int lineStart = -1, int lineEnd = -1)
     {
-        int contentSpace = this.currentPDFPage.Width / content.Count;
+        int contentSpace = GetWidthWithMargins() / content.Count;
         int currentContentIndex = 0;
         int currentTextX;
 
@@ -154,7 +159,7 @@ public class JobDetailsContentCreator : MonoBehaviour
 
     public void AddMultiText(List<string> content, List<BorderLineWidth> lineWidths, bool addCheckBox = false, int checkedBoxIndex = -1)
     {
-        int contentSpace = this.currentPDFPage.Width / content.Count;
+        int contentSpace = GetWidthWithMargins() / content.Count;
         int currentContentIndex = 0;
         int currentTextX;
 
@@ -198,14 +203,14 @@ public class JobDetailsContentCreator : MonoBehaviour
     public void AddParagraph(string content)
     {
         this.currentPDFPage.Page.addParagraph(
-            content,
-            DC.XMargin,
-            this.currentPDFPage.CurrentTextLineY,
-            DC.Active.Font,
-            DC.Active.FontSize,
-            DC.Active.FontSize,
-            this.currentPDFPage.Width - (DC.XMargin * 2)
-            );
+                content,
+                DC.XMargin,
+                this.currentPDFPage.CurrentTextLineY,
+                DC.Active.Font,
+                DC.Active.FontSize,
+                DC.Active.FontSize,
+                GetWidthWithMargins()
+                );
     }
 
     public void CreatePageLine(int y)
@@ -221,21 +226,6 @@ public class JobDetailsContentCreator : MonoBehaviour
     public void DrawRectangle(int x1, int y1, int x2, int y2)
     {
         this.currentPDFPage.Page.drawRectangle(x1, y1, x2, y2, DC.Active.RectanglePDFColor, new pdfColor(255, 255, 255));
-    }
-
-    public void CreateContent(string content)
-    {
-
-    }
-
-    private void CreateContentContainer(pdfPage page)
-    {
-
-    }
-
-    private void PopulateContent()
-    {
-
     }
 
     #endregion
