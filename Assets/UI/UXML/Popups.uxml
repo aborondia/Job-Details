@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/USS/popups.uss?fileID=7433441132597879392&amp;guid=49860d6f707b08b4dbc136bf00cbb0a5&amp;type=3#popups" />
-    <CustomVisualElement name="main" class="popups-main">
-        <CustomVisualElement name="confirmation-popup" class="gray1-border popup-parent" style="display: none;">
+    <CustomVisualElement name="main" picking-mode="Ignore" class="popups-main">
+        <CustomVisualElement name="confirmation-popup" class="gray1-border popup-parent confirmation-popup">
             <CustomVisualElement name="bottom" class="popup-bottom">
                 <CustomVisualElement name="buttons-container" class="popup-buttons-container">
                     <CustomVisualElement name="cancel-button-container" class="popup-button-container">
@@ -26,7 +26,7 @@
                 </CustomVisualElement>
             </CustomVisualElement>
         </CustomVisualElement>
-        <CustomVisualElement name="send-email-popup" class="gray1-border popup-parent">
+        <CustomVisualElement name="send-email-popup" class="gray1-border popup-parent send-email-popup" style="display: none;">
             <CustomVisualElement name="bottom" class="popup-bottom">
                 <CustomVisualElement name="buttons-container" class="popup-buttons-container">
                     <CustomVisualElement name="cancel-button-container" class="popup-button-container">
@@ -59,6 +59,24 @@
                     <ui:ScrollView class="recipient-scrollview white-bg" style="display: none;">
                         <CustomLabel text="Testing" class="regular-font" />
                     </ui:ScrollView>
+                </CustomVisualElement>
+            </CustomVisualElement>
+        </CustomVisualElement>
+        <CustomVisualElement name="notification-popup" class="gray1-border popup-parent notification-popup" style="display: none;">
+            <CustomVisualElement name="bottom" class="popup-bottom">
+                <CustomVisualElement name="buttons-container" class="popup-buttons-container" style="align-items: center; justify-content: center;">
+                    <CustomVisualElement name="confirm-button-container" class="popup-button-container">
+                        <CustomButton button-type="Primary" class="popup-button">
+                            <CustomVisualElement name="label-container" class="popup-button-label-container">
+                                <CustomLabel text="OKAY" class="regular-font" />
+                            </CustomVisualElement>
+                        </CustomButton>
+                    </CustomVisualElement>
+                </CustomVisualElement>
+            </CustomVisualElement>
+            <CustomVisualElement name="top" class="popup-top">
+                <CustomVisualElement name="display-message-container" class="confirmation-popup-display-message-container">
+                    <CustomLabel text="This action cannot be undone" class="regular-font display-message-label" />
                 </CustomVisualElement>
             </CustomVisualElement>
         </CustomVisualElement>

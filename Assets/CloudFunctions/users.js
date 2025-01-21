@@ -9,12 +9,75 @@ Parse.Cloud.define("userLogin", async (request) => {
 
   try {
     const user = await Parse.User.logIn(username, password);
-    return {
-      sessionToken: user.getSessionToken(),
-      user: user.toJSON(),
-    };
+
+    if (user.verified) {
+      return {
+        sessionToken: user.getSessionToken(),
+        user: user.toJSON(),
+      };
+    } else {
+      await Parse.User.logOut();
+
+      return {
+        user: {
+          verified: user.get("verified"),
+        },
+      };
+    }
   } catch (error) {
     throw new Error(`Login failed: ${error.message}`);
+  }
+});
+
+Parse.Cloud.define("checkRegistrationCredentials", async (request) => {
+  const { email, username } = request.params;
+
+  if (!email && !username) {
+    throw new Parse.Error(400, "Both email and username are missing.");
+  }
+
+  try {
+    const emailQuery = new Parse.Query(Parse.User);
+    if (email) {
+      emailQuery.equalTo("email", email.toLowerCase());
+    }
+
+    const usernameQuery = new Parse.Query(Parse.User);
+    if (username) {
+      usernameQuery.equalTo("username", username);
+    }
+
+    let combinedQuery;
+    if (email && username) {
+      combinedQuery = Parse.Query.or(emailQuery, usernameQuery);
+    } else if (email) {
+      combinedQuery = emailQuery;
+    } else {
+      combinedQuery = usernameQuery;
+    }
+
+    const results = await combinedQuery.find({ useMasterKey: true });
+
+    const result = {
+      emailExists: false,
+      usernameExists: false,
+    };
+
+    results.forEach((user) => {
+      if (user.get("email") === email.toLowerCase()) {
+        result.emailExists = true;
+      }
+      if (user.get("username") === username) {
+        result.usernameExists = true;
+      }
+    });
+
+    return result;
+  } catch (error) {
+    throw new Parse.Error(
+      error.code || 500,
+      error.message || "An error occurred while checking email and username."
+    );
   }
 });
 

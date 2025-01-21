@@ -106,8 +106,16 @@ public class UserDataHandler : MonoBehaviour
     private void SetCurrentUser()
     {
         UserDTM currentUserDTM = AppController.Active.ServerCommunicator.CurrentUserDTM;
-        RoleDTM userRole = this.roles[currentUserDTM.roleId];
+        RoleDTM userRole;
 
+        if (!currentUserDTM.verified)
+        {
+            QueryController.Active.ChangeView(Enumerations.MainView.Login, Enumerations.Subview.Login_UnregisteredUserLogin);
+
+            return;
+        }
+
+        userRole = this.roles[currentUserDTM.roleId];
         this.currentUser = new User(currentUserDTM, userRole);
 
         this.OnCurrentUserPopulatedEvent.Invoke();

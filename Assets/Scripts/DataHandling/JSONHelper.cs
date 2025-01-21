@@ -8,12 +8,24 @@ using UnityEngine;
 
 public static class JSONHelper
 {
-    public static UserDTM GetUserDTM(string result)
+    public static RegistrationValidationDTM GetRegistrationValidationDTM(string response)
     {
-        JSONNode resultsNode = JSON.Parse(result)["result"];
+        JSONNode resultsNode = JSON.Parse(response)["result"];
+
+        return JsonConvert.DeserializeObject<RegistrationValidationDTM>(resultsNode.ToString());
+    }
+
+    public static UserDTM GetUserDTM(string response)
+    {
+        JSONNode resultsNode = JSON.Parse(response)["result"];
         UserDTM userDTM = JsonConvert.DeserializeObject<UserDTM>(resultsNode["user"].ToString());
 
         return userDTM;
+    }
+
+    public static RequestErrorDTM GetRequestErrorDTM(string response)
+    {
+        return JsonConvert.DeserializeObject<RequestErrorDTM>(response);
     }
 
     public static DetailsReport GetDetailsReportFromCreate(string response)
@@ -27,10 +39,10 @@ public static class JSONHelper
         return detailsReport;
     }
 
-    public static List<DetailsReport> GetDetailsReports(string result)
+    public static List<DetailsReport> GetDetailsReports(string response)
     {
         List<DetailsReport> detailsReports = new List<DetailsReport>();
-        JSONNode resultsNode = JSON.Parse(result)["result"];
+        JSONNode resultsNode = JSON.Parse(response)["result"];
 
         foreach (JSONNode node in resultsNode.Values)
         {

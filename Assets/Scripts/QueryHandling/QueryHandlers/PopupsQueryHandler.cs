@@ -5,6 +5,7 @@ using UnityEngine.UIElements;
 public class PopupsQueryHandler : QueryHandler
 {
     #region Confirmation Popup
+
     [SerializeField] private string defaultConfirmationMessage = "This action cannot be undone.";
     private VisualElement confirmationPopup;
     private VisualElement confirmationMessageLabelContainer;
@@ -18,13 +19,22 @@ public class PopupsQueryHandler : QueryHandler
 
     #endregion
 
+    #region Notification Popup
+    private VisualElement notificationPopup;
+    private VisualElement notificationMessageLabelContainer;
+    private CustomLabel notificationMessageLabel;
+    private VisualElement notificationConfirmButtonContainer;
+    private CustomButton notificationConfirmButton;
+
+    #endregion
+
     #region Send Email Popup
     private const string recipient_placeholder = "Choose recipient";
     private VisualElement sendEmailPopup;
     private VisualElement emailrecipientsScrollviewContainer;
     private CustomInput emailRecipientPlaceholderInput;
     private ScrollView emailRecipientsScrollview;
-    private VisualElement emailButtonsContainer;
+    private VisualElement sendEmailButtonsContainer;
     private VisualElement sendEmailCancelButtonContainer;
     private CustomButton sendEmailCancelButton;
     private VisualElement sendEmailConfirmButtonContainer;
@@ -36,12 +46,17 @@ public class PopupsQueryHandler : QueryHandler
 
     #endregion
 
+    private int instanceId;
+    private Action blurAction;
     private Action closePopupsAction;
 
     public override void Initialize()
     {
         base.Initialize();
 
+        this.instanceId = GetInstanceID();
+        this.parentElement.focusable = true;
+        this.parentElement.RegisterCallback<BlurEvent>(evt => this.blurAction?.Invoke());
         SetupClosePopupAction();
         ClosePopup();
     }
@@ -52,35 +67,38 @@ public class PopupsQueryHandler : QueryHandler
         this.confirmationPopup = this.parentElement.Q<VisualElement>("confirmation-popup");
         this.confirmationMessageLabelContainer = this.confirmationPopup.Q<VisualElement>("display-message-container");
         this.confirmationMessageLabel = this.confirmationMessageLabelContainer.Q<CustomLabel>();
-
         this.confirmationButtonsContainer = this.confirmationPopup.Q<VisualElement>("buttons-container");
         this.confirmationCancelButtonContainer = this.confirmationButtonsContainer.Q<VisualElement>("cancel-button-container");
         this.confirmationCancelButton = this.confirmationCancelButtonContainer.Q<CustomButton>();
         this.confirmationConfirmButtonContainer = this.confirmationButtonsContainer.Q<VisualElement>("confirm-button-container");
         this.confirmationConfirmButton = this.confirmationConfirmButtonContainer.Q<CustomButton>();
 
-        this.sendEmailPopup = this.parentElement.Q<VisualElement>("send-email-popup");
+        this.notificationPopup = this.parentElement.Q<VisualElement>("notification-popup");
+        this.notificationMessageLabelContainer = this.notificationPopup.Q<VisualElement>("display-message-container");
+        this.notificationMessageLabel = this.notificationMessageLabelContainer.Q<CustomLabel>();
+        this.notificationConfirmButtonContainer = this.notificationPopup.Q<VisualElement>("confirm-button-container");
+        this.notificationConfirmButton = this.notificationConfirmButtonContainer.Q<CustomButton>();
 
+        this.sendEmailPopup = this.parentElement.Q<VisualElement>("send-email-popup");
         this.sendEmailContentInputContainer = this.sendEmailPopup.Q<VisualElement>("content-input-container");
         this.sendEmailContentInput = this.sendEmailContentInputContainer.Q<CustomInput>();
+        this.sendEmailButtonsContainer = this.sendEmailPopup.Q<VisualElement>("buttons-container");
+        this.sendEmailCancelButtonContainer = this.sendEmailButtonsContainer.Q<VisualElement>("cancel-button-container");
+        this.sendEmailCancelButton = this.sendEmailCancelButtonContainer.Q<CustomButton>();
+        this.sendEmailConfirmButtonContainer = this.sendEmailButtonsContainer.Q<VisualElement>("confirm-button-container");
+        this.sendEmailConfirmButton = this.sendEmailConfirmButtonContainer.Q<CustomButton>();
 
         this.emailrecipientsScrollviewContainer = this.sendEmailPopup.Q<VisualElement>("recipient-scrollview-container");
         this.emailRecipientPlaceholderInput = this.emailrecipientsScrollviewContainer.Q<CustomInput>();
         this.emailRecipientsScrollview = this.emailrecipientsScrollviewContainer.Q<ScrollView>();
-
-        this.emailButtonsContainer = this.sendEmailPopup.Q<VisualElement>("buttons-container");
-
-        this.sendEmailCancelButtonContainer = this.emailButtonsContainer.Q<VisualElement>("cancel-button-container");
-        this.sendEmailCancelButton = this.sendEmailCancelButtonContainer.Q<CustomButton>();
-
-        this.sendEmailConfirmButtonContainer = this.emailButtonsContainer.Q<VisualElement>("confirm-button-container");
-        this.sendEmailConfirmButton = this.sendEmailConfirmButtonContainer.Q<CustomButton>();
     }
 
     protected override void SetupButtons()
     {
         this.confirmationCancelButton.RegisterCallback<ClickEvent>(evt => ClosePopup());
         this.confirmationConfirmButton.RegisterCallback<ClickEvent>(evt => OnConfirmButtonPressed());
+
+        this.notificationConfirmButton.RegisterCallback<ClickEvent>(evt => OnConfirmButtonPressed());
 
         this.sendEmailCancelButton.RegisterCallback<ClickEvent>(evt => ClosePopup());
         this.sendEmailConfirmButton.RegisterCallback<ClickEvent>(evt => OnSendEmailButtonPressed());
@@ -103,21 +121,46 @@ public class PopupsQueryHandler : QueryHandler
         this.closePopupsAction = () => { };
 
         this.closePopupsAction += () => VisualElementHelper.SetElementDisplay(this.confirmationPopup, DisplayStyle.None);
+        this.closePopupsAction += () => VisualElementHelper.SetElementDisplay(this.notificationPopup, DisplayStyle.None);
         this.closePopupsAction += () => VisualElementHelper.SetElementDisplay(this.sendEmailPopup, DisplayStyle.None);
     }
 
-    public void OpenConfirmationPopup(Action confirmAction, string message = "")
+    private void OnOpeningPopup(bool canNavigateAway)
+    {
+        if (canNavigateAway)
+        {
+            this.blurAction = () => ClosePopup();
+        }
+
+        QueryController.Active.BlockInteractions(this.instanceId);
+
+        ActionHelper.ExecuteActionNextFrame(() => this.parentElement.Focus());
+    }
+
+    public void OpenConfirmationPopup(Action confirmAction, string message = "", bool canNavigateAway = true)
     {
         ShowParent();
+        OnOpeningPopup(canNavigateAway);
 
         VisualElementHelper.SetElementDisplay(this.confirmationPopup, DisplayStyle.Flex);
         this.confirmationMessageLabel.text = String.IsNullOrEmpty(message) ? this.defaultConfirmationMessage : message;
         this.confirmAction = confirmAction;
     }
 
-    public void OpenSendEmailPopup(Action<string> sendEmailAction)
+    public void OpenNotificationPopup(Action confirmAction, string message, bool canNavigateAway = true)
     {
         ShowParent();
+        OnOpeningPopup(canNavigateAway);
+
+        VisualElementHelper.SetElementDisplay(this.notificationPopup, DisplayStyle.Flex);
+        this.notificationMessageLabel.text = message;
+        this.confirmAction = confirmAction;
+    }
+
+    public void OpenSendEmailPopup(Action<string> sendEmailAction, bool canNavigateAway = false)
+    {
+        ShowParent();
+        OnOpeningPopup(canNavigateAway);
 
         VisualElementHelper.SetElementDisplay(this.sendEmailPopup, DisplayStyle.Flex);
         this.sendEmailAction = sendEmailAction;
@@ -153,10 +196,14 @@ public class PopupsQueryHandler : QueryHandler
         this.closePopupsAction.Invoke();
 
         this.confirmAction = null;
+        this.blurAction = null;
         this.confirmationMessageLabel.text = String.Empty;
+        this.notificationMessageLabel.text = String.Empty;
 
         this.currentEmailRecipient = recipient_placeholder;
         this.sendEmailAction = null;
+
+        QueryController.Active.UnblockInteractions(this.instanceId);
     }
 
     private void OpenRecipientScrollview()

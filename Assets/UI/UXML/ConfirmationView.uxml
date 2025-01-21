@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <CustomVisualElement name="main" style="width: 100%; height: 100%; justify-content: space-around; align-items: center;">
+        <CustomVisualElement name="display-label-container">
+            <CustomLabel text="You have successfully registered. An administrator must verify your account before you can login." class="x-large-font" style="white-space: normal; -unity-text-align: middle-center;" />
+        </CustomVisualElement>
+        <CustomVisualElement name="back-button-container" style="width: 200px; height: 60px;">
+            <CustomButton style="justify-content: center; align-items: center;">
+                <CustomLabel text="Back" class="large-font" />
+            </CustomButton>
+        </CustomVisualElement>
+    </CustomVisualElement>
+</ui:UXML>

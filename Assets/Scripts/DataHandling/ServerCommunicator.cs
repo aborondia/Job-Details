@@ -55,14 +55,14 @@ public class ServerCommunicator : MonoBehaviour
 
     #region Users
 
-    public void CreateUser(UserSignupDTM userSignupDTM)
+    public void CreateUser(UserSignupDTM userSignupDTM, ResponseDelegateBool responseDelegateBool)
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartCreatingUser(userSignupDTM));
+        StartCoroutine(StartCreatingUser(userSignupDTM, responseDelegateBool));
     }
 
-    private IEnumerator StartCreatingUser(UserSignupDTM userSignupDTM)
+    private IEnumerator StartCreatingUser(UserSignupDTM userSignupDTM, ResponseDelegateBool responseDelegateBool)
     {
         UnityWebRequest request = new UnityWebRequest($"{this.UsersUrl}", "POST");
         string jsonBody = JsonConvert.SerializeObject(userSignupDTM);
@@ -79,13 +79,50 @@ public class ServerCommunicator : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            ShowSuccessLog("User Created: " + request.downloadHandler.text);
+            ShowSuccessLog("Response (StartCreatingUser): " + request.downloadHandler.text);
+            responseDelegateBool?.Invoke(true);
             this.OnRegisterSuccessEvent.Invoke();
         }
         else
         {
-            ShowFailureLog("Request failed: " + request.error);
+            OnFailure(request, "(StartCreatingUser)");
+            responseDelegateBool?.Invoke(false);
             this.OnRegisterFailedEvent.Invoke();
+        }
+
+        this.OnRequestCompletedEvent.Invoke();
+    }
+
+    public void CheckRegistrationCredentials(string displayName, string email, ReturnStringDelegate returnStringDelegate)
+    {
+        this.OnRequestStartedEvent.Invoke();
+
+        StartCoroutine(StartCheckRegistrationCredentials(displayName, email, returnStringDelegate));
+    }
+
+    private IEnumerator StartCheckRegistrationCredentials(string displayName, string email, ReturnStringDelegate returnStringDelegate)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("username", displayName);
+        form.AddField("email", email);
+
+        UnityWebRequest request = UnityWebRequest.Post($"{this.FunctionsUrl}/checkRegistrationCredentials", form);
+        request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
+        request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
+        request.SetRequestHeader("X-Parse-Revocable-Session", "1");
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            ShowSuccessLog($"Response (StartCheckRegistrationCredentials): {request.downloadHandler.text}");
+
+            returnStringDelegate?.Invoke(request.downloadHandler.text);
+        }
+        else
+        {
+            OnFailure(request, "(StartCheckRegistrationCredentials)");
+            this.OnSignInFailedEvent.Invoke();
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -112,12 +149,12 @@ public class ServerCommunicator : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            ShowSuccessLog("Deleted: " + id);
+            ShowSuccessLog("Response (StartDeletingUser): " + id);
             successAction?.Invoke();
         }
         else
         {
-            ShowFailureLog("Request failed: " + request.error);
+            OnFailure(request, "(StartDeletingUser)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -127,7 +164,7 @@ public class ServerCommunicator : MonoBehaviour
     {
         if (ReferenceEquals(user, null))
         {
-            ShowFailureLog("User is null!");
+            OnFailure();
 
             return;
         }
@@ -161,7 +198,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog($"Request failed (StartUpdatingUser):  {request.error} {request.downloadHandler.text}");
+            OnFailure(request, "(StartUpdatingUser)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -196,7 +233,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartGettingUsersForRegularUser): " + request.error);
+            OnFailure(request, "(StartGettingUsersForRegularUser)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -231,20 +268,20 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartGettingUsersWithRoles): " + request.error);
+            OnFailure(request, "(StartGettingUsersWithRoles)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void SignIn(UserSignInDTM userSignInDTM)
+    public void LogIn(UserSignInDTM userSignInDTM)
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartSigningIn(userSignInDTM));
+        StartCoroutine(StartLoggingIn(userSignInDTM));
     }
 
-    private IEnumerator StartSigningIn(UserSignInDTM userSignInDTM)
+    private IEnumerator StartLoggingIn(UserSignInDTM userSignInDTM)
     {
         WWWForm form = new WWWForm();
         form.AddField("username", userSignInDTM.userName);
@@ -267,7 +304,8 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartSigningIn): " + request.error);
+            OnFailure(request, "(StartSigningIn)");
+
             this.OnSignInFailedEvent.Invoke();
         }
 
@@ -297,7 +335,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (GetRole): " + request.error);
+            OnFailure(request, "(GetRole)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -307,7 +345,7 @@ public class ServerCommunicator : MonoBehaviour
     {
         if (ReferenceEquals(this.currentUserDTM, null) || !this.signedIn)
         {
-            ShowFailureLog("Not signed in!");
+            OnFailure();
 
             return;
         }
@@ -337,7 +375,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Logout failed: " + request.error);
+            OnFailure(request, "(StartSigningOut)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -375,7 +413,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartGettingRoles): " + request.error + request.downloadHandler.text);
+            OnFailure(request, "(StartGettingRoles)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -421,7 +459,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartGettingUserRole): " + request.error + request.downloadHandler.text);
+            OnFailure(request, "(StartGettingUserRole)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -457,7 +495,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartUpdatingRole): " + request.error + request.downloadHandler.text);
+            OnFailure(request, "(StartUpdatingRole)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -493,7 +531,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartUpdatingRole): " + request.error + request.downloadHandler.text);
+            OnFailure(request, "(StartUpdatingRole)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -526,7 +564,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartVerifyingUser): " + request.error + request.downloadHandler.text);
+            OnFailure(request, "(StartVerifyingUser)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -542,7 +580,7 @@ public class ServerCommunicator : MonoBehaviour
     {
         if (ReferenceEquals(this.currentUserDTM, null))
         {
-            ShowFailureLog("Current user is null!");
+            OnFailure();
 
             return;
         }
@@ -578,7 +616,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartCreatingDetailsReport): " + request.error + request.downloadHandler.text);
+            OnFailure(request, "Request failed (StartCreatingDetailsReport)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -613,7 +651,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartGettingDetailsReports): " + request.error + request.downloadHandler.text);
+            OnFailure(request, "(StartGettingDetailsReports)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -647,7 +685,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartDeletingDetailsReport): " + request.error);
+            OnFailure(request, "(StartDeletingDetailsReport)");
             responseDelegate?.Invoke(false);
         }
 
@@ -662,7 +700,7 @@ public class ServerCommunicator : MonoBehaviour
     {
         if (ReferenceEquals(this.currentUserDTM, null))
         {
-            ShowFailureLog("Current user is null!");
+            OnFailure();
 
             return;
         }
@@ -696,7 +734,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartCreatingJobDetails): " + request.error + request.downloadHandler.text);
+            OnFailure(request, "(StartCreatingJobDetails)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -731,7 +769,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartGettingJobDetails): " + request.error + request.downloadHandler.text);
+            OnFailure(request, "(StartGettingJobDetails)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -741,7 +779,7 @@ public class ServerCommunicator : MonoBehaviour
     {
         if (ReferenceEquals(this.currentUserDTM, null))
         {
-            ShowFailureLog("Current user is null!");
+            OnFailure();
 
             return;
         }
@@ -776,7 +814,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartUpdatingJobDetails): " + request.error + request.downloadHandler.text);
+            OnFailure(request, "(StartUpdatingJobDetails)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -786,7 +824,7 @@ public class ServerCommunicator : MonoBehaviour
     {
         if (ReferenceEquals(this.currentUserDTM, null))
         {
-            ShowFailureLog("Current user is null!");
+            OnFailure();
 
             return;
         }
@@ -815,7 +853,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartDeletingJobDetails): " + request.error);
+            OnFailure(request, "(StartDeletingJobDetails");
             responseDelegate?.Invoke(false);
         }
 
@@ -857,7 +895,7 @@ public class ServerCommunicator : MonoBehaviour
         }
         else
         {
-            ShowFailureLog("Request failed (StartSendingEmail): " + request.error);
+            OnFailure(request, "(StartSendingEmail)");
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -875,6 +913,42 @@ public class ServerCommunicator : MonoBehaviour
         {
             LogHelper.Active.Log(message);
         }
+    }
+
+    private void OnFailure(UnityWebRequest request, string requestName = "")
+    {
+        RequestErrorDTM requestErrorDTM = JSONHelper.GetRequestErrorDTM(request.downloadHandler.text);
+        Debug.Log($"{requestErrorDTM.code} - {requestErrorDTM.error}");
+        switch (requestErrorDTM.code)
+        {
+            case 209:
+                QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(() =>
+                {
+                    QueryController.Active.ChangeView(Enumerations.MainView.Login, Enumerations.Subview.Login_EnterCredentials);
+                }, "Your session is no longer valid. Please login again."
+                , false);
+                break;
+            default:
+                QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(() =>
+                {
+                    QueryController.Active.ChangeView(Enumerations.MainView.Login, Enumerations.Subview.Login_EnterCredentials);
+                }, requestErrorDTM.error
+                , false);
+                return;
+        }
+
+        if (this.showFailureLogs)
+        {
+            ShowFailureLog($"Request Failed {requestName}: {request.error}");
+        }
+    }
+
+    private void OnFailure()
+    {
+        QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(() =>
+        {
+            QueryController.Active.ChangeView(Enumerations.MainView.Login, Enumerations.Subview.Login_EnterCredentials);
+        }, "Something went wrong. Please login again.");
     }
 
     private void ShowFailureLog(string message)

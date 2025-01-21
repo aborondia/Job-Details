@@ -16,7 +16,7 @@ Parse.Cloud.define("sendEmail", async (request) => {
   }
 
   const from = process.env.SENDGRID_EMAIL;
-  
+
   try {
     const emailData = request.params;
 
@@ -45,5 +45,27 @@ Parse.Cloud.define("sendEmail", async (request) => {
       console.error("SendGrid API Errors:", error.response.body.errors);
     }
     throw new Parse.Error(500, "Error sending email");
+  }
+});
+
+Parse.Cloud.job("cleanExpiredSessions", async (request) => {
+  const { params, headers, log } = request;
+  const query = new Parse.Query("_Session");
+
+  const currentTime = new Date();
+  const maxIdleTime = 3600 * 1000;
+  const expirationThreshold = new Date(currentTime.getTime() - maxIdleTime);
+
+  query.lessThan("updatedAt", expirationThreshold);
+
+  try {
+    const expiredSessions = await query.find({ useMasterKey: true });
+    await Parse.Object.destroyAll(expiredSessions, { useMasterKey: true });
+
+    log.info(`Expired ${expiredSessions.length} sessions.`);
+    return `Expired ${expiredSessions.length} sessions.`;
+  } catch (error) {
+    log.error("Error cleaning up sessions: ", error);
+    throw error;
   }
 });
