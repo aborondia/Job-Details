@@ -171,7 +171,10 @@ public class DetailsReportsQueryHandler : QueryHandler
 
         emailReportButton.RegisterCallback<ClickEvent>(evt =>
         {
-            AppController.Active.MailSender.StartSendingEmail(detailsReport, null);
+            QueryController.Active.PopupsQueryHandler.OpenSendEmailPopup(recipient =>
+            {
+                AppController.Active.MailSender.StartSendingEmail(detailsReport, recipient);
+            });
         });
 
         jobDetailsContainer.Clear();

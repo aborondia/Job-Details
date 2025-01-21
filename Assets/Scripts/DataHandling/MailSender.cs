@@ -16,7 +16,7 @@ public class MailSender : MonoBehaviour
     private CustomMailMessage mailMessage;
     CustomMailAttachment attachment;
 
-    public void StartSendingEmail(DetailsReport detailsReport, User recipient, string body = "")
+    public void StartSendingEmail(DetailsReport detailsReport, string recipient, string body = "")
     {
         CreateEmail(detailsReport, recipient, body);
         AppController.Active.ServerCommunicator.SendEmail(this.mailMessage);
@@ -24,17 +24,13 @@ public class MailSender : MonoBehaviour
 
     #region Setup
 
-    // K-E-JobDetails@outlook.com
-    // aborondia@gmail.com
-    // Default Subject
-    // Job details.
-    public void CreateEmail(DetailsReport detailsReport, User recipient, string body)
+    public void CreateEmail(DetailsReport detailsReport, string recipient, string body)
     {
         pdfDocument pdfDocument;
         MemoryStream memoryStream;
         byte[] fileBytes;
         string from = AppController.Active.UserDataHandler.CurrentUser.DTM.email;
-        string to = ReferenceEquals(recipient, null) ? this.debugEmail : recipient.DTM.email;
+        string to = String.IsNullOrEmpty(recipient) ? this.debugEmail : recipient;
         DateTime startDate = detailsReport.Details.Values.Select(dr => dr.JobDate).Min();
         DateTime endDate = detailsReport.Details.Values.Select(dr => dr.JobDate).Max();
         string subject = $"{from} Details:  {startDate.ToShortDateString()} - {endDate.ToShortDateString()}";

@@ -4,33 +4,27 @@
     background-color: var(--gray4);
 }
 
-.confirmation-popup {
+.popup-parent {
     width: 100%;
     height: 100%;
     border-top-width: 1px;
     border-right-width: 1px;
     border-bottom-width: 1px;
     border-left-width: 1px;
+    flex-direction: column-reverse;
 }
 
-.confirmation-popup-top {
+.popup-top {
     flex-grow: 1;
     width: 100%;
 }
 
-.confirmation-popup-bottom {
+.popup-bottom {
     height: 60px;
     width: 100%;
 }
 
-.confirmation-popup-display-message-container {
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-}
-
-.confirmation-popup-buttons-container {
+.popup-buttons-container {
     width: 100%;
     height: 100%;
     padding-top: 5px;
@@ -41,15 +35,15 @@
     justify-content: space-between;
 }
 
-.confirmation-popup-button-container {
+.popup-button-container {
     width: 40%;
     height: 100%;
 }
 
-.confirmation-popup-button {
+.popup-button {
 }
 
-.confirmation-popup-button-label-container {
+.popup-button-label-container {
     justify-content: center;
     align-items: center;
     width: 100%;
@@ -59,4 +53,63 @@
 .display-message-label {
     white-space: normal;
     -unity-text-align: middle-center;
+}
+
+.recipient-scrollview {
+    position: absolute;
+    min-height: 400%;
+    width: 100%;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    top: 0;
+    margin-top: 5px;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    max-height: 400%;
+}
+
+.confirmation-popup-display-message-container {
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.send-email-content-input-container {
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.send-email-header-label-container {
+    border-top-width: 5px;
+    border-right-width: 5px;
+    border-bottom-width: 5px;
+    border-left-width: 5px;
+}
+
+.send-email-body-input-container {
+    flex-grow: 1;
+    width: 100%;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}
+
+.sen-email-body-input {
+    width: 100%;
+    height: 100%;
+}
+
+.recipient-scrollview-container {
+    width: 100%;
+    height: 60px;
+    flex-direction: row;
+    justify-content: center;
 }
