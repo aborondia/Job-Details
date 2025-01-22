@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
+const sgMail = require("@sendgrid/mail");
 
 Parse.Cloud.define("userLogin", async (request) => {
   const { username, password } = request.params;
@@ -42,21 +43,46 @@ Parse.Cloud.define("checkRegistrationCredentials", async (request) => {
       emailQuery.equalTo("email", email.toLowerCase());
     }
 
+    const pendingEmailQuery = new Parse.Query("PendingUser");
+    if (email) {
+      pendingEmailQuery.equalTo("email", email.toLowerCase());
+    }
+
     const usernameQuery = new Parse.Query(Parse.User);
     if (username) {
       usernameQuery.equalTo("username", username);
     }
 
-    let combinedQuery;
-    if (email && username) {
-      combinedQuery = Parse.Query.or(emailQuery, usernameQuery);
-    } else if (email) {
-      combinedQuery = emailQuery;
-    } else {
-      combinedQuery = usernameQuery;
+    const pendingUsernameQuery = new Parse.Query("PendingUser");
+    if (username) {
+      pendingUsernameQuery.equalTo("username", username);
     }
 
-    const results = await combinedQuery.find({ useMasterKey: true });
+    let combinedUserQuery;
+    if (email && username) {
+      combinedUserQuery = Parse.Query.or(emailQuery, usernameQuery);
+    } else if (email) {
+      combinedUserQuery = Parse.Query(emailQuery);
+    } else {
+      combinedUserQuery = Parse.Query(usernameQuery);
+    }
+
+    let combinedPendingUserQuery;
+    if (email && username) {
+      combinedPendingUserQuery = Parse.Query.or(
+        pendingEmailQuery,
+        pendingUsernameQuery
+      );
+    } else if (email) {
+      combinedPendingUserQuery = Parse.Query(pendingEmailQuery);
+    } else {
+      combinedPendingUserQuery = Parse.Query(pendingUsernameQuery);
+    }
+
+    const results = await combinedUserQuery.find({ useMasterKey: true });
+    const pendingResults = await combinedPendingUserQuery.find({
+      useMasterKey: true,
+    });
 
     const result = {
       emailExists: false,
@@ -64,10 +90,19 @@ Parse.Cloud.define("checkRegistrationCredentials", async (request) => {
     };
 
     results.forEach((user) => {
-      if (user.get("email") === email.toLowerCase()) {
+      if (!result.emailExists && user.get("email") === email.toLowerCase()) {
         result.emailExists = true;
       }
-      if (user.get("username") === username) {
+      if (!result.usernameExists && user.get("username") === username) {
+        result.usernameExists = true;
+      }
+    });
+
+    pendingResults.forEach((user) => {
+      if (!result.emailExists && user.get("email") === email.toLowerCase()) {
+        result.emailExists = true;
+      }
+      if (!result.usernameExists && user.get("username") === username) {
         result.usernameExists = true;
       }
     });
@@ -264,4 +299,80 @@ Parse.Cloud.define("updateUserRole", async (request) => {
       `Failed to update user role: ${error}`
     );
   }
+});
+
+Parse.Cloud.define("registerUser", async (request) => {
+  const { username, email, password, verificationUrlBase } = request.params;
+
+  if (!username || !email || !password || !verificationUrlBase) {
+    throw new Error("Missing required parameters.");
+  }
+
+  const token = (
+    Math.random().toString(36).substr(2, 9) + Date.now()
+  ).toString();
+
+  const PendingUser = Parse.Object.extend("PendingUser");
+  const pendingUser = new PendingUser();
+  pendingUser.set("username", username);
+  pendingUser.set("email", email);
+  pendingUser.set("password", password);
+  pendingUser.set("token", token);
+
+  try {
+    await pendingUser.save({ useMasterKey: true });
+
+    const msg = {
+      to: email,
+      from: process.env.SENDGRID_EMAIL,
+      subject: "Job Details - Verify Your Email",
+      html: `<p>Hello ${username},</p>
+                 <p>Please verify your email by entering the code below in the registration section of the app:</p>
+                 <p><b><i>${token}<b><i></p>
+                 <p>If you did not register, you can safely ignore this email.</p>
+                 <p>This code will expire after 24 hours.</p>`,
+    };
+
+    await sgMail.send(msg, { useMasterKey: true });
+
+    return "Verification email sent successfully.";
+  } catch (error) {
+    throw new Error(`Error registering user: ${error.message}`);
+  }
+});
+
+Parse.Cloud.define("verifyRegistration", async (request) => {
+  const token = request.params.token;
+  const result = { success: false, message: "Default" };
+
+  if (!token) {
+    result.message = "Invalid or missing token!";
+  } else {
+    const query = new Parse.Query("PendingUser");
+    query.equalTo("token", token);
+    const pendingUser = await query.first({ useMasterKey: true });
+
+    if (!pendingUser) {
+      result.message = "Invalid token!";
+    } else {
+      try {
+        const user = new Parse.User();
+        user.set("username", pendingUser.get("username"));
+        user.set("email", pendingUser.get("email"));
+        user.set("password", pendingUser.get("password"));
+        await user.signUp(
+          { roleId: process.env.DEFAULT_ROLE_ID, emailVerified: true },
+          { useMasterKey: true }
+        );
+
+        await pendingUser.destroy({ useMasterKey: true });
+        result.success = true;
+        result.message = "Success";
+      } catch (error) {
+        result.message = `Error: ${error.message}`;
+      }
+    }
+  }
+
+  return result;
 });

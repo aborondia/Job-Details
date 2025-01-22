@@ -9,7 +9,7 @@ using Subview = Enumerations.Subview;
 
 public class LoginQueryHandler : QueryHandler
 {
-    private const string registration_success_message = "You have successfully registered. An administrator must verify your account before you can login.";
+    private const string registration_code_enter_message = "Please enter your verification code.";
     private const string registration_failed_message = "Something went wrong. Please try again.";
     private VisualElement loginBody;
     private VisualElement confirmationBody;
@@ -18,8 +18,10 @@ public class LoginQueryHandler : QueryHandler
     private CustomButton unregisteredLoginBackButton;
     private VisualElement confirmationLabelContainer;
     private CustomLabel confirmationLabel;
-    private VisualElement confirmationBackButtonContainer;
-    private CustomButton confirmationBackButton;
+    private VisualElement codeConfirmationButtonContainer;
+    private CustomButton codeConfirmationButton;
+    private VisualElement codeConfirmationInputContainer;
+    private CustomInput codeConfirmationInput;
     private VisualElement userNameInputContainer;
     private CustomInput userNameInput;
     private CustomLabel userNameInputErrorLabel;
@@ -38,13 +40,15 @@ public class LoginQueryHandler : QueryHandler
     private VisualElement cancelButtonContainer;
     private CustomButton cancelButton;
     private VisualElement optionsContainer;
+    private VisualElement validateRegistrationButtonContainer;
+    private CustomButton validateRegistrationButton;
     private VisualElement registerButtonContainer;
     private CustomButton registerButton;
-    private VisualElement forgotPasswordButtonContainer;
-    private CustomButton forgotPasswordButton;
+    private VisualElement forgotCredentialsButtonContainer;
+    private CustomButton forgotCredentialsButton;
     private const string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
     private static Regex emailRegex;
-    private UnityEvent hideErroLabels = new UnityEvent();
+    private UnityEvent hideErrorLabels = new UnityEvent();
 
     #region Initialization
 
@@ -68,8 +72,10 @@ public class LoginQueryHandler : QueryHandler
         this.confirmationBody = this.parentElement.Q<VisualElement>("confirmation-body");
         this.confirmationLabelContainer = this.confirmationBody.Q<VisualElement>("display-label-container");
         this.confirmationLabel = this.confirmationLabelContainer.Q<CustomLabel>();
-        this.confirmationBackButtonContainer = this.confirmationBody.Q<VisualElement>("back-button-container");
-        this.confirmationBackButton = this.confirmationBackButtonContainer.Q<CustomButton>();
+        this.codeConfirmationInputContainer = this.confirmationBody.Q<VisualElement>("code-input-container");
+        this.codeConfirmationInput = this.codeConfirmationInputContainer.Q<CustomInput>();
+        this.codeConfirmationButtonContainer = this.confirmationBody.Q<VisualElement>("confirm-button-container");
+        this.codeConfirmationButton = this.codeConfirmationButtonContainer.Q<CustomButton>();
 
         this.unregisteredLoginBody = this.parentElement.Q<VisualElement>("unregistered-login-body");
         this.unregisteredLoginBackButtonContainer = this.unregisteredLoginBody.Q<VisualElement>("back-button-container");
@@ -99,10 +105,15 @@ public class LoginQueryHandler : QueryHandler
         this.cancelButton = this.cancelButtonContainer.Q<CustomButton>();
 
         this.optionsContainer = this.loginBody.Q<VisualElement>("options-container");
+
+        this.validateRegistrationButtonContainer = this.optionsContainer.Q<VisualElement>("validate-registration-button-container");
+        this.validateRegistrationButton = this.validateRegistrationButtonContainer.Q<CustomButton>();
+
         this.registerButtonContainer = this.optionsContainer.Q<VisualElement>("register-button-container");
         this.registerButton = this.registerButtonContainer.Q<CustomButton>();
-        this.forgotPasswordButtonContainer = this.optionsContainer.Q<VisualElement>("forgot-password-button-container");
-        this.forgotPasswordButton = this.forgotPasswordButtonContainer.Q<CustomButton>();
+
+        this.forgotCredentialsButtonContainer = this.optionsContainer.Q<VisualElement>("forgot-credentials-button-container");
+        this.forgotCredentialsButton = this.forgotCredentialsButtonContainer.Q<CustomButton>();
 
         UpdateSubmitButtonState();
     }
@@ -114,10 +125,11 @@ public class LoginQueryHandler : QueryHandler
         this.AddSubviewElement(Subview.Login_Register, this.loginBody);
 
         this.AddSubviewElement(Subview.Login_EnterCredentials, this.registerButtonContainer);
-        this.AddSubviewElement(Subview.Login_EnterCredentials, this.forgotPasswordButtonContainer);
+        this.AddSubviewElement(Subview.Login_EnterCredentials, this.validateRegistrationButton);
+        this.AddSubviewElement(Subview.Login_EnterCredentials, this.forgotCredentialsButtonContainer);
         this.AddSubviewElement(Subview.Login_EnterCredentials, this.loginBody);
 
-        this.AddSubviewElement(Subview.Login_RegistrationComplete, this.confirmationBody);
+        this.AddSubviewElement(Subview.Login_Registration_Validation, this.confirmationBody);
 
         this.AddSubviewElement(Subview.Login_UnregisteredUserLogin, this.unregisteredLoginBody);
     }
@@ -132,40 +144,47 @@ public class LoginQueryHandler : QueryHandler
         this.emailInput.RegisterValueChangedCallback<string>(evt => OnEmailInputValueChanged(evt));
         this.emailInput.RegisterCallback<BlurEvent>(evt => OnEmailInputBlur(evt));
         this.emailInput.RegisterCallback<FocusEvent>(evt => OnEmailInputFocus(evt));
-        this.hideErroLabels.AddListener(() => HideEmailErrorLabel());
+        this.hideErrorLabels.AddListener(() => HideEmailErrorLabel());
 
         this.userNameInput.RegisterCallback<KeyDownEvent>(evt => OnUserNameInputReturnButtonPressed(evt));
         this.userNameInput.RegisterValueChangedCallback<string>(evt => OnUserNameInputValueChanged(evt));
         this.userNameInput.RegisterCallback<BlurEvent>(evt => OnUserNameInputBlur(evt));
         this.userNameInput.RegisterCallback<FocusEvent>(evt => OnUserNameInputFocus(evt));
-        this.hideErroLabels.AddListener(() => HideUserNameErrorLabel());
+        this.hideErrorLabels.AddListener(() => HideUserNameErrorLabel());
 
         this.passwordInput.RegisterValueChangedCallback<string>(evt => OnPasswordInputValueChanged(evt));
         this.passwordInput.RegisterCallback<BlurEvent>(evt => OnPasswordInputBlur(evt));
         this.passwordInput.RegisterCallback<FocusEvent>(evt => OnPasswordInputFocus(evt));
         this.passwordInput.RegisterCallback<KeyDownEvent>(evt => OnPasswordInputReturnButtonPressed(evt));
-        this.hideErroLabels.AddListener(() => HidePasswordConfirmErrorLabel());
+        this.hideErrorLabels.AddListener(() => HidePasswordConfirmErrorLabel());
 
         this.passwordConfirmInput.RegisterValueChangedCallback<string>(evt => OnPasswordConfirmInputValueChanged(evt));
         this.passwordConfirmInput.RegisterCallback<BlurEvent>(evt => OnPasswordConfirmInputBlur(evt));
         this.passwordConfirmInput.RegisterCallback<FocusEvent>(evt => OnPasswordConfirmInputFocus(evt));
         this.passwordConfirmInput.RegisterCallback<KeyDownEvent>(evt => OnPasswordConfirmInputReturnButtonPressed(evt));
-        this.hideErroLabels.AddListener(() => HidePasswordConfirmErrorLabel());
+        this.hideErrorLabels.AddListener(() => HidePasswordConfirmErrorLabel());
+
+        this.codeConfirmationInput.RegisterValueChangedCallback<string>(evt => OnCodeConfirmInputValueChanged(evt));
+        this.codeConfirmationInput.RegisterCallback<BlurEvent>(evt => OnCodeConfirmInputBlur(evt));
+        this.codeConfirmationInput.RegisterCallback<FocusEvent>(evt => OnCodeConfirmInputFocus(evt));
+        this.codeConfirmationInput.RegisterCallback<KeyDownEvent>(evt => OnCodeConfirmInputReturnButtonPressed(evt));
     }
 
     protected override void SetupButtons()
     {
+        this.validateRegistrationButton.RegisterCallback<ClickEvent>(evt => OnValidateRegistrationButtonPressed());
+
         this.registerButton.RegisterCallback<ClickEvent>(evt => OnRegisterButtonPressed());
 
-        this.forgotPasswordButton.RegisterCallback<ClickEvent>(evt => OnForgotPasswordButtonPressed());
-        this.forgotPasswordButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
+        this.forgotCredentialsButton.RegisterCallback<ClickEvent>(evt => OnForgotCredentialsButtonPressed());
+        this.forgotCredentialsButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
 
         this.submitButton.RegisterCallback<ClickEvent>(evt => OnSubmitButtonPressed());
 
         this.cancelButton.RegisterCallback<ClickEvent>(evt => OnCancelButtonPressed());
         this.cancelButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
 
-        this.confirmationBackButton.RegisterCallback<ClickEvent>(evt => QueryController.Active.ChangeView(MainView.Login, Subview.Login_EnterCredentials));
+        this.codeConfirmationButton.RegisterCallback<ClickEvent>(evt => OnCodeSubmitButtonPressed());
 
         this.unregisteredLoginBackButton.RegisterCallback<ClickEvent>(evt => QueryController.Active.ChangeView(MainView.Login, Subview.Login_EnterCredentials));
     }
@@ -182,7 +201,7 @@ public class LoginQueryHandler : QueryHandler
         UpdateSubmitButtonState();
         UpdateCancelButtonState();
 
-        this.hideErroLabels.Invoke();
+        this.hideErrorLabels.Invoke();
     }
 
     #endregion
@@ -342,16 +361,51 @@ public class LoginQueryHandler : QueryHandler
         SubmitRegistration();
     }
 
+    private void OnCodeConfirmInputBlur(BlurEvent evt)
+    {
+
+    }
+
+    private void OnCodeConfirmInputFocus(FocusEvent evt)
+    {
+    }
+
+    private void OnCodeConfirmInputValueChanged(ChangeEvent<string> evt)
+    {
+        UpdateCodeConfirmButtonState();
+    }
+
+    private void OnCodeConfirmInputReturnButtonPressed(KeyDownEvent evt)
+    {
+        if (evt.keyCode != KeyCode.Return)
+        {
+            return;
+        }
+        else if (String.IsNullOrEmpty(this.codeConfirmationInput.value))
+        {
+            this.loginBody.Focus();
+
+            return;
+        }
+
+        SubmitUserRegistrationConfirmation();
+    }
+
     #endregion
 
     #region Button Handling
+
+    private void OnValidateRegistrationButtonPressed()
+    {
+        QueryController.Active.ChangeView(MainView.Login, Subview.Login_Registration_Validation);
+    }
 
     private void OnRegisterButtonPressed()
     {
         QueryController.Active.ChangeView(MainView.Login, Subview.Login_Register);
     }
 
-    private void OnForgotPasswordButtonPressed()
+    private void OnForgotCredentialsButtonPressed()
     {
         QueryController.Active.ChangeView(MainView.Login, Subview.Login_ForgotPassword);
     }
@@ -367,6 +421,11 @@ public class LoginQueryHandler : QueryHandler
                 SubmitRegistration();
                 break;
         }
+    }
+
+    private void OnCodeSubmitButtonPressed()
+    {
+        SubmitUserRegistrationConfirmation();
     }
 
     private void OnCancelButtonPressed()
@@ -414,27 +473,30 @@ public class LoginQueryHandler : QueryHandler
                         AppController.Active.UserDataHandler.Roles
                         .FirstOrDefault(entry => entry.Value.name == UserDataHandler._UserRoleServerName).Key);
 
-
                     AppController.Active.ServerCommunicator.CreateUser(userSignupDTM, success =>
                     {
                         if (success)
                         {
-                            this.confirmationLabel.text = registration_success_message;
+                            this.confirmationLabel.text = registration_code_enter_message;
+                            QueryController.Active.ChangeView(MainView.Login, Subview.Login_Registration_Validation);
+                            QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null, "Please check your email for your confirmation code.");
                         }
                         else
                         {
-                            this.confirmationLabel.text = registration_failed_message;
+                            QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null, registration_failed_message);
                         }
-
-                        QueryController.Active.ChangeView(MainView.Login, Subview.Login_RegistrationComplete);
                     });
                 }
             });
     }
 
-    private void ValidateRegistrationDetails()
+    private void SubmitUserRegistrationConfirmation()
     {
-
+        AppController.Active.ServerCommunicator.VerifyRegistration(this.codeConfirmationInput.value, () =>
+        {
+            QueryController.Active.ChangeView(MainView.Login, Subview.Login_EnterCredentials);
+            QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null, "You have successfuly registered. Login to your account once an administrator has verified it.");
+        });
     }
 
     #endregion
@@ -450,6 +512,18 @@ public class LoginQueryHandler : QueryHandler
         else
         {
             this.submitButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
+        }
+    }
+
+    private void UpdateCodeConfirmButtonState()
+    {
+        if (String.IsNullOrEmpty(this.codeConfirmationInput.value))
+        {
+            this.codeConfirmationButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
+        }
+        else
+        {
+            this.codeConfirmationButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
         }
     }
 
@@ -471,8 +545,10 @@ public class LoginQueryHandler : QueryHandler
         this.emailInput.value = String.Empty;
         this.passwordInput.value = String.Empty;
         this.passwordConfirmInput.value = String.Empty;
+        this.codeConfirmationInput.value = String.Empty;
 
         UpdateSubmitButtonState();
+        UpdateCodeConfirmButtonState();
     }
 
     #endregion
@@ -481,17 +557,13 @@ public class LoginQueryHandler : QueryHandler
 
     private void ShowEmailErrorLabel(string errorText)
     {
-        Debug.Log(errorText);
         VisualElementHelper.SetElementVisibility(this.emailInputErrorLabel, Visibility.Visible);
-        Debug.Log(this.emailInputErrorLabel.resolvedStyle.visibility);
         this.emailInputErrorLabel.text = errorText;
     }
 
     private void HideEmailErrorLabel()
     {
-        Debug.Log("hide");
         VisualElementHelper.SetElementVisibility(this.emailInputErrorLabel, Visibility.Hidden);
-        Debug.Log(this.emailInputErrorLabel.resolvedStyle.visibility);
     }
 
     private void ShowUserNameErrorLabel(string errorText)

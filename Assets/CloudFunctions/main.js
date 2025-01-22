@@ -48,24 +48,35 @@ Parse.Cloud.define("sendEmail", async (request) => {
   }
 });
 
-Parse.Cloud.job("cleanExpiredSessions", async (request) => {
-  const { params, headers, log } = request;
-  const query = new Parse.Query("_Session");
+Parse.Cloud.job("cleanDatabase", async (request) => {
+  const sessionQuery = new Parse.Query("_Session");
+  const registrationQuery = new Parse.Query("PendingUser");
+
+  const maxSessionIdleTime = 3600 * 1000;
+  const maxRegistrationIdleTime = 3600 * 1000 * 24;
 
   const currentTime = new Date();
-  const maxIdleTime = 3600 * 1000;
-  const expirationThreshold = new Date(currentTime.getTime() - maxIdleTime);
+  const sessionExpirationThreshold = new Date(
+    currentTime.getTime() - maxSessionIdleTime
+  );
+  const registrationExpirationThreshold = new Date(
+    currentTime.getTime() - maxRegistrationIdleTime
+  );
 
-  query.lessThan("updatedAt", expirationThreshold);
+  sessionQuery.lessThan("updatedAt", sessionExpirationThreshold);
+  registrationQuery.lessThan("createdAt", registrationExpirationThreshold);
 
   try {
-    const expiredSessions = await query.find({ useMasterKey: true });
+    const expiredRegistrations = await registrationQuery.find({
+      useMasterKey: true,
+    });
+    const expiredSessions = await sessionQuery.find({ useMasterKey: true });
+
+    await Parse.Object.destroyAll(expiredRegistrations, { useMasterKey: true });
     await Parse.Object.destroyAll(expiredSessions, { useMasterKey: true });
 
-    log.info(`Expired ${expiredSessions.length} sessions.`);
-    return `Expired ${expiredSessions.length} sessions.`;
+    return `Cleanup complete`;
   } catch (error) {
-    log.error("Error cleaning up sessions: ", error);
     throw error;
   }
 });

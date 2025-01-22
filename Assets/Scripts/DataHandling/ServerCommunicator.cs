@@ -64,16 +64,17 @@ public class ServerCommunicator : MonoBehaviour
 
     private IEnumerator StartCreatingUser(UserSignupDTM userSignupDTM, ResponseDelegateBool responseDelegateBool)
     {
-        UnityWebRequest request = new UnityWebRequest($"{this.UsersUrl}", "POST");
-        string jsonBody = JsonConvert.SerializeObject(userSignupDTM);
-        byte[] bodyRaw = new System.Text.UTF8Encoding().GetBytes(jsonBody);
+        WWWForm form = new WWWForm();
+        UnityWebRequest request;
 
+        form.AddField("username", userSignupDTM.username);
+        form.AddField("email", userSignupDTM.email);
+        form.AddField("password", userSignupDTM.password);
+        form.AddField("verificationUrlBase", apiUrl);
+
+        request = UnityWebRequest.Post($"{this.FunctionsUrl}/registerUser", form);
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
-        request.SetRequestHeader("Content-Type", "application/json");
-        request.SetRequestHeader("X-Parse-Revocable-Session", "1");
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
 
         yield return request.SendWebRequest();
 
@@ -570,6 +571,38 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
+    public void VerifyRegistration(string confirmationCode, Action successAction = null)
+    {
+        this.OnRequestStartedEvent.Invoke();
+
+        StartCoroutine(StartVerifyingRegistration(confirmationCode, successAction));
+    }
+
+    private IEnumerator StartVerifyingRegistration(string confirmationCode, Action successAction)
+    {
+        string url = $"{this.FunctionsUrl}/verifyRegistration";
+        WWWForm form = new WWWForm();
+        form.AddField("token", confirmationCode);
+        UnityWebRequest request = UnityWebRequest.Post(url, form);
+
+        request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
+        request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            ShowSuccessLog("Response (StartVerifyingUser): " + request.downloadHandler.text);
+            successAction?.Invoke();
+        }
+        else
+        {
+            OnFailure(request, "(StartVerifyingUser)");
+        }
+
+        this.OnRequestCompletedEvent.Invoke();
+    }
+
     #endregion
 
     #region Job Details
@@ -918,7 +951,7 @@ public class ServerCommunicator : MonoBehaviour
     private void OnFailure(UnityWebRequest request, string requestName = "")
     {
         RequestErrorDTM requestErrorDTM = JSONHelper.GetRequestErrorDTM(request.downloadHandler.text);
-        Debug.Log($"{requestErrorDTM.code} - {requestErrorDTM.error}");
+
         switch (requestErrorDTM.code)
         {
             case 209:
@@ -934,7 +967,7 @@ public class ServerCommunicator : MonoBehaviour
                     QueryController.Active.ChangeView(Enumerations.MainView.Login, Enumerations.Subview.Login_EnterCredentials);
                 }, requestErrorDTM.error
                 , false);
-                return;
+                break;
         }
 
         if (this.showFailureLogs)

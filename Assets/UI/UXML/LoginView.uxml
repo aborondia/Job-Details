@@ -66,23 +66,31 @@
             <CustomVisualElement name="options-container" class="options-container" style="width: 100%;">
                 <CustomVisualElement name="register-button-container" class="option-button-container">
                     <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button">
-                        <CustomLabel text="Register" class="large-font option-button-label" />
+                        <CustomLabel text="Register" class="option-button-label regular-font" />
                     </CustomButton>
                 </CustomVisualElement>
-                <CustomVisualElement name="forgot-password-button-container" class="option-button-container">
-                    <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button" style="align-items: flex-end;">
-                        <CustomLabel text="Forgot Password?" class="white-font large-font option-button-label" />
+                <CustomVisualElement name="validate-registration-button-container" class="option-button-container">
+                    <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button">
+                        <CustomLabel text="Validate Registration" name="CustomLabel" class="option-button-label regular-font" />
+                    </CustomButton>
+                </CustomVisualElement>
+                <CustomVisualElement name="forgot-credentials-button-container" class="option-button-container">
+                    <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button">
+                        <CustomLabel text="Forgot Username or Password?" class="white-font option-button-label regular-font" />
                     </CustomButton>
                 </CustomVisualElement>
             </CustomVisualElement>
         </CustomVisualElement>
         <CustomVisualElement name="confirmation-body" style="width: 100%; height: 100%; justify-content: space-around; align-items: center; display: none;">
             <CustomVisualElement name="display-label-container">
-                <CustomLabel text="You have successfully registered. An administrator must verify your account before you can login." class="x-large-font" style="white-space: normal; -unity-text-align: middle-center;" />
+                <CustomLabel text="Please enter your verification code." class="x-large-font" style="white-space: normal; -unity-text-align: middle-center;" />
             </CustomVisualElement>
-            <CustomVisualElement name="back-button-container" style="width: 200px; height: 60px;">
+            <CustomVisualElement name="code-input-container">
+                <CustomInput style="min-width: 300px;" />
+            </CustomVisualElement>
+            <CustomVisualElement name="confirm-button-container" style="width: 200px; height: 60px;">
                 <CustomButton style="justify-content: center; align-items: center;">
-                    <CustomLabel text="Back" class="large-font" />
+                    <CustomLabel text="Confirm" class="large-font" />
                 </CustomButton>
             </CustomVisualElement>
         </CustomVisualElement>

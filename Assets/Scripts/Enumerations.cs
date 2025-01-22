@@ -19,7 +19,7 @@ namespace Enumerations
         Login_EnterCredentials = 1,
         Login_Register = 2,
         Login_ForgotPassword = 3,
-        Login_RegistrationComplete = 4,
+        Login_Registration_Validation = 4,
         Login_UnregisteredUserLogin = 5,
     }
 
