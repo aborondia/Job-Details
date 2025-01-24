@@ -5,21 +5,26 @@ using Enumerations;
 
 public class FullViewContainer
 {
-    private MainView? mainView = null;
-    public MainView? MainView => mainView;
-    private Subview? subview = null;
-    public Subview? Subview => subview;
-    public bool PreviousViewValid => !ReferenceEquals(mainView, null) && !ReferenceEquals(subview, null);
+    private MainView mainView;
+    public MainView MainView => mainView;
+    private Subview subview;
+    public Subview Subview => subview;
+    // public bool PreviousViewValid => !ReferenceEquals(mainView, null) && !ReferenceEquals(subview, null);
 
-    public void SetView(MainView mainView, Subview subview)
+    public FullViewContainer(MainView mainView, Subview subview)
     {
         this.mainView = mainView;
         this.subview = subview;
     }
+    // public void SetView(MainView mainView, Subview subview)
+    // {
+    //     this.mainView = mainView;
+    //     this.subview = subview;
+    // }
 
-    public void ResetView()
-    {
-        this.mainView = null;
-        this.subview = null;
-    }
+    // public void ResetView()
+    // {
+    //     this.mainView = null;
+    //     this.subview = null;
+    // }
 }

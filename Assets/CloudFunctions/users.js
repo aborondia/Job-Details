@@ -10,8 +10,9 @@ Parse.Cloud.define("userLogin", async (request) => {
 
   try {
     const user = await Parse.User.logIn(username, password);
+    const verified = user.get("verified");
 
-    if (user.verified) {
+    if (verified) {
       return {
         sessionToken: user.getSessionToken(),
         user: user.toJSON(),
@@ -330,7 +331,7 @@ Parse.Cloud.define("registerUser", async (request) => {
                  <p>Please verify your email by entering the code below in the registration section of the app:</p>
                  <p><b><i>${token}<b><i></p>
                  <p>If you did not register, you can safely ignore this email.</p>
-                 <p>This code will expire after 24 hours.</p>`,
+                 <p>This code will expire in 24 hours.</p>`,
     };
 
     await sgMail.send(msg, { useMasterKey: true });
@@ -375,4 +376,124 @@ Parse.Cloud.define("verifyRegistration", async (request) => {
   }
 
   return result;
+});
+
+Parse.Cloud.define("forgotUsername", async (request) => {
+  const email = request.params.email;
+
+  if (!email) {
+    throw new Error("Email is null.");
+  } else {
+    const query = new Parse.Query(Parse.User);
+    query.equalTo("email", email);
+    const user = await query.first({ useMasterKey: true });
+
+    if (!user) {
+      throw new Error("User not found.");
+    } else {
+      try {
+        const username = user.get("username");
+
+        const msg = {
+          to: email,
+          from: process.env.SENDGRID_EMAIL,
+          subject: "Job Details - Forgot Username",
+          html: `<p>Your username is $<b><i>{username}</b></i></p>
+          <p>If you did not make this request, you can safely ignore this email.</p>`,
+        };
+
+        await sgMail.send(msg, { useMasterKey: true });
+      } catch (error) {
+        throw new Error(error.message);
+      }
+    }
+  }
+
+  return "Email sent";
+});
+
+Parse.Cloud.define("forgotPassword", async (request) => {
+  const email = request.params.email;
+
+  try {
+    if (!email) {
+      throw new Error("Email is null.");
+    } else {
+      const query = new Parse.Query(Parse.User);
+      query.equalTo("email", email);
+      const user = await query.first({ useMasterKey: true });
+
+      if (!user) {
+        return "Email not found.";
+      } else {
+        forgotPasswordQuery = new Parse.Query("ForgotPasswordCode");
+        forgotPasswordQuery.equalTo("email", email);
+
+        if (await forgotPasswordQuery.first({ useMasterKey: true })) {
+          return "Reset request already made for this email.";
+        }
+
+        const ForgotPasswordCode = Parse.Object.extend("ForgotPasswordCode");
+        const forgotPasswordCode = new ForgotPasswordCode();
+
+        await forgotPasswordCode.save(
+          {
+            email: email,
+            userId: user.id,
+          },
+          { useMasterKey: true }
+        );
+
+        const objectId = forgotPasswordCode.id;
+
+        const msg = {
+          to: email,
+          from: process.env.SENDGRID_EMAIL,
+          subject: "Job Details - Forgot Password",
+          html: `<p>Use the following code in the forgot password section of the app</p>
+                     <p><b><i>${objectId}<b><i></p>
+                     <p>If you did not request a password reset, you can safely ignore this email.</p>
+                     <p>This code will expire in 24 hours.</p>`,
+        };
+
+        await sgMail.send(msg, { useMasterKey: true });
+      }
+    }
+  } catch (error) {
+    throw new Error(error.message);
+  }
+
+  return "Email sent";
+});
+
+Parse.Cloud.define("resetPassword", async (request) => {
+  const { code, newPassword } = request.params;
+  const forgotPasswordQuery = new Parse.Query("ForgotPasswordCode");
+
+  try {
+    const forgotPassword = await forgotPasswordQuery.get(code, {
+      useMasterKey: true,
+    });
+    if (!forgotPassword) {
+      throw new Error("Code not found");
+    } else {
+      const userQuery = new Parse.Query(Parse.User);
+      const user = await userQuery.get(forgotPassword.get("userId"), {
+        useMasterKey: true,
+      });
+
+      if (!user) {
+        throw new Error("User not found");
+      } else {
+        user.set("password", newPassword);
+
+        await user.save(null, { useMasterKey: true });
+        await forgotPassword.destroy({ useMasterKey: true });
+      }
+    }
+  } catch (error) {
+    throw new Error(error.message);
+  }
+
+  return "Password reset successfully.";
 });

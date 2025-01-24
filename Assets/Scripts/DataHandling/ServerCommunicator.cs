@@ -5,7 +5,6 @@ using SimpleJSON;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
-using ReturnStringDelegate = ActionHelper.StringDelegate;
 using System;
 using System.Collections.Generic;
 using ResponseDelegateString = ActionHelper.StringDelegate;
@@ -94,14 +93,14 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void CheckRegistrationCredentials(string displayName, string email, ReturnStringDelegate returnStringDelegate)
+    public void CheckRegistrationCredentials(string displayName, string email, ResponseDelegateString returnStringDelegate)
     {
         this.OnRequestStartedEvent.Invoke();
 
         StartCoroutine(StartCheckRegistrationCredentials(displayName, email, returnStringDelegate));
     }
 
-    private IEnumerator StartCheckRegistrationCredentials(string displayName, string email, ReturnStringDelegate returnStringDelegate)
+    private IEnumerator StartCheckRegistrationCredentials(string displayName, string email, ResponseDelegateString returnStringDelegate)
     {
         WWWForm form = new WWWForm();
         form.AddField("username", displayName);
@@ -205,14 +204,14 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void GetUsersForRegularUser(ReturnStringDelegate responseDelegate)
+    public void GetUsersForRegularUser(ResponseDelegateString responseDelegate)
     {
         this.OnRequestStartedEvent.Invoke();
 
         StartCoroutine(StartGettingUsersForRegularUser(responseDelegate));
     }
 
-    private IEnumerator StartGettingUsersForRegularUser(ReturnStringDelegate responseDelegate)
+    private IEnumerator StartGettingUsersForRegularUser(ResponseDelegateString responseDelegate)
     {
         UnityWebRequest request = new UnityWebRequest($"{this.FunctionsUrl}/getUsersForRegularUser", "POST");
         byte[] bodyRaw = new UTF8Encoding().GetBytes("{}");
@@ -240,14 +239,14 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void GetUsersForAdmin(ReturnStringDelegate responseDelegate)
+    public void GetUsersForAdmin(ResponseDelegateString responseDelegate)
     {
         this.OnRequestStartedEvent.Invoke();
 
         StartCoroutine(StartGettingUsersForAdmin(responseDelegate));
     }
 
-    private IEnumerator StartGettingUsersForAdmin(ReturnStringDelegate responseDelegate)
+    private IEnumerator StartGettingUsersForAdmin(ResponseDelegateString responseDelegate)
     {
         UnityWebRequest request = new UnityWebRequest($"{this.FunctionsUrl}/getUsersForAdmin", "POST");
         byte[] bodyRaw = new UTF8Encoding().GetBytes("{}");
@@ -313,14 +312,14 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void GetRole(string roleId, ReturnStringDelegate responseDelegate)
+    public void GetRole(string roleId, ResponseDelegateString responseDelegate)
     {
         this.OnRequestStartedEvent.Invoke();
 
         StartCoroutine(StartGettingRole(roleId, responseDelegate));
     }
 
-    private IEnumerator StartGettingRole(string roleId, ReturnStringDelegate responseDelegate)
+    private IEnumerator StartGettingRole(string roleId, ResponseDelegateString responseDelegate)
     {
         WWWForm form = new WWWForm();
         form.AddField("objectId", roleId);
@@ -384,16 +383,123 @@ public class ServerCommunicator : MonoBehaviour
 
     #endregion
 
+    #region Recovery
+
+    public void SendForgottenUsername(string email, ResponseDelegateBool responseDelegateBool = null)
+    {
+        this.OnRequestStartedEvent.Invoke();
+
+        StartCoroutine(StartSendingForgottenUsername(email, responseDelegateBool));
+    }
+
+    private IEnumerator StartSendingForgottenUsername(string email, ResponseDelegateBool responseDelegateBool)
+    {
+        WWWForm form = new WWWForm();
+        UnityWebRequest request;
+
+        form.AddField("email", email);
+
+        request = UnityWebRequest.Post($"{this.FunctionsUrl}/forgotUsername", form);
+        request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
+        request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            ShowSuccessLog("Response (StartSendingForgottenUsername): " + request.downloadHandler.text);
+            responseDelegateBool?.Invoke(true);
+        }
+        else
+        {
+            OnFailure(request, "(StartSendingForgottenUsername)");
+            responseDelegateBool?.Invoke(false);
+        }
+
+        this.OnRequestCompletedEvent.Invoke();
+    }
+
+    public void SendForgotPasswordRequest(string email, ResponseDelegateBool responseDelegateBool = null)
+    {
+        this.OnRequestStartedEvent.Invoke();
+
+        StartCoroutine(StartSendingForgotPasswordRequest(email, responseDelegateBool));
+    }
+
+    private IEnumerator StartSendingForgotPasswordRequest(string email, ResponseDelegateBool responseDelegateBool)
+    {
+        WWWForm form = new WWWForm();
+        UnityWebRequest request;
+
+        form.AddField("email", email);
+
+        request = UnityWebRequest.Post($"{this.FunctionsUrl}/forgotPassword", form);
+        request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
+        request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            ShowSuccessLog("Response (StartSendingPasswordReset): " + request.downloadHandler.text);
+            responseDelegateBool?.Invoke(true);
+        }
+        else
+        {
+            OnFailure(request, "(StartSendingPasswordReset)");
+            responseDelegateBool?.Invoke(false);
+        }
+
+        this.OnRequestCompletedEvent.Invoke();
+    }
+
+    public void SendPasswordResetRequest(string code, string password, ResponseDelegateBool responseDelegateBool = null)
+    {
+        this.OnRequestStartedEvent.Invoke();
+
+        StartCoroutine(StartSendingResetPasswordRequest(code, password, responseDelegateBool));
+    }
+
+    private IEnumerator StartSendingResetPasswordRequest(string code, string password, ResponseDelegateBool responseDelegateBool)
+    {
+        WWWForm form = new WWWForm();
+        UnityWebRequest request;
+
+        form.AddField("code", code);
+        form.AddField("newPassword", password);
+
+        request = UnityWebRequest.Post($"{this.FunctionsUrl}/resetPassword", form);
+        request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
+        request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            ShowSuccessLog("Response (StartSendingResetPasswordRequest): " + request.downloadHandler.text);
+            responseDelegateBool?.Invoke(true);
+        }
+        else
+        {
+            OnFailure(request, "(StartSendingResetPasswordRequest)");
+            responseDelegateBool?.Invoke(false);
+        }
+
+        this.OnRequestCompletedEvent.Invoke();
+    }
+
+    #endregion
+
     #region Roles
 
-    public void GetRoles(ReturnStringDelegate responseDelegate = null)
+    public void GetRoles(ResponseDelegateString responseDelegate = null)
     {
         this.OnRequestStartedEvent.Invoke();
 
         StartCoroutine(StartGettingRoles(responseDelegate));
     }
 
-    private IEnumerator StartGettingRoles(ReturnStringDelegate responseDelegate)
+    private IEnumerator StartGettingRoles(ResponseDelegateString responseDelegate)
     {
         string url = $"{this.ClassesUrl}/_Role";
 
@@ -420,14 +526,14 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void GetUserRole(ReturnStringDelegate responseDelegate, string userObjectId)
+    public void GetUserRole(ResponseDelegateString responseDelegate, string userObjectId)
     {
         this.OnRequestStartedEvent.Invoke();
 
         StartCoroutine(StartGettingUserRole(responseDelegate, userObjectId));
     }
 
-    private IEnumerator StartGettingUserRole(ReturnStringDelegate responseDelegate, string userObjectId)
+    private IEnumerator StartGettingUserRole(ResponseDelegateString responseDelegate, string userObjectId)
     {
         UnityWebRequest request;
         Dictionary<string, object> whereDict = new Dictionary<string, object>

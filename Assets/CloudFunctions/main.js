@@ -51,9 +51,11 @@ Parse.Cloud.define("sendEmail", async (request) => {
 Parse.Cloud.job("cleanDatabase", async (request) => {
   const sessionQuery = new Parse.Query("_Session");
   const registrationQuery = new Parse.Query("PendingUser");
+  const forgotPasswordQuery = new Parse.Query("ForgotPasswordCode");
 
   const maxSessionIdleTime = 3600 * 1000;
   const maxRegistrationIdleTime = 3600 * 1000 * 24;
+  const maxPasswordResetTime = 3600 * 1000 * 24;
 
   const currentTime = new Date();
   const sessionExpirationThreshold = new Date(
@@ -62,18 +64,28 @@ Parse.Cloud.job("cleanDatabase", async (request) => {
   const registrationExpirationThreshold = new Date(
     currentTime.getTime() - maxRegistrationIdleTime
   );
+  const passwordResetExpirationThreshold = new Date(
+    currentTime.getTime() - maxPasswordResetTime
+  );
 
   sessionQuery.lessThan("updatedAt", sessionExpirationThreshold);
   registrationQuery.lessThan("createdAt", registrationExpirationThreshold);
+  forgotPasswordQuery.lessThan("createdAt", passwordResetExpirationThreshold);
 
   try {
     const expiredRegistrations = await registrationQuery.find({
       useMasterKey: true,
     });
     const expiredSessions = await sessionQuery.find({ useMasterKey: true });
+    const expiredPasswordResets = await forgotPasswordQuery.find({
+      useMasterKey: true,
+    });
 
     await Parse.Object.destroyAll(expiredRegistrations, { useMasterKey: true });
     await Parse.Object.destroyAll(expiredSessions, { useMasterKey: true });
+    await Parse.Object.destroyAll(expiredPasswordResets, {
+      useMasterKey: true,
+    });
 
     return `Cleanup complete`;
   } catch (error) {

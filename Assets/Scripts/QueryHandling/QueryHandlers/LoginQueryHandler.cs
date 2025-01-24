@@ -11,17 +11,14 @@ public class LoginQueryHandler : QueryHandler
 {
     private const string registration_code_enter_message = "Please enter your verification code.";
     private const string registration_failed_message = "Something went wrong. Please try again.";
-    private VisualElement loginBody;
-    private VisualElement confirmationBody;
-    private VisualElement unregisteredLoginBody;
-    private VisualElement unregisteredLoginBackButtonContainer;
-    private CustomButton unregisteredLoginBackButton;
-    private VisualElement confirmationLabelContainer;
-    private CustomLabel confirmationLabel;
-    private VisualElement codeConfirmationButtonContainer;
-    private CustomButton codeConfirmationButton;
-    private VisualElement codeConfirmationInputContainer;
-    private CustomInput codeConfirmationInput;
+    private const string forgot_credentials_message = "Enter the email associated with your account below";
+    private const string password_reset_message = "Enter your new password, along with your password reset code below.";
+    private VisualElement displayLabelContainer;
+    private CustomLabel displayLabel;
+    private VisualElement codeInputContainer;
+    private VisualElement inputsContainer;
+    private CustomInput codeInput;
+    private CustomLabel codeInputErrorLabel;
     private VisualElement userNameInputContainer;
     private CustomInput userNameInput;
     private CustomLabel userNameInputErrorLabel;
@@ -37,17 +34,23 @@ public class LoginQueryHandler : QueryHandler
     private VisualElement navigationButtonsContainer;
     private VisualElement submitButtonContainer;
     private CustomButton submitButton;
-    private VisualElement cancelButtonContainer;
-    private CustomButton cancelButton;
+    private VisualElement backButtonContainer;
+    private CustomButton backButton;
     private VisualElement optionsContainer;
-    private VisualElement validateRegistrationButtonContainer;
-    private CustomButton validateRegistrationButton;
-    private VisualElement registerButtonContainer;
-    private CustomButton registerButton;
-    private VisualElement forgotCredentialsButtonContainer;
-    private CustomButton forgotCredentialsButton;
+    private VisualElement validateRegistrationOptionButtonContainer;
+    private CustomButton validateRegistrationOptionButton;
+    private VisualElement registerOptionButtonContainer;
+    private CustomButton registerOptionButton;
+    private VisualElement forgotUsernameOptionButtonContainer;
+    private CustomButton forgotUsernameOptionButton;
+    private VisualElement forgotPasswordOptionButtonContainer;
+    private CustomButton forgotPasswordOptionButton;
+    private VisualElement resetPasswordOptionButtonContainer;
+    private CustomButton resetPasswordOptionButton;
     private const string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+    private const string passwordPattern = @"^.{3,20}$";
     private static Regex emailRegex;
+    private static Regex passwordRegex;
     private UnityEvent hideErrorLabels = new UnityEvent();
 
     #region Initialization
@@ -57,6 +60,7 @@ public class LoginQueryHandler : QueryHandler
         base.Initialize();
 
         emailRegex = new Regex(emailPattern);
+        passwordRegex = new Regex(passwordPattern);
 
         AppController.Active.UserDataHandler.OnCurrentUserPopulatedEvent.AddListener(() =>
         {
@@ -65,81 +69,103 @@ public class LoginQueryHandler : QueryHandler
 
         AppController.Active.ServerCommunicator.OnSignInSuccessEvent.AddListener(() => ClearInputs());
         AppController.Active.ServerCommunicator.OnRegisterSuccessEvent.AddListener(() => ClearInputs());
+
+        UpdateSubmitButtonState();
     }
 
     protected override void InitializeElements()
     {
-        this.confirmationBody = this.parentElement.Q<VisualElement>("confirmation-body");
-        this.confirmationLabelContainer = this.confirmationBody.Q<VisualElement>("display-label-container");
-        this.confirmationLabel = this.confirmationLabelContainer.Q<CustomLabel>();
-        this.codeConfirmationInputContainer = this.confirmationBody.Q<VisualElement>("code-input-container");
-        this.codeConfirmationInput = this.codeConfirmationInputContainer.Q<CustomInput>();
-        this.codeConfirmationButtonContainer = this.confirmationBody.Q<VisualElement>("confirm-button-container");
-        this.codeConfirmationButton = this.codeConfirmationButtonContainer.Q<CustomButton>();
+        this.displayLabelContainer = this.parentElement.Q<VisualElement>("display-label-container");
+        this.displayLabel = this.displayLabelContainer.Q<CustomLabel>();
+        this.inputsContainer = this.parentElement.Q<VisualElement>("inputs-container");
+        this.codeInputContainer = this.inputsContainer.Q<VisualElement>("code-input-container");
+        this.codeInput = this.codeInputContainer.Q<CustomInput>();
+        this.codeInputErrorLabel = this.codeInputContainer.Q<VisualElement>("error-label-container").Q<CustomLabel>();
 
-        this.unregisteredLoginBody = this.parentElement.Q<VisualElement>("unregistered-login-body");
-        this.unregisteredLoginBackButtonContainer = this.unregisteredLoginBody.Q<VisualElement>("back-button-container");
-        this.unregisteredLoginBackButton = this.unregisteredLoginBackButtonContainer.Q<CustomButton>();
-
-        this.loginBody = this.parentElement.Q<VisualElement>("login-body");
-        this.userNameInputContainer = this.loginBody.Q<VisualElement>("display-name-input-container");
+        this.userNameInputContainer = this.inputsContainer.Q<VisualElement>("display-name-input-container");
         this.userNameInput = this.userNameInputContainer.Q<CustomInput>();
         this.userNameInputErrorLabel = this.userNameInputContainer.Q<VisualElement>("error-label-container").Q<CustomLabel>();
 
-        this.emailInputContainer = this.loginBody.Q<VisualElement>("email-input-container");
+        this.emailInputContainer = this.inputsContainer.Q<VisualElement>("email-input-container");
         this.emailInput = this.emailInputContainer.Q<CustomInput>();
         this.emailInputErrorLabel = this.emailInputContainer.Q<VisualElement>("error-label-container").Q<CustomLabel>();
 
-        this.passwordInputContainer = this.loginBody.Q<VisualElement>("password-input-container");
+        this.passwordInputContainer = this.inputsContainer.Q<VisualElement>("password-input-container");
         this.passwordInput = this.passwordInputContainer.Q<CustomInput>();
         this.passwordInputErrorLabel = this.passwordInputContainer.Q<VisualElement>("error-label-container").Q<CustomLabel>();
 
-        this.passwordConfirmInputContainer = this.loginBody.Q<VisualElement>("password-confirm-input-container");
+        this.passwordConfirmInputContainer = this.inputsContainer.Q<VisualElement>("password-confirm-input-container");
         this.passwordConfirmInput = this.passwordConfirmInputContainer.Q<CustomInput>();
         this.passwordConfirmInputErrorLabel = this.passwordConfirmInputContainer.Q<VisualElement>("error-label-container").Q<CustomLabel>();
 
-        this.navigationButtonsContainer = this.loginBody.Q<VisualElement>("navigation-buttons-container");
-        this.submitButtonContainer = this.loginBody.Q<VisualElement>("submit-button-container");
+        this.navigationButtonsContainer = this.parentElement.Q<VisualElement>("navigation-buttons-container");
+        this.submitButtonContainer = this.navigationButtonsContainer.Q<VisualElement>("submit-button-container");
         this.submitButton = this.submitButtonContainer.Q<CustomButton>();
-        this.cancelButtonContainer = this.loginBody.Q<VisualElement>("cancel-button-container");
-        this.cancelButton = this.cancelButtonContainer.Q<CustomButton>();
+        this.backButtonContainer = this.navigationButtonsContainer.Q<VisualElement>("back-button-container");
+        this.backButton = this.backButtonContainer.Q<CustomButton>();
 
-        this.optionsContainer = this.loginBody.Q<VisualElement>("options-container");
+        this.optionsContainer = this.parentElement.Q<VisualElement>("options-container");
 
-        this.validateRegistrationButtonContainer = this.optionsContainer.Q<VisualElement>("validate-registration-button-container");
-        this.validateRegistrationButton = this.validateRegistrationButtonContainer.Q<CustomButton>();
+        this.validateRegistrationOptionButtonContainer = this.optionsContainer.Q<VisualElement>("validate-registration-button-container");
+        this.validateRegistrationOptionButton = this.validateRegistrationOptionButtonContainer.Q<CustomButton>();
 
-        this.registerButtonContainer = this.optionsContainer.Q<VisualElement>("register-button-container");
-        this.registerButton = this.registerButtonContainer.Q<CustomButton>();
+        this.registerOptionButtonContainer = this.optionsContainer.Q<VisualElement>("register-button-container");
+        this.registerOptionButton = this.registerOptionButtonContainer.Q<CustomButton>();
 
-        this.forgotCredentialsButtonContainer = this.optionsContainer.Q<VisualElement>("forgot-credentials-button-container");
-        this.forgotCredentialsButton = this.forgotCredentialsButtonContainer.Q<CustomButton>();
+        this.forgotUsernameOptionButtonContainer = this.optionsContainer.Q<VisualElement>("forgot-username-button-container");
+        this.forgotUsernameOptionButton = this.forgotUsernameOptionButtonContainer.Q<CustomButton>();
+
+        this.forgotPasswordOptionButtonContainer = this.optionsContainer.Q<VisualElement>("forgot-password-button-container");
+        this.forgotPasswordOptionButton = this.forgotPasswordOptionButtonContainer.Q<CustomButton>();
+
+        this.resetPasswordOptionButtonContainer = this.optionsContainer.Q<VisualElement>("reset-password-button-container");
+        this.resetPasswordOptionButton = this.resetPasswordOptionButtonContainer.Q<CustomButton>();
 
         UpdateSubmitButtonState();
     }
 
     protected override void SetViewElements()
     {
+        this.AddSubviewElement(Subview.Login_EnterCredentials, this.userNameInputContainer);
+        this.AddSubviewElement(Subview.Login_EnterCredentials, this.passwordInputContainer);
+        this.AddSubviewElement(Subview.Login_EnterCredentials, this.submitButtonContainer);
+        this.AddSubviewElement(Subview.Login_EnterCredentials, this.registerOptionButtonContainer);
+        this.AddSubviewElement(Subview.Login_EnterCredentials, this.forgotPasswordOptionButtonContainer);
+        this.AddSubviewElement(Subview.Login_EnterCredentials, this.forgotUsernameOptionButtonContainer);
+
+        this.AddSubviewElement(Subview.Login_ForgotUsername, this.emailInputContainer);
+        this.AddSubviewElement(Subview.Login_ForgotUsername, this.backButtonContainer);
+        this.AddSubviewElement(Subview.Login_ForgotUsername, this.submitButtonContainer);
+        this.AddSubviewElement(Subview.Login_ForgotUsername, this.displayLabelContainer);
+
+        this.AddSubviewElement(Subview.Login_ForgotPassword, this.emailInputContainer);
+        this.AddSubviewElement(Subview.Login_ForgotPassword, this.backButtonContainer);
+        this.AddSubviewElement(Subview.Login_ForgotPassword, this.submitButtonContainer);
+        this.AddSubviewElement(Subview.Login_ForgotPassword, this.resetPasswordOptionButtonContainer);
+        this.AddSubviewElement(Subview.Login_ForgotPassword, this.displayLabelContainer);
+
+        this.AddSubviewElement(Subview.Login_ResetPassword, this.codeInputContainer);
+        this.AddSubviewElement(Subview.Login_ResetPassword, this.passwordInputContainer);
+        this.AddSubviewElement(Subview.Login_ResetPassword, this.passwordConfirmInputContainer);
+        this.AddSubviewElement(Subview.Login_ResetPassword, this.backButtonContainer);
+        this.AddSubviewElement(Subview.Login_ResetPassword, this.submitButtonContainer);
+        this.AddSubviewElement(Subview.Login_ResetPassword, this.displayLabelContainer);
+
+        this.AddSubviewElement(Subview.Login_Register, this.userNameInputContainer);
         this.AddSubviewElement(Subview.Login_Register, this.emailInputContainer);
+        this.AddSubviewElement(Subview.Login_Register, this.passwordInputContainer);
         this.AddSubviewElement(Subview.Login_Register, this.passwordConfirmInputContainer);
-        this.AddSubviewElement(Subview.Login_Register, this.loginBody);
+        this.AddSubviewElement(Subview.Login_Register, this.backButtonContainer);
+        this.AddSubviewElement(Subview.Login_Register, this.submitButtonContainer);
+        this.AddSubviewElement(Subview.Login_Register, this.validateRegistrationOptionButtonContainer);
 
-        this.AddSubviewElement(Subview.Login_EnterCredentials, this.registerButtonContainer);
-        this.AddSubviewElement(Subview.Login_EnterCredentials, this.validateRegistrationButton);
-        this.AddSubviewElement(Subview.Login_EnterCredentials, this.forgotCredentialsButtonContainer);
-        this.AddSubviewElement(Subview.Login_EnterCredentials, this.loginBody);
-
-        this.AddSubviewElement(Subview.Login_Registration_Validation, this.confirmationBody);
-
-        this.AddSubviewElement(Subview.Login_UnregisteredUserLogin, this.unregisteredLoginBody);
+        this.AddSubviewElement(Subview.Login_RegistrationValidation, this.codeInputContainer);
+        this.AddSubviewElement(Subview.Login_RegistrationValidation, this.submitButtonContainer);
+        this.AddSubviewElement(Subview.Login_RegistrationValidation, this.displayLabelContainer);
     }
 
     protected override void SetupInputs()
     {
-        this.userNameInput.value = "dude@dude.com";
-        this.passwordInput.value = "123";
-        UpdateSubmitButtonState();
-
         this.emailInput.RegisterCallback<KeyDownEvent>(evt => OnEmailInputReturnButtonPressed(evt));
         this.emailInput.RegisterValueChangedCallback<string>(evt => OnEmailInputValueChanged(evt));
         this.emailInput.RegisterCallback<BlurEvent>(evt => OnEmailInputBlur(evt));
@@ -164,29 +190,22 @@ public class LoginQueryHandler : QueryHandler
         this.passwordConfirmInput.RegisterCallback<KeyDownEvent>(evt => OnPasswordConfirmInputReturnButtonPressed(evt));
         this.hideErrorLabels.AddListener(() => HidePasswordConfirmErrorLabel());
 
-        this.codeConfirmationInput.RegisterValueChangedCallback<string>(evt => OnCodeConfirmInputValueChanged(evt));
-        this.codeConfirmationInput.RegisterCallback<BlurEvent>(evt => OnCodeConfirmInputBlur(evt));
-        this.codeConfirmationInput.RegisterCallback<FocusEvent>(evt => OnCodeConfirmInputFocus(evt));
-        this.codeConfirmationInput.RegisterCallback<KeyDownEvent>(evt => OnCodeConfirmInputReturnButtonPressed(evt));
+        this.codeInput.RegisterValueChangedCallback<string>(evt => OnCodeInputValueChanged(evt));
+        this.codeInput.RegisterCallback<BlurEvent>(evt => OnCodeInputBlur(evt));
+        this.codeInput.RegisterCallback<FocusEvent>(evt => OnCodeInputFocus(evt));
+        this.codeInput.RegisterCallback<KeyDownEvent>(evt => OnCodeInputReturnButtonPressed(evt));
     }
 
     protected override void SetupButtons()
     {
-        this.validateRegistrationButton.RegisterCallback<ClickEvent>(evt => OnValidateRegistrationButtonPressed());
+        this.validateRegistrationOptionButton.RegisterCallback<ClickEvent>(evt => OnValidateRegistrationOptionButtonPressed());
+        this.registerOptionButton.RegisterCallback<ClickEvent>(evt => OnRegisterOptionButtonPressed());
+        this.forgotUsernameOptionButton.RegisterCallback<ClickEvent>(evt => OnForgotUsernameOptionButtonPressed());
+        this.forgotPasswordOptionButton.RegisterCallback<ClickEvent>(evt => OnForgotPasswordOptionButtonPressed());
+        this.resetPasswordOptionButton.RegisterCallback<ClickEvent>(evt => OnResetPasswordOptionButtonPressed());
 
-        this.registerButton.RegisterCallback<ClickEvent>(evt => OnRegisterButtonPressed());
-
-        this.forgotCredentialsButton.RegisterCallback<ClickEvent>(evt => OnForgotCredentialsButtonPressed());
-        this.forgotCredentialsButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
-
-        this.submitButton.RegisterCallback<ClickEvent>(evt => OnSubmitButtonPressed());
-
-        this.cancelButton.RegisterCallback<ClickEvent>(evt => OnCancelButtonPressed());
-        this.cancelButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
-
-        this.codeConfirmationButton.RegisterCallback<ClickEvent>(evt => OnCodeSubmitButtonPressed());
-
-        this.unregisteredLoginBackButton.RegisterCallback<ClickEvent>(evt => QueryController.Active.ChangeView(MainView.Login, Subview.Login_EnterCredentials));
+        this.submitButton.RegisterCallback<ClickEvent>(evt => PerformSubmitAction());
+        this.backButton.RegisterCallback<ClickEvent>(evt => PerformBackAction());
     }
 
     #endregion
@@ -199,9 +218,15 @@ public class LoginQueryHandler : QueryHandler
 
         ClearInputs();
         UpdateSubmitButtonState();
-        UpdateCancelButtonState();
 
         this.hideErrorLabels.Invoke();
+    }
+
+    protected override void OnSubviewChanged()
+    {
+        base.OnSubviewChanged();
+
+        UpdateConfirmationLabel();
     }
 
     #endregion
@@ -232,12 +257,21 @@ public class LoginQueryHandler : QueryHandler
 
     private void OnEmailInputReturnButtonPressed(KeyDownEvent evt)
     {
-        if (evt.keyCode != KeyCode.Return)
+        OnReturnButtonPressed(evt, () =>
         {
-            return;
-        }
-
-        this.passwordInput.Focus();
+            if (QueryController.Active.CurrentSubview == Subview.Login_Register)
+            {
+                this.passwordInput.Focus();
+            }
+            else if (CredentialsAreValid())
+            {
+                PerformSubmitAction();
+            }
+            else
+            {
+                this.parentElement.Focus();
+            }
+        });
     }
 
     private void OnUserNameInputBlur(BlurEvent evt)
@@ -264,19 +298,24 @@ public class LoginQueryHandler : QueryHandler
 
     private void OnUserNameInputReturnButtonPressed(KeyDownEvent evt)
     {
-        if (evt.keyCode != KeyCode.Return)
+        OnReturnButtonPressed(evt, () =>
         {
-            return;
-        }
-
-        this.emailInput.Focus();
+            if (QueryController.Active.CurrentSubview == Subview.Login_EnterCredentials)
+            {
+                this.passwordInput.Focus();
+            }
+            else
+            {
+                this.emailInput.Focus();
+            }
+        });
     }
 
     private void OnPasswordInputBlur(BlurEvent evt)
     {
-        if (String.IsNullOrEmpty(this.passwordInput.value))
+        if (!IsValidPassword(this.passwordInput.value))
         {
-            ShowPasswordErrorLabel("Password cannot be empty");
+            ShowPasswordErrorLabel("Password must be between 4 to 20 characters");
         }
         else if (!String.IsNullOrEmpty(this.passwordConfirmInput.value)
         && !String.Equals(this.passwordInput.value, this.passwordConfirmInput.value))
@@ -301,31 +340,24 @@ public class LoginQueryHandler : QueryHandler
 
     private void OnPasswordInputReturnButtonPressed(KeyDownEvent evt)
     {
-        if (evt.keyCode != KeyCode.Return)
+        OnReturnButtonPressed(evt, () =>
         {
-            return;
-        }
-
-        if (QueryController.Active.CurrentSubview == Subview.Login_EnterCredentials)
-        {
-            if (CredentialsValid())
+            if (QueryController.Active.CurrentSubview == Subview.Login_EnterCredentials
+            && CredentialsAreValid())
             {
-                SubmitLogin();
+                PerformSubmitAction();
             }
-        }
-        else if (QueryController.Active.CurrentSubview == Subview.Login_Register)
-        {
-            this.passwordConfirmInput.Focus();
-        }
+            else
+            {
+                this.passwordConfirmInput.Focus();
+            }
+        });
     }
 
     private void OnPasswordConfirmInputBlur(BlurEvent evt)
     {
-        if (String.IsNullOrEmpty(this.passwordConfirmInput.value))
-        {
-            ShowPasswordConfirmErrorLabel("Password confirm cannot be empty");
-        }
-        else if (!String.Equals(this.passwordConfirmInput.value, this.passwordInput.value))
+        if (!String.IsNullOrEmpty(this.passwordInput.value)
+        && !String.Equals(this.passwordConfirmInput.value, this.passwordInput.value))
         {
             ShowPasswordConfirmErrorLabel("Passwords do not match");
         }
@@ -347,70 +379,116 @@ public class LoginQueryHandler : QueryHandler
 
     private void OnPasswordConfirmInputReturnButtonPressed(KeyDownEvent evt)
     {
+        OnReturnButtonPressed(evt, () =>
+        {
+            if (QueryController.Active.CurrentSubview == Subview.Login_ResetPassword)
+            {
+                this.codeInput.Focus();
+            }
+            else if (CredentialsAreValid())
+            {
+                PerformSubmitAction();
+            }
+            else
+            {
+                this.parentElement.Focus();
+            }
+        });
+    }
+
+    private void OnCodeInputBlur(BlurEvent evt)
+    {
+        if (CredentialsAreValid())
+        {
+            return;
+        }
+
+        if (String.IsNullOrEmpty(this.codeInput.value))
+        {
+            ShowConfirmationErrorLabel("The input cannot be empty");
+        }
+        else
+        {
+            switch (QueryController.Active.CurrentSubview)
+            {
+                case Subview.Login_ForgotPassword:
+                    ShowConfirmationErrorLabel("Please enter a valid email");
+                    break;
+                case Subview.Login_ForgotUsername:
+                    ShowConfirmationErrorLabel("Please enter a valid email");
+                    break;
+                case Subview.Login_ResetPassword:
+                case Subview.Login_RegistrationValidation:
+                    break;
+            }
+        }
+    }
+
+    private void OnCodeInputFocus(FocusEvent evt)
+    {
+        HideConfirmationErrorLabel();
+    }
+
+    private void OnCodeInputValueChanged(ChangeEvent<string> evt)
+    {
+        UpdateSubmitButtonState();
+    }
+
+    private void OnCodeInputReturnButtonPressed(KeyDownEvent evt)
+    {
+        OnReturnButtonPressed(evt, () =>
+        {
+            if (CredentialsAreValid())
+            {
+                PerformSubmitAction();
+            }
+            else
+            {
+                this.parentElement.Focus();
+            }
+        });
+    }
+
+    private void OnReturnButtonPressed(KeyDownEvent evt, Action action)
+    {
         if (evt.keyCode != KeyCode.Return)
         {
             return;
         }
-        else if (!CredentialsValid())
-        {
-            this.loginBody.Focus();
 
-            return;
-        }
-
-        SubmitRegistration();
-    }
-
-    private void OnCodeConfirmInputBlur(BlurEvent evt)
-    {
-
-    }
-
-    private void OnCodeConfirmInputFocus(FocusEvent evt)
-    {
-    }
-
-    private void OnCodeConfirmInputValueChanged(ChangeEvent<string> evt)
-    {
-        UpdateCodeConfirmButtonState();
-    }
-
-    private void OnCodeConfirmInputReturnButtonPressed(KeyDownEvent evt)
-    {
-        if (evt.keyCode != KeyCode.Return)
-        {
-            return;
-        }
-        else if (String.IsNullOrEmpty(this.codeConfirmationInput.value))
-        {
-            this.loginBody.Focus();
-
-            return;
-        }
-
-        SubmitUserRegistrationConfirmation();
+        action?.Invoke();
     }
 
     #endregion
 
     #region Button Handling
 
-    private void OnValidateRegistrationButtonPressed()
+    private void OnValidateRegistrationOptionButtonPressed()
     {
-        QueryController.Active.ChangeView(MainView.Login, Subview.Login_Registration_Validation);
+        QueryController.Active.ChangeView(MainView.Login, Subview.Login_RegistrationValidation);
     }
 
-    private void OnRegisterButtonPressed()
+    private void OnRegisterOptionButtonPressed()
     {
         QueryController.Active.ChangeView(MainView.Login, Subview.Login_Register);
     }
 
-    private void OnForgotCredentialsButtonPressed()
+    private void OnForgotUsernameOptionButtonPressed()
+    {
+        QueryController.Active.ChangeView(MainView.Login, Subview.Login_ForgotUsername);
+    }
+
+    private void OnForgotPasswordOptionButtonPressed()
     {
         QueryController.Active.ChangeView(MainView.Login, Subview.Login_ForgotPassword);
     }
 
-    private void OnSubmitButtonPressed()
+    private void OnResetPasswordOptionButtonPressed()
+    {
+        QueryController.Active.ChangeView(MainView.Login, Subview.Login_ResetPassword);
+    }
+
+    private void PerformSubmitAction()
     {
         switch (QueryController.Active.CurrentSubview)
         {
@@ -420,15 +498,22 @@ public class LoginQueryHandler : QueryHandler
             case Subview.Login_Register:
                 SubmitRegistration();
                 break;
+            case Subview.Login_ForgotUsername:
+                SubmitForgotUsernameRequest();
+                break;
+            case Subview.Login_ForgotPassword:
+                SubmitForgotPasswordRequest();
+                break;
+            case Subview.Login_RegistrationValidation:
+                SubmitUserRegistrationConfirmation();
+                break;
+            case Subview.Login_ResetPassword:
+                SubmitResetRequestPassword();
+                break;
         }
     }
 
-    private void OnCodeSubmitButtonPressed()
-    {
-        SubmitUserRegistrationConfirmation();
-    }
-
-    private void OnCancelButtonPressed()
+    private void PerformBackAction()
     {
         QueryController.Active.ReturnToPreviousView();
     }
@@ -477,9 +562,9 @@ public class LoginQueryHandler : QueryHandler
                     {
                         if (success)
                         {
-                            this.confirmationLabel.text = registration_code_enter_message;
-                            QueryController.Active.ChangeView(MainView.Login, Subview.Login_Registration_Validation);
-                            QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null, "Please check your email for your confirmation code.");
+                            this.displayLabel.text = registration_code_enter_message;
+                            QueryController.Active.ChangeView(MainView.Login, Subview.Login_RegistrationValidation);
+                            QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null, "Please check your email for your verification code.");
                         }
                         else
                         {
@@ -487,15 +572,58 @@ public class LoginQueryHandler : QueryHandler
                         }
                     });
                 }
+                else
+                {
+                    QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null,
+                    "Could not register. Please check the inputs and try again.");
+                }
             });
     }
 
     private void SubmitUserRegistrationConfirmation()
     {
-        AppController.Active.ServerCommunicator.VerifyRegistration(this.codeConfirmationInput.value, () =>
+        AppController.Active.ServerCommunicator.VerifyRegistration(this.codeInput.value, () =>
         {
             QueryController.Active.ChangeView(MainView.Login, Subview.Login_EnterCredentials);
             QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null, "You have successfuly registered. Login to your account once an administrator has verified it.");
+        });
+    }
+
+    private void SubmitForgotUsernameRequest()
+    {
+        AppController.Active.ServerCommunicator.SendForgottenUsername(this.emailInput.value, success =>
+        {
+            QueryController.Active.ChangeView(MainView.Login, Subview.Login_EnterCredentials);
+            QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null,
+            "If an account is found your username will be emailed to you.");
+        });
+    }
+
+    private void SubmitForgotPasswordRequest()
+    {
+        AppController.Active.ServerCommunicator.SendForgotPasswordRequest(this.emailInput.value, success =>
+        {
+            QueryController.Active.ChangeView(MainView.Login, Subview.Login_ResetPassword);
+            QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null,
+            "If an account is found your username will be emailed to you.");
+        });
+    }
+
+    private void SubmitResetRequestPassword()
+    {
+        AppController.Active.ServerCommunicator.SendPasswordResetRequest(this.codeInput.value, this.passwordInput.value, success =>
+        {
+            if (success)
+            {
+                QueryController.Active.ChangeView(MainView.Login, Subview.Login_EnterCredentials);
+                QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null,
+                "Your password has been successfully reset.");
+            }
+            else
+            {
+                QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null,
+                "Could not reset password. Please ensure your code is valid.");
+            }
         });
     }
 
@@ -505,7 +633,7 @@ public class LoginQueryHandler : QueryHandler
 
     private void UpdateSubmitButtonState()
     {
-        if (CredentialsValid())
+        if (CredentialsAreValid())
         {
             this.submitButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
         }
@@ -515,28 +643,30 @@ public class LoginQueryHandler : QueryHandler
         }
     }
 
-    private void UpdateCodeConfirmButtonState()
+    private void UpdateConfirmationLabel()
     {
-        if (String.IsNullOrEmpty(this.codeConfirmationInput.value))
-        {
-            this.codeConfirmationButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
-        }
-        else
-        {
-            this.codeConfirmationButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
-        }
-    }
+        string displayLabelText;
 
-    private void UpdateCancelButtonState()
-    {
-        if (QueryController.Active.CurrentSubview == Subview.Login_EnterCredentials)
+        switch (QueryController.Active.CurrentSubview)
         {
-            this.cancelButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
+            case Subview.Login_ForgotPassword:
+                displayLabelText = forgot_credentials_message;
+                break;
+            case Subview.Login_ForgotUsername:
+                displayLabelText = forgot_credentials_message;
+                break;
+            case Subview.Login_ResetPassword:
+                displayLabelText = password_reset_message;
+                break;
+            case Subview.Login_RegistrationValidation:
+                displayLabelText = registration_code_enter_message;
+                break;
+            default:
+                displayLabelText = String.Empty;
+                return;
         }
-        else
-        {
-            this.cancelButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
-        }
+
+        this.displayLabel.text = displayLabelText;
     }
 
     private void ClearInputs()
@@ -545,10 +675,10 @@ public class LoginQueryHandler : QueryHandler
         this.emailInput.value = String.Empty;
         this.passwordInput.value = String.Empty;
         this.passwordConfirmInput.value = String.Empty;
-        this.codeConfirmationInput.value = String.Empty;
+        this.codeInput.value = String.Empty;
 
         UpdateSubmitButtonState();
-        UpdateCodeConfirmButtonState();
+        // UpdateConfirmButtonState();
     }
 
     #endregion
@@ -599,6 +729,17 @@ public class LoginQueryHandler : QueryHandler
         VisualElementHelper.SetElementVisibility(this.passwordConfirmInputErrorLabel, Visibility.Hidden);
     }
 
+    private void ShowConfirmationErrorLabel(string errorText)
+    {
+        VisualElementHelper.SetElementVisibility(this.codeInputErrorLabel, Visibility.Visible);
+        this.codeInputErrorLabel.text = errorText;
+    }
+
+    private void HideConfirmationErrorLabel()
+    {
+        VisualElementHelper.SetElementVisibility(this.codeInputErrorLabel, Visibility.Hidden);
+    }
+
     #endregion
 
     #region Validation
@@ -611,18 +752,40 @@ public class LoginQueryHandler : QueryHandler
         return emailRegex.IsMatch(email);
     }
 
-    private bool CredentialsValid()
+    public static bool IsValidPassword(string password)
+    {
+        if (string.IsNullOrEmpty(password))
+            return false;
+
+        return passwordRegex.IsMatch(password);
+    }
+
+    private bool CredentialsAreValid()
     {
         switch (QueryController.Active.CurrentSubview)
         {
             case Subview.Login_EnterCredentials:
                 return !String.IsNullOrEmpty(this.userNameInput.value)
-                && !String.IsNullOrEmpty(this.passwordInput.value);
+                && IsValidPassword(this.passwordInput.value);
             case Subview.Login_Register:
+                Debug.Log(IsValidEmail(this.emailInput.value));
+                Debug.Log(String.IsNullOrEmpty(this.userNameInput.value));
+                Debug.Log(IsValidPassword(this.passwordInput.value));
+                Debug.Log(String.Equals(this.passwordInput.value, this.passwordConfirmInput.value));
                 return IsValidEmail(this.emailInput.value)
                 && !String.IsNullOrEmpty(this.userNameInput.value)
-                && !String.IsNullOrEmpty(this.passwordInput.value)
+                && IsValidPassword(this.passwordInput.value)
                 && String.Equals(this.passwordInput.value, this.passwordConfirmInput.value);
+            case Subview.Login_ForgotPassword:
+                return IsValidEmail(this.emailInput.value);
+            case Subview.Login_ForgotUsername:
+                return IsValidEmail(this.emailInput.value);
+            case Subview.Login_ResetPassword:
+                return !String.IsNullOrEmpty(this.codeInput.value)
+                && IsValidPassword(this.passwordInput.value)
+                && String.Equals(this.passwordInput.value, this.passwordConfirmInput.value);
+            case Subview.Login_RegistrationValidation:
+                return !String.IsNullOrEmpty(this.codeInput.value);
             default:
                 return false;
         }

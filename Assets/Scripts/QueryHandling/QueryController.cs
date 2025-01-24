@@ -8,6 +8,7 @@ using Subview = Enumerations.Subview;
 using System;
 using System.Linq;
 using System.Text;
+using CircularBuffer;
 
 public class QueryController : MonoBehaviour
 {
@@ -34,8 +35,8 @@ public class QueryController : MonoBehaviour
     private CustomLabel interactionBlockerLabel;
     private VisualElement debugInfo;
     private CustomLabel debugInfoLabel;
-    private FullViewContainer previousView;
-    public FullViewContainer PreviousView => previousView;
+    private CircularBuffer<FullViewContainer> previousViews;
+    public CircularBuffer<FullViewContainer> PreviousViews => previousViews;
     private HashSet<int> interactionBlockerIds;
     private bool initialized;
     public bool Initialized => initialized;
@@ -73,7 +74,7 @@ public class QueryController : MonoBehaviour
 
     private void Initialize()
     {
-        this.previousView = new FullViewContainer();
+        this.previousViews = new CircularBuffer<FullViewContainer>(10);
 
         this.interactionBlocker = this.rootDocument.rootVisualElement.Q<TemplateContainer>("InteractionBlocker");
         this.interactionBlockerLabel = this.interactionBlocker.Q<CustomLabel>();
@@ -127,21 +128,14 @@ public class QueryController : MonoBehaviour
 
     #region View Change
 
-    public void ChangeView(MainView mainView, Subview subview, bool resetPreviousView = false)
+    public void ChangeView(MainView mainView, Subview subview)
     {
         if (this.currentMainView == mainView && this.currentSubview == subview)
         {
             return;
         }
 
-        if (resetPreviousView)
-        {
-            this.previousView.ResetView();
-        }
-        else
-        {
-            this.previousView.SetView(this.currentMainView, this.currentSubview);
-        }
+        this.previousViews.PushFront(new FullViewContainer(this.currentMainView, this.currentSubview));
 
         if (this.currentMainView != mainView)
         {
@@ -180,12 +174,19 @@ public class QueryController : MonoBehaviour
 
     public void ReturnToPreviousView()
     {
-        if (!this.previousView.PreviousViewValid)
+        FullViewContainer previousView;
+
+        if (this.previousViews.Count() <= 0)
         {
             LogHelper.Active.LogError("Previous view not valid!");
         }
 
-        ChangeView(this.previousView.MainView.Value, this.previousView.Subview.Value);
+        previousView = this.previousViews.Front();
+        this.previousViews.PopFront();
+
+        ChangeView(previousView.MainView, previousView.Subview);
+
+        this.previousViews.PopFront();
     }
 
     #endregion
@@ -228,18 +229,6 @@ public class QueryController : MonoBehaviour
             VisualElementHelper.SetElementDisplay(this.interactionBlocker, DisplayStyle.None);
         }
     }
-
-    // private IEnumerator UnblockIntereractionsAfterTimeout(int blockingId, float timeout = 5f)
-    // {
-    //     float elapsedTime = 0;
-
-    //     yield return new WaitUntil(() =>
-    //     {
-    //         elapsedTime += Time.deltaTime;
-
-    //         return elapsedTime >= timeout;
-    //     });
-    // }
 
     #endregion
 }

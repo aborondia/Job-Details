@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Enumerations;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -102,7 +103,7 @@ public abstract class QueryHandler : MonoBehaviour
             }
         }
 
-        previousView = QueryController.Active.PreviousView.MainView;
+        previousView = QueryController.Active.PreviousViews.Front().MainView;
         currentView = QueryController.Active.CurrentMainView;
 
         if (previousView.HasValue && this.mainViewElements.ContainsKey(previousView.Value))
@@ -125,7 +126,7 @@ public abstract class QueryHandler : MonoBehaviour
             return;
         }
 
-        previousSubview = QueryController.Active.PreviousView.Subview;
+        previousSubview = QueryController.Active.PreviousViews.Front().Subview;
         currentSubview = QueryController.Active.CurrentSubview;
 
         if (previousSubview.HasValue && this.subviewElements.ContainsKey(previousSubview.Value))

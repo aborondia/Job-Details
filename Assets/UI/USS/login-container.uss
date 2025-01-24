@@ -89,12 +89,16 @@
 
 .buttons-container {
     flex-direction: row;
-    width: 100%;
-    justify-content: space-between;
+    justify-content: space-around;
 }
 
 .error-label {
     -unity-font-style: italic;
     white-space: normal;
     font-size: 18px;
+}
+
+.centered-element {
+    width: 50%;
+    max-width: 600px;
 }

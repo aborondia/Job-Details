@@ -18,9 +18,11 @@ namespace Enumerations
         Default = 0,
         Login_EnterCredentials = 1,
         Login_Register = 2,
-        Login_ForgotPassword = 3,
-        Login_Registration_Validation = 4,
-        Login_UnregisteredUserLogin = 5,
+        Login_ForgotUsername = 3,
+        Login_ForgotPassword = 4,
+        Login_RegistrationValidation = 5,
+        Login_UnregisteredUserLogin = 6,
+        Login_ResetPassword = 7,
     }
 
     public enum JobTypeEnum
