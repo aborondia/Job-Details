@@ -1,20 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using System;
 using UnityEngine.UIElements;
 using System.Linq;
+using MainView = Enumerations.MainView;
+using Subview = Enumerations.Subview;
 
 public class HeaderQueryHandler : QueryHandler
 {
     private VisualElement headerLabelContainer;
     private Label headerLabel;
     private VisualElement rightHeaderContainer;
-    private VisualElement detailsReportRightHeaderContainer;
     private VisualElement addDetailsReportButtonContainer;
     private CustomButton addDetailsReportButton;
-    private VisualElement closeButtonContainer;
-    private CustomButton closeButton;
+    private VisualElement logoutButtonContainer;
+    private CustomButton logoutButton;
+    private VisualElement teamButtonDisplayParent;
     private VisualElement teamButtonContainer;
     private CustomButton teamButton;
     private VisualElement viewUsersNotificationContainer;
@@ -25,22 +24,25 @@ public class HeaderQueryHandler : QueryHandler
         this.headerLabelContainer = this.parentElement.Q<VisualElement>("header-label-container");
         this.headerLabel = this.headerLabelContainer.Q<Label>();
         this.rightHeaderContainer = this.parentElement.Q<VisualElement>("right-header-container");
-        this.detailsReportRightHeaderContainer = this.rightHeaderContainer.Q<VisualElement>("details-report-right-header-container");
-        this.addDetailsReportButtonContainer = this.detailsReportRightHeaderContainer.Q<VisualElement>("add-details-report-button-container");
+        this.addDetailsReportButtonContainer = this.rightHeaderContainer.Q<VisualElement>("add-details-report-button-container");
         this.addDetailsReportButton = this.addDetailsReportButtonContainer.Q<CustomButton>();
-        this.teamButtonContainer = this.detailsReportRightHeaderContainer.Q<VisualElement>("team-button-container");
+        this.teamButtonDisplayParent = this.rightHeaderContainer.Q<VisualElement>("team-button-display-parent");
+        this.teamButtonContainer = this.teamButtonDisplayParent.Q<VisualElement>("team-button-container");
         this.teamButton = this.teamButtonContainer.Q<CustomButton>();
-        this.closeButtonContainer = this.rightHeaderContainer.Q<VisualElement>("close-button-container");
-        this.closeButton = this.closeButtonContainer.Q<CustomButton>();
+        this.logoutButtonContainer = this.rightHeaderContainer.Q<VisualElement>("logout-button-container");
+        this.logoutButton = this.logoutButtonContainer.Q<CustomButton>();
         this.viewUsersNotificationContainer = this.teamButton.Q<VisualElement>("notification-container");
         this.viewUsersNotificationLabel = this.viewUsersNotificationContainer.Q<Label>("notification-label");
 
-        VisualElementHelper.SetElementDisplay(this.closeButtonContainer, DisplayStyle.None);
+        VisualElementHelper.SetElementDisplay(this.logoutButtonContainer, DisplayStyle.None);
     }
 
     protected override void SetupButtons()
     {
         this.teamButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
+        VisualElementHelper.SetElementDisplay(this.addDetailsReportButtonContainer, DisplayStyle.None);
+        VisualElementHelper.SetElementDisplay(this.logoutButtonContainer, DisplayStyle.None);
+        VisualElementHelper.SetElementDisplay(this.teamButtonContainer, DisplayStyle.None);
         VisualElementHelper.SetElementDisplay(this.viewUsersNotificationContainer, DisplayStyle.None);
 
         AppController.Active.UserDataHandler.OnCurrentUserPopulatedEvent.AddListener(() =>
@@ -57,32 +59,10 @@ public class HeaderQueryHandler : QueryHandler
 
         AppController.Active.UserDataHandler.OnUsersPopulatedEvent.AddListener(() =>
         {
-            if (AppController.Active.UserDataHandler.CurrentUser.RoleDTM.name != UserDataHandler._UserRoleServerName)
-            {
-                this.teamButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
-
-                int unverifiedUserCount = AppController.Active.UserDataHandler.Users.Values
-                .Where(user => !user.DTM.verified).Count();
-
-                this.teamButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
-                VisualElementHelper.SetElementDisplay(this.teamButtonContainer, DisplayStyle.Flex);
-
-                if (unverifiedUserCount > 0)
-                {
-                    VisualElementHelper.SetElementDisplay(this.viewUsersNotificationContainer, DisplayStyle.Flex);
-                    this.viewUsersNotificationLabel.text = unverifiedUserCount.ToString();
-                }
-
-                this.teamButton.RegisterCallback<ClickEvent>(evt =>
-                {
-                    QueryController.Active.ChangeView(Enumerations.MainView.Users, Enumerations.Subview.Default);
-                });
-            }
-            else
-            {
-                VisualElementHelper.SetElementDisplay(this.teamButtonContainer, DisplayStyle.None);
-            }
+            UpdateUserNotification();
         });
+
+        QueryController.Active.UsersQueryHandler.OnUserDataChange.AddListener(() => UpdateUserNotification());
 
         this.addDetailsReportButton.RegisterCallback<ClickEvent>(evt =>
         {
@@ -98,7 +78,12 @@ public class HeaderQueryHandler : QueryHandler
             AppController.Active.DetailsReportsHandler.RefreshReports();
         });
 
-        this.closeButton.RegisterCallback<ClickEvent>(evt => QueryController.Active.ReturnToPreviousView());
+        this.teamButton.RegisterCallback<ClickEvent>(evt =>
+        {
+            QueryController.Active.ChangeView(MainView.Users, Subview.Default);
+        });
+
+        this.logoutButton.RegisterCallback<ClickEvent>(evt => OnLogoutButtonPressed());
     }
 
     protected override void SetupInputs()
@@ -107,10 +92,13 @@ public class HeaderQueryHandler : QueryHandler
 
     protected override void SetViewElements()
     {
-        // AddMainViewElement(Enumerations.MainView.DetailsReports, this.teamButtonContainer);
-        AddMainViewElement(Enumerations.MainView.DetailsReports, this.detailsReportRightHeaderContainer);
-        AddMainViewElement(Enumerations.MainView.Users, this.closeButtonContainer);
-        AddMainViewElement(Enumerations.MainView.JobDetails, this.closeButtonContainer);
+        AddMainViewElement(MainView.DetailsReports, this.addDetailsReportButtonContainer);
+        AddMainViewElement(MainView.DetailsReports, this.logoutButtonContainer);
+        AddMainViewElement(MainView.DetailsReports, this.teamButtonContainer);
+
+        AddMainViewElement(MainView.Users, this.logoutButtonContainer);
+
+        AddMainViewElement(MainView.JobDetails, this.logoutButtonContainer);
     }
 
     protected override void OnAnyViewChanged()
@@ -120,25 +108,62 @@ public class HeaderQueryHandler : QueryHandler
         UpdateHeaderLabel();
     }
 
+    private void OnLogoutButtonPressed()
+    {
+        AppController.Active.ServerCommunicator.LogOut(success =>
+        {
+            QueryController.Active.ChangeView(MainView.Login, Subview.Login_EnterCredentials);
+            QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null, "You have been logged out.");
+        });
+    }
+
     private void UpdateHeaderLabel()
     {
         switch (QueryController.Active.CurrentMainView)
         {
-            case Enumerations.MainView.DetailsReports:
+            case MainView.DetailsReports:
                 this.headerLabel.text = "Details Reports";
                 break;
-            case Enumerations.MainView.JobDetails:
+            case MainView.JobDetails:
                 this.headerLabel.text = "Details";
                 break;
-            case Enumerations.MainView.Login:
+            case MainView.Login:
                 this.headerLabel.text = "Login";
                 break;
-            case Enumerations.MainView.Users:
+            case MainView.Users:
                 this.headerLabel.text = "Users";
                 break;
             default:
                 this.headerLabel.text = String.Empty;
                 break;
+        }
+    }
+
+    private void UpdateUserNotification()
+    {
+        if (AppController.Active.UserDataHandler.CurrentUser.RoleDTM.name != UserDataHandler._AdminRoleServerName
+        && AppController.Active.UserDataHandler.CurrentUser.RoleDTM.name != UserDataHandler._OwnerRoleServerName)
+        {
+            VisualElementHelper.SetElementDisplay(this.teamButtonDisplayParent, DisplayStyle.None);
+
+            return;
+        }
+
+        this.teamButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
+
+        int unverifiedUserCount = AppController.Active.UserDataHandler.Users.Values
+        .Where(user => !user.DTM.verified).Count();
+
+        VisualElementHelper.SetElementDisplay(this.teamButtonDisplayParent, DisplayStyle.Flex);
+
+        if (unverifiedUserCount > 0)
+        {
+            VisualElementHelper.SetElementDisplay(this.viewUsersNotificationContainer, DisplayStyle.Flex);
+            this.viewUsersNotificationLabel.text = unverifiedUserCount.ToString();
+        }
+        else
+        {
+            VisualElementHelper.SetElementDisplay(this.viewUsersNotificationContainer, DisplayStyle.None);
         }
     }
 }

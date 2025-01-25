@@ -27,28 +27,27 @@ namespace Enumerations
 
     public enum JobTypeEnum
     {
-        JobType,
-        BiWeekly,
-        FirstTime,
-        Monthly,
-        MoveIn,
-        MoveOut,
-        Weekly,
+        JobType = 0,
+        BiWeekly = 1,
+        FirstTime = 2,
+        Monthly = 3,
+        MoveIn = 4,
+        MoveOut = 5,
+        Weekly = 6,
     }
 
     public enum PaymentTypeEnum
     {
-        PaymentType,
-        Cash,
-        Cheque,
-        NoPayment,
-        Premium,
+        Cash = 0,
+        Cheque = 1,
+        NoPayment = 2,
+        Premium = 3,
     }
 
     public enum TimeOfDayEnum
     {
-        AM,
-        PM
+        AM = 0,
+        PM = 1
     }
 
     public enum UserRoleEnum
@@ -57,5 +56,6 @@ namespace Enumerations
         Admin = 1,
         Owner = 2,
         RegularUser = 0,
+        Developer = 3,
     }
 }

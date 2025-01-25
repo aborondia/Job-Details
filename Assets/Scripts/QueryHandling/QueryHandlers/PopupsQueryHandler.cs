@@ -42,7 +42,7 @@ public class PopupsQueryHandler : QueryHandler
     private VisualElement sendEmailContentInputContainer;
     private CustomInput sendEmailContentInput;
     private string currentEmailRecipient;
-    private Action<string> sendEmailAction;
+    private Action<string, string> sendEmailAction;
 
     #endregion
 
@@ -108,7 +108,7 @@ public class PopupsQueryHandler : QueryHandler
     {
         this.emailRecipientPlaceholderInput.RegisterCallback<ClickEvent>(evt => OpenRecipientScrollview());
         this.emailRecipientsScrollview.focusable = true;
-        this.emailRecipientsScrollview.RegisterCallback<BlurEvent>(evt => CloseRecipientScrollview());
+        this.emailRecipientsScrollview.RegisterCallback<BlurEvent>(evt => OnRecipientScrollviewBlur(evt));
     }
 
     protected override void SetViewElements()
@@ -157,7 +157,7 @@ public class PopupsQueryHandler : QueryHandler
         this.confirmAction = confirmAction;
     }
 
-    public void OpenSendEmailPopup(Action<string> sendEmailAction, bool canNavigateAway = false)
+    public void OpenSendEmailPopup(Action<string, string> sendEmailAction, bool canNavigateAway = false)
     {
         ShowParent();
         OnOpeningPopup(canNavigateAway);
@@ -169,8 +169,14 @@ public class PopupsQueryHandler : QueryHandler
 
         foreach (User user in AppController.Active.UserDataHandler.Users.Values)
         {
-            CustomLabel recipientEmailLabel = new CustomLabel();
+            CustomLabel recipientEmailLabel;
 
+            if (user.RoleDTM.name == UserDataHandler._DeveloperRoleServerName)
+            {
+                continue;
+            }
+
+            recipientEmailLabel = new CustomLabel();
             recipientEmailLabel.AddToClassList("regular-font");
             recipientEmailLabel.style.color = Color.black;
 
@@ -213,6 +219,33 @@ public class PopupsQueryHandler : QueryHandler
         this.emailRecipientsScrollview.Focus();
     }
 
+    private void OnRecipientScrollviewBlur(BlurEvent evt)
+    {
+        EventCallback<BlurEvent> newBlurEvent;
+        VisualElement eventTarget;
+
+        if (evt?.relatedTarget == null ||
+        (evt.relatedTarget.GetType().IsAssignableFrom(typeof(VisualElement))
+        && !this.emailRecipientsScrollview.Contains(evt.relatedTarget as VisualElement)))
+        {
+            CloseRecipientScrollview();
+        }
+        else
+        {
+            eventTarget = evt.relatedTarget as VisualElement;
+
+            if (eventTarget == this.emailRecipientsScrollview)
+            {
+                return;
+            }
+
+            newBlurEvent = evt => OnRecipientScrollviewBlur(evt);
+            newBlurEvent += evt => eventTarget.UnregisterCallback(newBlurEvent);
+
+            eventTarget.RegisterCallback(newBlurEvent);
+        }
+    }
+
     private void CloseRecipientScrollview()
     {
         VisualElementHelper.SetElementDisplay(this.emailRecipientPlaceholderInput, DisplayStyle.Flex);
@@ -228,7 +261,7 @@ public class PopupsQueryHandler : QueryHandler
 
     private void OnSendEmailButtonPressed()
     {
-        this.sendEmailAction?.Invoke(this.currentEmailRecipient);
+        this.sendEmailAction?.Invoke(this.currentEmailRecipient, this.sendEmailContentInput.value);
 
         ClosePopup();
     }

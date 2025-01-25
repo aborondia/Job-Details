@@ -11,7 +11,7 @@ public class UsersQueryHandler : QueryHandler
     ScrollView usersScrollView;
     VisualElement usersScrollViewContentContainer;
     private List<Enumerations.UserRoleEnum> roleInputDropdownValues = new List<Enumerations.UserRoleEnum>();
-    private UnityEvent onUserDataChange = new UnityEvent();
+    public UnityEvent OnUserDataChange = new UnityEvent();
 
     protected override void Awake()
     {
@@ -19,7 +19,7 @@ public class UsersQueryHandler : QueryHandler
 
         foreach (Enumerations.UserRoleEnum roleType in Enum.GetValues(typeof(Enumerations.UserRoleEnum)))
         {
-            if (roleType == Enumerations.UserRoleEnum.Owner)
+            if ((int)roleType >= (int)Enumerations.UserRoleEnum.Owner)
             {
                 continue;
             }
@@ -33,7 +33,7 @@ public class UsersQueryHandler : QueryHandler
         usersScrollView = this.parentElement.Q<ScrollView>();
         this.usersScrollViewContentContainer = this.usersScrollView.contentContainer;
 
-        this.onUserDataChange.AddListener(() => RefreshUsersList());
+        this.OnUserDataChange.AddListener(() => RefreshUsersList());
         AppController.Active.UserDataHandler.OnUsersPopulatedEvent.AddListener(() =>
         {
             if (QueryController.Active.CurrentMainView == Enumerations.MainView.Users)
@@ -71,6 +71,11 @@ public class UsersQueryHandler : QueryHandler
 
         foreach (User user in AppController.Active.UserDataHandler.Users.Values)
         {
+            if (ReferenceEquals(user.RoleDTM, null) || user.RoleDTM.name == UserDataHandler._DeveloperRoleServerName)
+            {
+                continue;
+            }
+
             AddUserRow(user);
         }
     }
@@ -87,7 +92,7 @@ public class UsersQueryHandler : QueryHandler
         VisualElement userTypeContainer = baseElement.Q<VisualElement>("user-type-container");
         DropdownField userTypeDropdownField = baseElement.Q<DropdownField>();
         VisualElement userTypeLabelContainer = baseElement.Q<VisualElement>("user-role-label-container");
-        Action onDataChangeAction = () => this.onUserDataChange.Invoke();
+        Action onDataChangeAction = () => this.OnUserDataChange.Invoke();
         nameLabel.text = $"{user.DTM.username} - {user.DTM.email}";
 
         SetupDeleteUserButton(deleteUserButton, user, onDataChangeAction);
@@ -155,30 +160,21 @@ public class UsersQueryHandler : QueryHandler
         if (!user.DTM.verified)
         {
             VisualElementHelper.SetElementDisplay(userTypeDropdownField.parent, DisplayStyle.None);
+
             return;
         }
 
-        switch (user.RoleDTM.name)
-        {
-            case UserDataHandler._AdminRoleServerName:
-                userRole = Enumerations.UserRoleEnum.Admin;
-                break;
-            case UserDataHandler._OwnerRoleServerName:
-                userRole = Enumerations.UserRoleEnum.Owner;
-                break;
-            case UserDataHandler._UserRoleServerName:
-                userRole = Enumerations.UserRoleEnum.RegularUser;
-                break;
-            default:
-                userRole = Enumerations.UserRoleEnum.RegularUser;
-                break;
-        }
+        userRole = AppController.Active.UserDataHandler.GetRoleEnum(user.RoleDTM.name);
 
-        canChangeRoles = (int)AppController.Active.UserDataHandler.CurrentUser.RoleInHierarchy == (int)Enumerations.UserRoleEnum.Owner;
+        canChangeRoles = AppController.Active.UserDataHandler.CurrentUser.RoleInHierarchy >= (int)Enumerations.UserRoleEnum.Owner;
 
         if (canChangeRoles && user.RoleDTM.name != UserDataHandler._OwnerRoleServerName)
         {
-            userTypeDropdownField.choices = this.roleInputDropdownValues.Select(role => role.ToString()).ToList();
+            userTypeDropdownField.choices = this.roleInputDropdownValues
+            .Select(role => role.ToString())
+            .Where(roleName => roleName != UserDataHandler._DeveloperRoleServerName)
+            .ToList();
+
             userTypeDropdownField.value = AppController.Active.UserDataHandler.GetRoleEnum(user.RoleDTM.name).ToString();
             VisualElementHelper.SetElementDisplay(userTypeLabelContainer, DisplayStyle.None);
             VisualElementHelper.SetElementDisplay(userTypeDropdownField, DisplayStyle.Flex);

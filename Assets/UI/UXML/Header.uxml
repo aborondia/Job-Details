@@ -1,11 +1,18 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/USS/header.uss?fileID=7433441132597879392&amp;guid=74d25f5d6d6c7b841bd210113a760add&amp;type=3#header" />
-    <CustomVisualElement name="reports-header" class="gray1-border main-header" style="display: flex;">
+    <CustomVisualElement name="main" class="gray1-border main-header">
         <CustomVisualElement name="header-label-container" class="header-label-container">
             <CustomLabel text="Job Details" class="white-font x-large-font header-label" />
         </CustomVisualElement>
         <CustomVisualElement name="right-header-container" class="right-header-container">
-            <CustomVisualElement name="details-report-right-header-container" class="right-header-container">
+            <CustomVisualElement name="add-details-report-button-container" class="right-header-button-container">
+                <CustomButton name="CustomButton" use-background-color="false" use-border="false" regenerate-in-editor="true" class="right-header-button">
+                    <CustomVisualElement name="icon-container" class="right-header-button-icon-container">
+                        <CustomVisualElement name="icon" largest-dimension="50" regenerate-in-editor="true" enforce-largest-dimension="true" class="gi-plus green1-img right-header-button-icon" />
+                    </CustomVisualElement>
+                </CustomButton>
+            </CustomVisualElement>
+            <CustomVisualElement name="team-button-display-parent">
                 <CustomVisualElement name="team-button-container" class="right-header-button-container">
                     <CustomButton name="CustomButton" use-background-color="false" use-border="false" regenerate-in-editor="true" class="add-button right-header-button">
                         <CustomVisualElement name="icon-container" class="right-header-button-icon-container">
@@ -16,18 +23,11 @@
                         </CustomVisualElement>
                     </CustomButton>
                 </CustomVisualElement>
-                <CustomVisualElement name="add-details-report-button-container" class="right-header-button-container">
-                    <CustomButton name="CustomButton" use-background-color="false" use-border="false" regenerate-in-editor="true" class="right-header-button">
-                        <CustomVisualElement name="icon-container" class="right-header-button-icon-container">
-                            <CustomVisualElement name="icon" largest-dimension="50" regenerate-in-editor="true" enforce-largest-dimension="true" class="gi-plus green1-img right-header-button-icon" />
-                        </CustomVisualElement>
-                    </CustomButton>
-                </CustomVisualElement>
             </CustomVisualElement>
-            <CustomVisualElement name="close-button-container" class="right-header-button-container">
+            <CustomVisualElement name="logout-button-container" class="right-header-button-container">
                 <CustomButton name="CustomButton" use-background-color="false" use-border="false" regenerate-in-editor="true" class="right-header-button">
                     <CustomVisualElement name="icon-container" class="right-header-button-icon-container">
-                        <CustomVisualElement name="icon" largest-dimension="50" regenerate-in-editor="true" enforce-largest-dimension="true" class="right-header-button-icon gi-close white-img" />
+                        <CustomVisualElement name="icon" largest-dimension="50" regenerate-in-editor="true" enforce-largest-dimension="true" class="right-header-button-icon white-img gi-logout" />
                     </CustomVisualElement>
                 </CustomButton>
             </CustomVisualElement>

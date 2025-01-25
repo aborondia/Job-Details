@@ -40,8 +40,8 @@ public class JobDetailsContentCreator : MonoBehaviour
     {
         return new List<string>
         {
-            $"Start Time: {jobDetail.StartTime}",
-            $"Finish Time: {jobDetail.FinishTime}"
+            $"Start Time: {jobDetail.StartTime.ToShortTimeString()}",
+            $"Finish Time: {jobDetail.FinishTime.ToShortTimeString()}"
         };
     }
 

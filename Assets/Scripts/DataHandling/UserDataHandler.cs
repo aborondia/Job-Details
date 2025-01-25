@@ -10,11 +10,12 @@ public class UserDataHandler : MonoBehaviour
     public const string _UserRoleServerName = "RegularUser";
     public const string _AdminRoleServerName = "Admin";
     public const string _OwnerRoleServerName = "Owner";
+    public const string _DeveloperRoleServerName = "Developer";
     private User currentUser;
     public User CurrentUser => currentUser;
     private Dictionary<string, RoleDTM> roles = new Dictionary<string, RoleDTM>();
     public Dictionary<string, RoleDTM> Roles => roles;
-    private Dictionary<string, User> users = new Dictionary<string, User>();
+    private Dictionary<string, User> users;
     public Dictionary<string, User> Users => users;
     private bool rolesObtained = false;
     public bool RolesObtained => rolesObtained;
@@ -31,9 +32,14 @@ public class UserDataHandler : MonoBehaviour
             PopulateRoles(JSONHelper.GetRoles(response));
         });
 
-        AppController.Active.ServerCommunicator.OnSignInSuccessEvent.AddListener(() =>
+        AppController.Active.ServerCommunicator.OnLoginSuccessEvent.AddListener(() =>
         {
             OnSignInComplete();
+        });
+
+        AppController.Active.ServerCommunicator.OnLogoutSuccessEvent.AddListener(() =>
+        {
+            UnsetCurrentUser();
         });
     }
 
@@ -78,6 +84,8 @@ public class UserDataHandler : MonoBehaviour
                 return Enumerations.UserRoleEnum.Admin;
             case UserDataHandler._OwnerRoleServerName:
                 return Enumerations.UserRoleEnum.Owner;
+            case UserDataHandler._DeveloperRoleServerName:
+                return Enumerations.UserRoleEnum.Developer;
             default:
                 return Enumerations.UserRoleEnum.RegularUser;
         }
@@ -85,6 +93,8 @@ public class UserDataHandler : MonoBehaviour
 
     public void PopulateUsers()
     {
+        this.users = new Dictionary<string, User>();
+
         if (this.currentUser.RoleDTM.name == _UserRoleServerName)
         {
             AppController.Active.ServerCommunicator.GetUsersForRegularUser(response =>
@@ -121,6 +131,12 @@ public class UserDataHandler : MonoBehaviour
         this.OnCurrentUserPopulatedEvent.Invoke();
 
         OnSettingUser();
+    }
+
+    private void UnsetCurrentUser()
+    {
+        this.users = null;
+        this.currentUser = null;
     }
 
     private void PopulateRoles(List<RoleDTM> roleDTMs)

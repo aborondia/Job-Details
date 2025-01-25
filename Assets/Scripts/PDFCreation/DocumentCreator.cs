@@ -81,7 +81,7 @@ public class DocumentCreator : MonoBehaviour
 
             this.jobDetailsContentCreator.StartCreatingPDFPage(detailPage);
 
-            this.jobDetailsContentCreator.AddTextWithLine($"Date: {jobDetail.StartTime}");
+            this.jobDetailsContentCreator.AddTextWithLine($"Date: {jobDetail.StartTime.ToShortDateString()}");
             detailPage.OnTextLineAdded();
 
             this.jobDetailsContentCreator.AddTextWithLine($"Client Name: {jobDetail.ClientName}");

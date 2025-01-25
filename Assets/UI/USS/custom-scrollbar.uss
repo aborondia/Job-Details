@@ -13,9 +13,9 @@ ScrollView Scroller {
     position: fixed;
     height: 100%;
     right: 0;
-    width: 7.5px;
-    min-width: 7.5px;
-    max-width: 7.5px;
+    width: 15px;
+    min-width: 15px;
+    max-width: 15px;
 }
 
 .custom-scrollbar > #unity-content-and-vertical-scroll-container Scroller ScrollerSlider {
@@ -24,9 +24,9 @@ ScrollView Scroller {
     border-bottom-left-radius: 5px;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
-    width: 7.5px;
-    min-width: 7.5px;
-    max-width: 7.5px;
+    width: 15px;
+    min-width: 15px;
+    max-width: 15px;
 }
 
 .custom-scrollbar > #unity-content-and-vertical-scroll-container Scroller ScrollerSlider #unity-drag-container {
@@ -35,9 +35,9 @@ ScrollView Scroller {
     border-bottom-left-radius: 5px;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
-    width: 7.5px;
-    max-width: 7.5px;
-    min-width: 7.5px;
+    width: 15px;
+    max-width: 15px;
+    min-width: 15px;
 }
 
 .custom-scrollbar > #unity-content-and-vertical-scroll-container Scroller RepeatButton {
@@ -57,9 +57,9 @@ ScrollView Scroller {
     border-top-width: 0;
     border-bottom-width: 0;
     background-color: var(--gray1);
-    width: 7.5px;
-    max-width: 7.5px;
-    min-width: 7.5px;
+    width: 15px;
+    max-width: 15px;
+    min-width: 15px;
     max-height: 25%;
 }
 
@@ -69,20 +69,20 @@ ScrollView Scroller {
 }
 
 .custom-scrollbar > #unity-content-and-vertical-scroll-container Scroller ScrollerSlider #unity-tracker {
-    width: 7.5px;
-    min-width: 7.5px;
+    width: 15px;
+    min-width: 15px;
     background-color: var(--gray3);
     border-left-width: 0;
     border-right-width: 0;
     border-top-width: 0;
     border-bottom-width: 0;
-    max-width: 7.5px;
+    max-width: 15px;
 }
 
 .custom-scrollbar > #unity-content-and-vertical-scroll-container Scroller ScrollerSlider #unity-dragger {
-    min-width: 7.5px;
-    width: 7.5px;
-    max-width: 7.5px;
+    min-width: 15px;
+    width: 15px;
+    max-width: 15px;
 }
 
 ScrollView Scroller ScrollerSlider #unity-drag-container #unity-dragger-border {
@@ -100,13 +100,13 @@ ScrollView Scroller ScrollerSlider #unity-drag-container #unity-dragger-border {
     right: 0;
     top: 0;
     bottom: 0;
-    width: 7.5px;
+    width: 15px;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
-    max-width: 7.5px;
-    min-width: 7.5px;
+    max-width: 15px;
+    min-width: 15px;
 }
 
 .custom-scrollbar {
@@ -119,9 +119,9 @@ ScrollView Scroller ScrollerSlider #unity-drag-container #unity-dragger-border {
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
     min-width: 100%;
-    height: 7.5px;
-    min-height: 7.5px;
-    max-height: 7.5px;
+    height: 15px;
+    min-height: 15px;
+    max-height: 15px;
     bottom: -10px;
 }
 
@@ -131,9 +131,9 @@ ScrollView Scroller ScrollerSlider #unity-drag-container #unity-dragger-border {
     border-bottom-left-radius: 5px;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
-    height: 7.5px;
-    min-height: 7.5px;
-    max-height: 7.5px;
+    height: 15px;
+    min-height: 15px;
+    max-height: 15px;
 }
 
 .custom-scrollbar-horizontal > Scroller ScrollerSlider #unity-drag-container {
@@ -142,9 +142,9 @@ ScrollView Scroller ScrollerSlider #unity-drag-container #unity-dragger-border {
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
     opacity: 1;
-    height: 7.5px;
-    max-height: 7.5px;
-    min-height: 7.5px;
+    height: 15px;
+    max-height: 15px;
+    min-height: 15px;
 }
 
 .custom-scrollbar-horizontal > Scroller RepeatButton {
@@ -164,10 +164,10 @@ ScrollView Scroller ScrollerSlider #unity-drag-container #unity-dragger-border {
     border-top-width: 0;
     border-bottom-width: 0;
     background-color: var(--gray1);
-    height: 7.5px;
-    max-height: 7.5px;
+    height: 15px;
+    max-height: 15px;
     max-width: 25%;
-    min-height: 7.5px;
+    min-height: 15px;
     top: 0;
 }
 
@@ -182,20 +182,20 @@ ScrollView Scroller ScrollerSlider #unity-drag-container #unity-dragger-border {
     border-right-width: 0;
     border-top-width: 0;
     border-bottom-width: 0;
-    height: 7.5px;
+    height: 15px;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
-    max-height: 7.5px;
-    min-height: 7.5px;
+    max-height: 15px;
+    min-height: 15px;
     bottom: -3px;
 }
 
 .custom-scrollbar-horizontal > Scroller #unity-dragger {
-    height: 7.5px;
-    max-height: 7.5px;
-    min-height: 7.5px;
+    height: 15px;
+    max-height: 15px;
+    min-height: 15px;
 }
 
 .custom-scrollbar-horizontal > Scroller ScrollerSlider #unity-drag-container #unity-dragger-border {
@@ -213,10 +213,10 @@ ScrollView Scroller ScrollerSlider #unity-drag-container #unity-dragger-border {
     border-bottom-left-radius: 5px;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
-    height: 7.5px;
-    max-height: 7.5px;
+    height: 15px;
+    max-height: 15px;
     min-width: auto;
-    min-height: 7.5px;
+    min-height: 15px;
 }
 
 .custom-scrollbar-horizontal > Scroller {

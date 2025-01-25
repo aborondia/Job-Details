@@ -27,8 +27,10 @@ public class ServerCommunicator : MonoBehaviour
     public bool ProcessingRequests => serverOperationsInProgress > 0;
     private UserDTM currentUserDTM;
     public UserDTM CurrentUserDTM => currentUserDTM;
-    public UnityEvent OnSignInSuccessEvent;
-    public UnityEvent OnSignInFailedEvent;
+    public UnityEvent OnLoginSuccessEvent;
+    public UnityEvent OnLoginFailedEvent;
+    public UnityEvent OnLogoutSuccessEvent;
+    public UnityEvent OnLogoutFailedEvent;
     public UnityEvent OnRegisterSuccessEvent;
     public UnityEvent OnRegisterFailedEvent;
     public UnityEvent OnRequestStartedEvent;
@@ -122,7 +124,7 @@ public class ServerCommunicator : MonoBehaviour
         else
         {
             OnFailure(request, "(StartCheckRegistrationCredentials)");
-            this.OnSignInFailedEvent.Invoke();
+            this.OnLoginFailedEvent.Invoke();
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -300,13 +302,13 @@ public class ServerCommunicator : MonoBehaviour
             this.currentUserDTM = JSONHelper.GetUserDTM(request.downloadHandler.text);
 
             this.signedIn = true;
-            this.OnSignInSuccessEvent.Invoke();
+            this.OnLoginSuccessEvent.Invoke();
         }
         else
         {
             OnFailure(request, "(StartSigningIn)");
 
-            this.OnSignInFailedEvent.Invoke();
+            this.OnLoginFailedEvent.Invoke();
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -341,41 +343,45 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    private void SignOut()
+    public void LogOut(ResponseDelegateBool responseDelegateBool = null)
     {
         if (ReferenceEquals(this.currentUserDTM, null) || !this.signedIn)
         {
             OnFailure();
+            responseDelegateBool?.Invoke(false);
 
             return;
         }
 
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartSigningOut());
+        StartCoroutine(StartLoggingOut(responseDelegateBool));
     }
 
-    private IEnumerator StartSigningOut()
+    private IEnumerator StartLoggingOut(ResponseDelegateBool responseDelegateBool)
     {
-        UnityWebRequest request = new UnityWebRequest(this.LogoutUrl, "POST");
-
+        UnityWebRequest request = new UnityWebRequest($"{this.FunctionsUrl}/userLogout", "POST");
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
-
-        request.downloadHandler = new DownloadHandlerBuffer();
 
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            ShowSuccessLog("Logout successful");
+            ShowSuccessLog($"Response (StartLoggingOut): Sign out successfull");
 
+            responseDelegateBool?.Invoke(true);
+            this.currentUserDTM = null;
             this.signedIn = false;
+
+            this.OnLogoutSuccessEvent.Invoke();
         }
         else
         {
-            OnFailure(request, "(StartSigningOut)");
+            responseDelegateBool?.Invoke(false);
+            OnFailure(request, "(StartLoggingOut)");
+            this.OnLogoutFailedEvent.Invoke();
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -835,7 +841,7 @@ public class ServerCommunicator : MonoBehaviour
 
     #region JobDetails
 
-    public void CreateJobDetails(JobDetail jobDetails, ResponseDelegateString responseDelegate = null)
+    public void CreateJobDetails(JobDetail jobDetails, ResponseDelegateBool responseDelegate = null)
     {
         if (ReferenceEquals(this.currentUserDTM, null))
         {
@@ -849,7 +855,7 @@ public class ServerCommunicator : MonoBehaviour
         StartCoroutine(StartCreatingJobDetails(jobDetails, responseDelegate));
     }
 
-    private IEnumerator StartCreatingJobDetails(JobDetail jobDetails, ResponseDelegateString responseDelegate = null)
+    private IEnumerator StartCreatingJobDetails(JobDetail jobDetails, ResponseDelegateBool responseDelegate = null)
     {
         string url = $"{this.FunctionsUrl}/createJobDetail";
         UnityWebRequest request = new UnityWebRequest(url, "POST");
@@ -869,11 +875,12 @@ public class ServerCommunicator : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             ShowSuccessLog("Response (StartCreatingJobDetails): " + request.downloadHandler.text);
-            responseDelegate?.Invoke(request.downloadHandler.text);
+            responseDelegate?.Invoke(true);
         }
         else
         {
             OnFailure(request, "(StartCreatingJobDetails)");
+            responseDelegate?.Invoke(false);
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -914,7 +921,7 @@ public class ServerCommunicator : MonoBehaviour
         this.OnRequestCompletedEvent.Invoke();
     }
 
-    public void UpdateJobDetails(JobDetail jobDetails, ResponseDelegateString responseDelegate = null)
+    public void UpdateJobDetails(JobDetail jobDetails, ResponseDelegateBool responseDelegate = null)
     {
         if (ReferenceEquals(this.currentUserDTM, null))
         {
@@ -928,7 +935,7 @@ public class ServerCommunicator : MonoBehaviour
         StartCoroutine(StartUpdatingJobDetails(jobDetails, responseDelegate));
     }
 
-    private IEnumerator StartUpdatingJobDetails(JobDetail jobDetails, ResponseDelegateString responseDelegate)
+    private IEnumerator StartUpdatingJobDetails(JobDetail jobDetails, ResponseDelegateBool responseDelegate)
     {
         string url = $"{this.ClassesUrl}/JobDetail/{jobDetails.ObjectId}";
         JobDetailsDTM dtm = new JobDetailsDTM(this.currentUserDTM.objectId, jobDetails);
@@ -949,11 +956,12 @@ public class ServerCommunicator : MonoBehaviour
         {
             ShowSuccessLog("Response (StartUpdatingJobDetails): " + request.downloadHandler.text);
 
-            responseDelegate?.Invoke(request.downloadHandler.text);
+            responseDelegate?.Invoke(true);
         }
         else
         {
             OnFailure(request, "(StartUpdatingJobDetails)");
+            responseDelegate?.Invoke(false);
         }
 
         this.OnRequestCompletedEvent.Invoke();
@@ -1058,22 +1066,35 @@ public class ServerCommunicator : MonoBehaviour
     {
         RequestErrorDTM requestErrorDTM = JSONHelper.GetRequestErrorDTM(request.downloadHandler.text);
 
-        switch (requestErrorDTM.code)
+        if (ReferenceEquals(request.downloadHandler, null))
         {
-            case 209:
-                QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(() =>
-                {
-                    QueryController.Active.ChangeView(Enumerations.MainView.Login, Enumerations.Subview.Login_EnterCredentials);
-                }, "Your session is no longer valid. Please login again."
-                , false);
-                break;
-            default:
-                QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(() =>
-                {
-                    QueryController.Active.ChangeView(Enumerations.MainView.Login, Enumerations.Subview.Login_EnterCredentials);
-                }, requestErrorDTM.error
-                , false);
-                break;
+            QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(() =>
+            {
+                QueryController.Active.ChangeView(Enumerations.MainView.Login, Enumerations.Subview.Login_EnterCredentials);
+            }, request.error
+            , false);
+        }
+        else
+        {
+            requestErrorDTM = JSONHelper.GetRequestErrorDTM(request.downloadHandler.text);
+
+            switch (requestErrorDTM.code)
+            {
+                case 209:
+                    QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(() =>
+                    {
+                        QueryController.Active.ChangeView(Enumerations.MainView.Login, Enumerations.Subview.Login_EnterCredentials);
+                    }, "Your session is no longer valid. Please login again."
+                    , false);
+                    break;
+                default:
+                    QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(() =>
+                    {
+                        QueryController.Active.ChangeView(Enumerations.MainView.Login, Enumerations.Subview.Login_EnterCredentials);
+                    }, requestErrorDTM.error
+                    , false);
+                    break;
+            }
         }
 
         if (this.showFailureLogs)

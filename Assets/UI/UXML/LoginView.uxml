@@ -66,20 +66,9 @@
                 <CustomInput placeholder-text="Code" class="large-font" style="min-width: 300px;" />
             </CustomVisualElement>
         </CustomVisualElement>
-        <CustomVisualElement name="navigation-buttons-container" class="buttons-container centered-element">
-            <CustomVisualElement name="back-button-container" class="navigation-button-container">
-                <CustomButton class="navigation-button">
-                    <CustomLabel text="BACK" class="large-font white-font" />
-                </CustomButton>
-            </CustomVisualElement>
-            <CustomVisualElement name="submit-button-container" class="navigation-button-container">
-                <CustomButton class="cursor-test navigation-button">
-                    <CustomLabel text="SUBMIT" class="large-font white-font" />
-                </CustomButton>
-            </CustomVisualElement>
-        </CustomVisualElement>
+        <CustomVisualElement name="navigation-buttons-container" class="centered-element" />
         <CustomVisualElement name="options-container" class="options-container centered-element">
-            <CustomVisualElement name="register-button-container" class="option-button-container">
+            <CustomVisualElement name="register-button-container" class="option-button-container" style="width: 100%;">
                 <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button">
                     <CustomLabel text="Register" class="option-button-label regular-font" />
                 </CustomButton>

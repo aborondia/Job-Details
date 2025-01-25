@@ -26,11 +26,6 @@ public class DetailsReportsQueryHandler : QueryHandler
 
         AppController.Active.DetailsReportsHandler.OnReportsCollectionChangedEvent.AddListener(() =>
         {
-            QueryController.Active.ChangeView(MainView.DetailsReports, Subview.Default);
-        });
-
-        AppController.Active.DetailsReportsHandler.OnReportsCollectionChangedEvent.AddListener(() =>
-        {
             if (QueryController.Active.CurrentMainView == this.mainView)
             {
                 RefreshDetailsReports();
@@ -171,9 +166,9 @@ public class DetailsReportsQueryHandler : QueryHandler
 
         emailReportButton.RegisterCallback<ClickEvent>(evt =>
         {
-            QueryController.Active.PopupsQueryHandler.OpenSendEmailPopup(recipient =>
+            QueryController.Active.PopupsQueryHandler.OpenSendEmailPopup((string recipient, string bodyContent) =>
             {
-                AppController.Active.MailSender.StartSendingEmail(detailsReport, recipient);
+                AppController.Active.MailSender.StartSendingEmail(detailsReport, recipient, bodyContent);
             });
         });
 

@@ -26,6 +26,10 @@
     background-image: url('project://database/Assets/Icons/edit.png?fileID=5050237576729777607&guid=124a3d39198b0ba49a4d6f46e847254f&type=3#edit_0');
 }
 
+.gi-logout {
+    background-image: url('project://database/Assets/Icons/logout.png');
+}
+
 .gi-mail {
     background-image: url('project://database/Assets/Icons/mail.png');
 }

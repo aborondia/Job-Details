@@ -24,6 +24,7 @@
 .right-header-button-container {
     height: 100%;
     min-width: 60px;
+    margin-left: 10px;
 }
 
 .right-header-button {

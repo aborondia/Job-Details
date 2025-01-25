@@ -1,13 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 using UnityEngine;
 using UnityEngine.Events;
 using MainView = Enumerations.MainView;
 using Subview = Enumerations.Subview;
-using System;
 using System.Linq;
-using System.Text;
 using CircularBuffer;
 
 public class QueryController : MonoBehaviour
@@ -27,6 +24,8 @@ public class QueryController : MonoBehaviour
     public HeaderQueryHandler HeaderQueryHandler => headerQueryHandler;
     [SerializeField] private DetailsReportsQueryHandler detailsReportsQueryHandler;
     public DetailsReportsQueryHandler DetailsReportsQueryHandler => detailsReportsQueryHandler;
+    [SerializeField] private NavigationButtonsQueryHandler navigationButtonsQueryHandler;
+    public NavigationButtonsQueryHandler NavigationButtonsQueryHandler => navigationButtonsQueryHandler;
     [SerializeField] private PopupsQueryHandler popupsQueryHandler;
     public PopupsQueryHandler PopupsQueryHandler => popupsQueryHandler;
     [SerializeField] private GameObject queryHandlersParent;

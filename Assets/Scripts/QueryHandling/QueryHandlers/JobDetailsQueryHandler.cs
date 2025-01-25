@@ -42,11 +42,6 @@ public class JobDetailsQueryHandler : QueryHandler
     private CustomButton addCleanerButton;
     private VisualElement detailsContentContainer;
     private CustomInput detailsInput;
-    private VisualElement reportsFooter;
-    private VisualElement cancelButtonContainer;
-    private CustomButton cancelButton;
-    private VisualElement saveButtonContainer;
-    private CustomButton saveButton;
     private JobDetail currentJobDetail;
     public JobDetail CurrentJobDetail => currentJobDetail;
     private bool editingExistingDetails;
@@ -109,14 +104,6 @@ public class JobDetailsQueryHandler : QueryHandler
         this.detailsContentContainer.RegisterCallback<ClickEvent>(evt => this.detailsInput.Focus());
         this.detailsInput = this.detailsContentContainer.Q<CustomInput>();
         this.detailsInput.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
-
-        this.reportsFooter = this.mainContainer.Q<VisualElement>("reports-footer");
-
-        this.cancelButtonContainer = this.reportsFooter.Q<VisualElement>("cancel-button-container");
-        this.cancelButton = this.cancelButtonContainer.Q<CustomButton>();
-
-        this.saveButtonContainer = this.reportsFooter.Q<VisualElement>("save-button-container");
-        this.saveButton = this.saveButtonContainer.Q<CustomButton>();
     }
 
     protected override void SetViewElements()
@@ -126,27 +113,6 @@ public class JobDetailsQueryHandler : QueryHandler
     protected override void SetupButtons()
     {
         this.addCleanerButton.RegisterCallback<ClickEvent>(evt => CreateCleanerRow());
-
-        this.cancelButton.RegisterCallback<ClickEvent>(evt => QueryController.Active.ReturnToPreviousView());
-
-        this.saveButton.RegisterCallback<ClickEvent>(evt =>
-        {
-            SetJobDetailProperties();
-
-            ActionHelper.StringDelegate responseDelegate = (string response) =>
-            {
-                AppController.Active.DetailsReportsHandler.RefreshReports();
-            };
-
-            if (this.editingExistingDetails)
-            {
-                AppController.Active.ServerCommunicator.UpdateJobDetails(this.currentJobDetail, responseDelegate);
-            }
-            else
-            {
-                AppController.Active.ServerCommunicator.CreateJobDetails(this.currentJobDetail, responseDelegate);
-            }
-        });
     }
 
     protected override void SetupInputs()
@@ -392,6 +358,34 @@ public class JobDetailsQueryHandler : QueryHandler
 
     #region Actions
 
+    public void SaveDetails()
+    {
+        SetJobDetailProperties();
+
+        ActionHelper.BoolDelegate responseDelegate = success =>
+        {
+            if (success)
+            {
+                QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null, "Details saved sucessfully.");
+                AppController.Active.DetailsReportsHandler.RefreshReports();
+                QueryController.Active.ChangeView(MainView.DetailsReports, Subview.Default);
+            }
+            else
+            {
+                QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null, "Something went wrong. Please try again later.");
+            }
+        };
+
+        if (this.editingExistingDetails)
+        {
+            AppController.Active.ServerCommunicator.UpdateJobDetails(this.currentJobDetail, responseDelegate);
+        }
+        else
+        {
+            AppController.Active.ServerCommunicator.CreateJobDetails(this.currentJobDetail, responseDelegate);
+        }
+    }
+
     private void OpenCleanerNameSelect(CleanerJobEntry cleanerJobEntry, Label nameLabel, ScrollView cleanerNameScrollView)
     {
         PopulateCleanerRowNameSelect(cleanerJobEntry, nameLabel, cleanerNameScrollView);
@@ -526,8 +520,14 @@ public class JobDetailsQueryHandler : QueryHandler
 
         foreach (var entry in AppController.Active.UserDataHandler.Users)
         {
-            CustomLabel cleanerNameLabel = new CustomLabel();
+            CustomLabel cleanerNameLabel;
 
+            if (entry.Value.RoleDTM.name == UserDataHandler._DeveloperRoleServerName)
+            {
+                continue;
+            }
+
+            cleanerNameLabel = new CustomLabel();
             cleanerNameLabel.AddToClassList("regular-font");
             cleanerNameLabel.style.color = Color.black;
 

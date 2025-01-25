@@ -33,7 +33,7 @@ public class MailSender : MonoBehaviour
         string to = String.IsNullOrEmpty(recipient) ? this.debugEmail : recipient;
         DateTime startDate = detailsReport.Details.Values.Select(dr => dr.JobDate).Min();
         DateTime endDate = detailsReport.Details.Values.Select(dr => dr.JobDate).Max();
-        string subject = $"{from} Details:  {startDate.ToShortDateString()} - {endDate.ToShortDateString()}";
+        string subject = $"Details:  {startDate.ToShortDateString()} - {endDate.ToShortDateString()} ({from})";
 
         pdfDocument = DocumentCreator.Active.GetDocument(detailsReport);
         memoryStream = new MemoryStream();
@@ -47,7 +47,7 @@ public class MailSender : MonoBehaviour
 
         CreateAttachment(Convert.ToBase64String(fileBytes));
 
-        if (String.IsNullOrEmpty(body))
+        if (String.IsNullOrWhiteSpace(body))
         {
             body = "Job details";
         }

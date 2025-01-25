@@ -66,21 +66,5 @@
                 </CustomVisualElement>
             </CustomVisualElement>
         </CustomVisualElement>
-        <CustomVisualElement name="reports-footer" style="min-height: 60px; max-height: 60px; flex-direction: row; justify-content: flex-end;">
-            <CustomVisualElement name="cancel-button-container" class="footer-button-container">
-                <CustomButton class="footer-button">
-                    <CustomVisualElement name="label-container" class="footer-button-label-container">
-                        <CustomLabel text="Cancel" class="large-font footer-button-label" />
-                    </CustomVisualElement>
-                </CustomButton>
-            </CustomVisualElement>
-            <CustomVisualElement name="save-button-container" class="footer-button-container">
-                <CustomButton button-type="Secondary" class="footer-button">
-                    <CustomVisualElement name="label-container" class="footer-button-label-container">
-                        <CustomLabel text="Save" class="large-font footer-button-label" />
-                    </CustomVisualElement>
-                </CustomButton>
-            </CustomVisualElement>
-        </CustomVisualElement>
     </CustomVisualElement>
 </ui:UXML>

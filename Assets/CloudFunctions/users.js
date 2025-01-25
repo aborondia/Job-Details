@@ -31,6 +31,30 @@ Parse.Cloud.define("userLogin", async (request) => {
   }
 });
 
+Parse.Cloud.define("userLogout", async (request) => {
+  const sessionToken = request.headers['x-parse-session-token'];
+
+  if (!sessionToken) {
+    throw new Error("Session token is required for logout.");
+  }
+
+  try {
+    const query = new Parse.Query("_Session");
+    query.equalTo("sessionToken", sessionToken);
+    const session = await query.first({ useMasterKey: true });
+
+    if (!session) {
+      throw new Error("Session not found.");
+    }
+
+    await session.destroy({ useMasterKey: true });
+
+    return "Logged out successfully and session destroyed.";
+  } catch (error) {
+    throw new Error(`Logout failed: ${error.message}`);
+  }
+});
+
 Parse.Cloud.define("checkRegistrationCredentials", async (request) => {
   const { email, username } = request.params;
 

@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using SimpleJSON;
-using UnityEditor.Experimental.GraphView;
-using UnityEngine;
 
 public static class JSONHelper
 {
@@ -286,36 +283,6 @@ public static class JSONHelper
             User user = new User(userDTM, roleDTM);
 
             users.Add(user.DTM.username, user);
-        }
-
-        return users;
-    }
-
-    public static List<User> GetUnverifiedUsers(string response)
-    {
-        List<User> users = new List<User>();
-        JSONNode result = JSON.Parse(response)["result"];
-
-        foreach (JSONNode node in result.Values)
-        {
-            User user = new User(GetUserDTM(node), null);
-
-            users.Add(user);
-        }
-
-        return users;
-    }
-
-    private static List<User> GetUsers(JSONNode nodeWithValues, RoleDTM roleDTM)
-    {
-        List<User> users = new List<User>();
-
-        foreach (JSONNode node in nodeWithValues.Values)
-        {
-            UserDTM userDTM = GetUserDTM(node);
-            User user = new User(userDTM, roleDTM);
-
-            users.Add(user);
         }
 
         return users;
