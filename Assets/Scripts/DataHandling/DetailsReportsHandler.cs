@@ -48,11 +48,15 @@ public class DetailsReportsHandler : MonoBehaviour
         OnReportsCollectionChangedEvent.Invoke();
     }
 
-    private void SetJobDetails(DetailsReport report, List<JobDetail> jobDetails)
+    public DetailsReport GetDetailsReport(string id)
     {
-        foreach (JobDetail jobDetail in jobDetails)
+        if (this.detailsReports.ContainsKey(id))
         {
-            report.AddJobDetail(jobDetail);
+            return this.detailsReports[id];
+        }
+        else
+        {
+            return null;
         }
     }
 

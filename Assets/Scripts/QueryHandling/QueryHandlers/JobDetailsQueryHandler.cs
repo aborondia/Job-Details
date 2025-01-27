@@ -42,11 +42,11 @@ public class JobDetailsQueryHandler : QueryHandler
     private CustomButton addCleanerButton;
     private VisualElement detailsContentContainer;
     private CustomInput detailsInput;
+    private DetailsReport currentDetailsReport;
     private JobDetail currentJobDetail;
     public JobDetail CurrentJobDetail => currentJobDetail;
     private bool editingExistingDetails;
     private DateTime? currentDatePickerDate;
-    private UnityEvent onCurrentJobDetailChanged = new UnityEvent();
 
     #region  Initlialization
 
@@ -167,8 +167,9 @@ public class JobDetailsQueryHandler : QueryHandler
 
     #region Open Job Details
 
-    public void OpenNewJobDetails()
+    public void OpenNewJobDetails(DetailsReport detailsReport)
     {
+        this.currentDetailsReport = detailsReport;
         this.editingExistingDetails = false;
         this.currentJobDetail = new JobDetail();
         this.currentJobDetail.AddCleaner(new CleanerJobEntry(AppController.Active.UserDataHandler.CurrentUser.DTM.username, 0));
@@ -176,8 +177,9 @@ public class JobDetailsQueryHandler : QueryHandler
         QueryController.Active.ChangeView(MainView.JobDetails, Subview.Default);
     }
 
-    public void OpenExistingJobDetails(JobDetail jobDetail)
+    public void OpenExistingJobDetails(DetailsReport detailsReport, JobDetail jobDetail)
     {
+        this.currentDetailsReport = detailsReport;
         this.editingExistingDetails = true;
         this.currentJobDetail = jobDetail;
         RefreshJobDetail();
@@ -438,7 +440,7 @@ public class JobDetailsQueryHandler : QueryHandler
         }
 
         this.currentJobDetail.SetJobDetailProperties(
-            QueryController.Active.DetailsReportsQueryHandler.CurrentlySelectedDetailsReport.ObjectId,
+            this.currentDetailsReport.ObjectId,
             this.clientNameInput.value,
             this.clientAddressInput.value,
             jobDate,

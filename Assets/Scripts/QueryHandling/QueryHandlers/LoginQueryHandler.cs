@@ -11,7 +11,7 @@ public class LoginQueryHandler : QueryHandler
 {
     private const string registration_code_enter_message = "Please enter your verification code.";
     private const string registration_failed_message = "Something went wrong. Please try again.";
-    private const string forgot_credentials_message = "Enter the email associated with your account below";
+    private const string forgot_credentials_message = "Enter the email associated with your account below.";
     private const string password_reset_message = "Enter your new password, along with your password reset code below.";
     private VisualElement displayLabelContainer;
     private CustomLabel displayLabel;
@@ -45,7 +45,7 @@ public class LoginQueryHandler : QueryHandler
     private VisualElement resetPasswordOptionButtonContainer;
     private CustomButton resetPasswordOptionButton;
     private const string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-    private const string passwordPattern = @"^.{3,20}$";
+    private const string passwordPattern = @"^.{4,20}$";
     private static Regex emailRegex;
     private static Regex passwordRegex;
     private UnityEvent hideErrorLabels = new UnityEvent();
@@ -145,13 +145,13 @@ public class LoginQueryHandler : QueryHandler
 
     protected override void SetupInputs()
     {
-        this.emailInput.RegisterCallback<KeyDownEvent>(evt => OnEmailInputReturnButtonPressed(evt));
+        this.emailInput.RegisterCallback<KeyUpEvent>(evt => OnEmailInputReturnButtonPressed(evt));
         this.emailInput.RegisterValueChangedCallback<string>(evt => OnEmailInputValueChanged(evt));
         this.emailInput.RegisterCallback<BlurEvent>(evt => OnEmailInputBlur(evt));
         this.emailInput.RegisterCallback<FocusEvent>(evt => OnEmailInputFocus(evt));
         this.hideErrorLabels.AddListener(() => HideEmailErrorLabel());
 
-        this.userNameInput.RegisterCallback<KeyDownEvent>(evt => OnUserNameInputReturnButtonPressed(evt));
+        this.userNameInput.RegisterCallback<KeyUpEvent>(evt => OnUserNameInputReturnButtonPressed(evt));
         this.userNameInput.RegisterValueChangedCallback<string>(evt => OnUserNameInputValueChanged(evt));
         this.userNameInput.RegisterCallback<BlurEvent>(evt => OnUserNameInputBlur(evt));
         this.userNameInput.RegisterCallback<FocusEvent>(evt => OnUserNameInputFocus(evt));
@@ -160,19 +160,19 @@ public class LoginQueryHandler : QueryHandler
         this.passwordInput.RegisterValueChangedCallback<string>(evt => OnPasswordInputValueChanged(evt));
         this.passwordInput.RegisterCallback<BlurEvent>(evt => OnPasswordInputBlur(evt));
         this.passwordInput.RegisterCallback<FocusEvent>(evt => OnPasswordInputFocus(evt));
-        this.passwordInput.RegisterCallback<KeyDownEvent>(evt => OnPasswordInputReturnButtonPressed(evt));
+        this.passwordInput.RegisterCallback<KeyUpEvent>(evt => OnPasswordInputReturnButtonPressed(evt));
         this.hideErrorLabels.AddListener(() => HidePasswordErrorLabel());
 
         this.passwordConfirmInput.RegisterValueChangedCallback<string>(evt => OnPasswordConfirmInputValueChanged(evt));
         this.passwordConfirmInput.RegisterCallback<BlurEvent>(evt => OnPasswordConfirmInputBlur(evt));
         this.passwordConfirmInput.RegisterCallback<FocusEvent>(evt => OnPasswordConfirmInputFocus(evt));
-        this.passwordConfirmInput.RegisterCallback<KeyDownEvent>(evt => OnPasswordConfirmInputReturnButtonPressed(evt));
+        this.passwordConfirmInput.RegisterCallback<KeyUpEvent>(evt => OnPasswordConfirmInputReturnButtonPressed(evt));
         this.hideErrorLabels.AddListener(() => HidePasswordConfirmErrorLabel());
 
         this.codeInput.RegisterValueChangedCallback<string>(evt => OnCodeInputValueChanged(evt));
         this.codeInput.RegisterCallback<BlurEvent>(evt => OnCodeInputBlur(evt));
         this.codeInput.RegisterCallback<FocusEvent>(evt => OnCodeInputFocus(evt));
-        this.codeInput.RegisterCallback<KeyDownEvent>(evt => OnCodeInputReturnButtonPressed(evt));
+        this.codeInput.RegisterCallback<KeyUpEvent>(evt => OnCodeInputReturnButtonPressed(evt));
         this.hideErrorLabels.AddListener(() => HideCodeErrorLabel());
     }
 
@@ -232,7 +232,7 @@ public class LoginQueryHandler : QueryHandler
         UpdateSubmitButtonState();
     }
 
-    private void OnEmailInputReturnButtonPressed(KeyDownEvent evt)
+    private void OnEmailInputReturnButtonPressed(KeyUpEvent evt)
     {
         OnReturnButtonPressed(evt, () =>
         {
@@ -273,7 +273,7 @@ public class LoginQueryHandler : QueryHandler
         UpdateSubmitButtonState();
     }
 
-    private void OnUserNameInputReturnButtonPressed(KeyDownEvent evt)
+    private void OnUserNameInputReturnButtonPressed(KeyUpEvent evt)
     {
         OnReturnButtonPressed(evt, () =>
         {
@@ -315,7 +315,7 @@ public class LoginQueryHandler : QueryHandler
         UpdateSubmitButtonState();
     }
 
-    private void OnPasswordInputReturnButtonPressed(KeyDownEvent evt)
+    private void OnPasswordInputReturnButtonPressed(KeyUpEvent evt)
     {
         OnReturnButtonPressed(evt, () =>
         {
@@ -354,7 +354,7 @@ public class LoginQueryHandler : QueryHandler
         UpdateSubmitButtonState();
     }
 
-    private void OnPasswordConfirmInputReturnButtonPressed(KeyDownEvent evt)
+    private void OnPasswordConfirmInputReturnButtonPressed(KeyUpEvent evt)
     {
         OnReturnButtonPressed(evt, () =>
         {
@@ -411,7 +411,7 @@ public class LoginQueryHandler : QueryHandler
         UpdateSubmitButtonState();
     }
 
-    private void OnCodeInputReturnButtonPressed(KeyDownEvent evt)
+    private void OnCodeInputReturnButtonPressed(KeyUpEvent evt)
     {
         OnReturnButtonPressed(evt, () =>
         {
@@ -426,7 +426,7 @@ public class LoginQueryHandler : QueryHandler
         });
     }
 
-    private void OnReturnButtonPressed(KeyDownEvent evt, Action action)
+    private void OnReturnButtonPressed(KeyUpEvent evt, Action action)
     {
         if (evt.keyCode != KeyCode.Return)
         {

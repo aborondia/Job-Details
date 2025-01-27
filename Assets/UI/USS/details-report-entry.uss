@@ -1,12 +1,14 @@
 .details-report-main {
-    min-height: 60px;
-    flex-direction: row;
+    flex-direction: column;
     border-bottom-width: 1px;
+    height: 100%;
 }
 
 .time-range-labels-container {
     flex-direction: row;
     align-items: center;
+    flex-grow: 1;
+    padding-left: 5%;
 }
 
 .time-range-label {
@@ -35,4 +37,8 @@
 .report-details-container {
     flex-direction: row;
     min-height: 60px;
+}
+
+.job-details-container {
+    padding-left: 5%;
 }

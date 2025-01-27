@@ -2,15 +2,15 @@
     <Style src="project://database/Assets/UI/USS/job-details-entry.uss?fileID=7433441132597879392&amp;guid=a76fd5bd4d4de8f4f91716e7cf6be800&amp;type=3#job-details-entry" />
     <CustomVisualElement name="main" class="job-details-main">
         <CustomVisualElement name="info-labels-container" class="info-labels-container">
-            <CustomVisualElement name="left-labels-container" class="multi-labels-container">
+            <CustomVisualElement name="left-labels-container" class="left-labels-container">
                 <CustomVisualElement name="client-name-label-container" class="info-label-container">
-                    <CustomLabel text="Client: FirstName LastName" class="info-label" />
+                    <CustomLabel text="Client: FirstName LastName" class="info-label client-info-label" />
                 </CustomVisualElement>
                 <CustomVisualElement name="address-label-container" class="info-label-container">
-                    <CustomLabel text="Address: 123 Fake St." class="info-label" />
+                    <CustomLabel text="Address: 123 Fake St." class="info-label client-info-label" />
                 </CustomVisualElement>
             </CustomVisualElement>
-            <CustomVisualElement name="right-labels-container" class="multi-labels-container">
+            <CustomVisualElement name="right-labels-container" class="right-labels-container">
                 <CustomVisualElement name="date-time-label-container" class="info-label-container">
                     <CustomLabel text="Time: 24/2/19" class="info-label" />
                 </CustomVisualElement>

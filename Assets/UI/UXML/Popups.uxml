@@ -51,7 +51,7 @@
                         <CustomLabel text="E-mail body (optional)" class="regular-font display-message-label" />
                     </CustomVisualElement>
                     <CustomVisualElement name="body-input-container" class="send-email-body-input-container">
-                        <CustomInput multiline="true" class="sen-email-body-input" />
+                        <CustomInput multiline="true" placeholder-text="(Optional)" vertical-scroller-visibility="Auto" class="sen-email-body-input" />
                     </CustomVisualElement>
                 </CustomVisualElement>
                 <CustomVisualElement name="recipient-scrollview-container" class="recipient-scrollview-container">

@@ -5,7 +5,8 @@
 
 .info-labels-container {
     flex-direction: row;
-    width: 100%;
+    flex-grow: 1;
+    justify-content: space-between;
 }
 
 .multi-labels-container {
@@ -28,6 +29,7 @@
 }
 
 .option-buttons-container {
+    width: 15%;
 }
 
 .option-button-container {
@@ -39,4 +41,26 @@
 .option-button {
     align-items: center;
     justify-content: center;
+}
+
+.left-labels-container {
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    justify-content: space-between;
+    width: 65%;
+}
+
+.right-labels-container {
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    justify-content: space-between;
+    width: 35%;
+}
+
+.client-info-label {
+    text-overflow: ellipsis;
 }

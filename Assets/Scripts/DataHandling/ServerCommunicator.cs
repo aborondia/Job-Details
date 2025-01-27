@@ -1013,14 +1013,14 @@ public class ServerCommunicator : MonoBehaviour
 
     #region Email
 
-    public void SendEmail(CustomMailMessage customMailMessage)
+    public void SendEmail(CustomMailMessage customMailMessage, ResponseDelegateBool responseDelegate = null)
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartSendingEmail(customMailMessage));
+        StartCoroutine(StartSendingEmail(customMailMessage, responseDelegate));
     }
 
-    private IEnumerator StartSendingEmail(CustomMailMessage customMailMessage)
+    private IEnumerator StartSendingEmail(CustomMailMessage customMailMessage, ResponseDelegateBool responseDelegate)
     {
         UnityWebRequest request = new UnityWebRequest($"{this.FunctionsUrl}/sendEmail", "POST");
         string jsonBody = JsonConvert.SerializeObject(customMailMessage);
@@ -1038,10 +1038,12 @@ public class ServerCommunicator : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
+            responseDelegate?.Invoke(true);
             ShowSuccessLog("Response (StartSendingEmail): " + request.downloadHandler.text);
         }
         else
         {
+            responseDelegate?.Invoke(false);
             OnFailure(request, "(StartSendingEmail)");
         }
 

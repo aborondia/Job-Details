@@ -163,6 +163,7 @@ public class PopupsQueryHandler : QueryHandler
         OnOpeningPopup(canNavigateAway);
 
         VisualElementHelper.SetElementDisplay(this.sendEmailPopup, DisplayStyle.Flex);
+        this.sendEmailContentInput.value = String.Empty;
         this.sendEmailAction = sendEmailAction;
         this.emailRecipientPlaceholderInput.value = recipient_placeholder;
         this.emailRecipientsScrollview.contentContainer.Clear();

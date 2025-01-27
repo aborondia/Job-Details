@@ -19,7 +19,21 @@ public class MailSender : MonoBehaviour
     public void StartSendingEmail(DetailsReport detailsReport, string recipient, string body = "")
     {
         CreateEmail(detailsReport, recipient, body);
-        AppController.Active.ServerCommunicator.SendEmail(this.mailMessage);
+        AppController.Active.ServerCommunicator.SendEmail(this.mailMessage, success =>
+        {
+            string responseMessage;
+
+            if (success)
+            {
+                responseMessage = "Email sent successfully.";
+            }
+            else
+            {
+                responseMessage = "Email could not be sent.";
+            }
+
+            QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null, responseMessage);
+        });
     }
 
     #region Setup

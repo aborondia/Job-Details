@@ -3,20 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
-using MainView = Enumerations.MainView;
-using Subview = Enumerations.Subview;
 
 public class DetailsReportsQueryHandler : QueryHandler
 {
     [SerializeField] private VisualTreeAsset detailsReportEntryBase;
     [SerializeField] private VisualTreeAsset jobDetailsEntryBase;
-    private VisualElement header;
-    private VisualElement addReportButtonContainer;
-    private CustomButton addReportButton;
     private VisualElement scrollviewContainer;
     private ScrollView scrollview;
-    private DetailsReport currentlySelectedDetailsReport;
-    public DetailsReport CurrentlySelectedDetailsReport => currentlySelectedDetailsReport;
+    private Dictionary<string, bool> reportElementExpandedStates = new Dictionary<string, bool>();
 
     #region Initialization
 
@@ -94,13 +88,6 @@ public class DetailsReportsQueryHandler : QueryHandler
             VisualElement reportElement = CreateDetailsReportElement(detailsReport);
             VisualElement detailsContainer = reportElement.Q<VisualElement>("job-details-container");
 
-            detailsContainer.Clear();
-
-            foreach (JobDetail jobDetail in detailsReport.Details.Values)
-            {
-                detailsContainer.Add(CreateJobDetailsElement(jobDetail));
-            }
-
             this.scrollview.contentContainer.Add(reportElement);
         }
     }
@@ -108,18 +95,16 @@ public class DetailsReportsQueryHandler : QueryHandler
     private VisualElement CreateDetailsReportElement(DetailsReport detailsReport)
     {
         VisualElement mainElement = this.detailsReportEntryBase.Instantiate();
-        VisualElement leftColumn = mainElement.Q<VisualElement>("left-column");
-        CustomButton expandCollapseButton = leftColumn.Q<VisualElement>("expand-collapse-button-container").Q<CustomButton>();
+        CustomButton expandCollapseButton = mainElement.Q<VisualElement>("expand-collapse-button-container").Q<CustomButton>();
         VisualElement expandCollapseButtonIcon = expandCollapseButton.Q<VisualElement>("icon");
-        VisualElement rightColumn = mainElement.Q<VisualElement>("right-column");
-        VisualElement reportDetailsContainer = rightColumn.Q<VisualElement>("report-details-container");
+        VisualElement reportDetailsContainer = mainElement.Q<VisualElement>("report-details-container");
         VisualElement timeRangeLabelsContainer = reportDetailsContainer.Q<VisualElement>("time-range-labels-container");
         CustomLabel timeLabel = timeRangeLabelsContainer.Q<VisualElement>("time-label-container").Q<CustomLabel>();
         VisualElement optionButtonsContainer = reportDetailsContainer.Q<VisualElement>("option-buttons-container");
         CustomButton addDetailsButton = optionButtonsContainer.Q<VisualElement>("add-details-button-container").Q<CustomButton>();
         CustomButton deleteReportButton = optionButtonsContainer.Q<VisualElement>("delete-report-button-container").Q<CustomButton>();
         CustomButton emailReportButton = optionButtonsContainer.Q<VisualElement>("email-button-container").Q<CustomButton>();
-        VisualElement jobDetailsContainer = rightColumn.Q<VisualElement>("job-details-container");
+        VisualElement jobDetailsContainer = mainElement.Q<VisualElement>("job-details-container");
 
         if (detailsReport.Details.Count <= 0)
         {
@@ -130,7 +115,10 @@ public class DetailsReportsQueryHandler : QueryHandler
             expandCollapseButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
         }
 
-        expandCollapseButton.RegisterCallback<ClickEvent>(evt => ToggleJobDetailsExpandState(jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon));
+        expandCollapseButton.RegisterCallback<ClickEvent>(evt =>
+        {
+            ToggleJobDetailsExpandState(detailsReport.ObjectId, jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon);
+        });
 
         if (detailsReport.Details.Count >= 1)
         {
@@ -147,8 +135,7 @@ public class DetailsReportsQueryHandler : QueryHandler
             timeLabel.text = "N/A - N/A";
         }
 
-        this.currentlySelectedDetailsReport = detailsReport;
-        addDetailsButton.RegisterCallback<ClickEvent>(evt => QueryController.Active.JobDetailsQueryHandler.OpenNewJobDetails());
+        addDetailsButton.RegisterCallback<ClickEvent>(evt => QueryController.Active.JobDetailsQueryHandler.OpenNewJobDetails(detailsReport));
 
         deleteReportButton.RegisterCallback<ClickEvent>(evt =>
         {
@@ -159,27 +146,59 @@ public class DetailsReportsQueryHandler : QueryHandler
                     if (successful)
                     {
                         AppController.Active.DetailsReportsHandler.RemoveDetailsReports(detailsReport.ObjectId);
+
+                        RefreshJobDetails(detailsReport, jobDetailsContainer);
                     }
                 });
             });
         });
 
-        emailReportButton.RegisterCallback<ClickEvent>(evt =>
+        if (detailsReport.Details.Count > 0)
         {
-            QueryController.Active.PopupsQueryHandler.OpenSendEmailPopup((string recipient, string bodyContent) =>
+            emailReportButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
+            emailReportButton.RegisterCallback<ClickEvent>(evt =>
             {
-                AppController.Active.MailSender.StartSendingEmail(detailsReport, recipient, bodyContent);
+                QueryController.Active.PopupsQueryHandler.OpenSendEmailPopup((string recipient, string bodyContent) =>
+                {
+                    AppController.Active.MailSender.StartSendingEmail(detailsReport, recipient, bodyContent);
+                });
             });
-        });
+        }
+        else
+        {
+            emailReportButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
+        }
 
-        jobDetailsContainer.Clear();
+        if (!this.reportElementExpandedStates.ContainsKey(detailsReport.ObjectId))
+        {
+            this.reportElementExpandedStates.Add(detailsReport.ObjectId, false);
+        }
 
-        CollapseJobDetails(jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon);
+        if (this.reportElementExpandedStates[detailsReport.ObjectId])
+        {
+            ExpandJobDetails(detailsReport.ObjectId, jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon);
+        }
+        else
+        {
+            CollapseJobDetails(detailsReport.ObjectId, jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon);
+        }
+
+        RefreshJobDetails(detailsReport, jobDetailsContainer);
 
         return mainElement;
     }
 
-    private VisualElement CreateJobDetailsElement(JobDetail jobDetail)
+    private void RefreshJobDetails(DetailsReport detailsReport, VisualElement jobDetailsContainer)
+    {
+        jobDetailsContainer.Clear();
+
+        foreach (JobDetail jobDetail in detailsReport.Details.Values)
+        {
+            jobDetailsContainer.Add(CreateJobDetailsElement(detailsReport, jobDetail));
+        }
+    }
+
+    private VisualElement CreateJobDetailsElement(DetailsReport detailsReport, JobDetail jobDetail)
     {
         VisualElement mainElement = this.jobDetailsEntryBase.Instantiate();
         Label clientNameLabel = mainElement.Q<VisualElement>("client-name-label-container").Q<Label>();
@@ -202,7 +221,7 @@ public class DetailsReportsQueryHandler : QueryHandler
 
         editButton.RegisterCallback<ClickEvent>(evt =>
         {
-            QueryController.Active.JobDetailsQueryHandler.OpenExistingJobDetails(jobDetail);
+            QueryController.Active.JobDetailsQueryHandler.OpenExistingJobDetails(detailsReport, jobDetail);
         });
 
         deleteButton.RegisterCallback<ClickEvent>(evt =>
@@ -223,27 +242,29 @@ public class DetailsReportsQueryHandler : QueryHandler
 
     #region Actions
 
-    private void ToggleJobDetailsExpandState(VisualElement jobDetailsContainer, CustomButton expandCollapseButton, VisualElement expandCollapseButtonIcon)
+    private void ToggleJobDetailsExpandState(string detailsReportId, VisualElement jobDetailsContainer, CustomButton expandCollapseButton, VisualElement expandCollapseButtonIcon)
     {
         bool expand = jobDetailsContainer.resolvedStyle.display == DisplayStyle.None;
 
         if (expand)
         {
-            ExpandJobDetails(jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon);
+            ExpandJobDetails(detailsReportId, jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon);
         }
         else
         {
-            CollapseJobDetails(jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon);
+            CollapseJobDetails(detailsReportId, jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon);
         }
     }
 
-    private void ExpandJobDetails(VisualElement jobDetailsContainer, CustomButton expandCollapseButton, VisualElement expandCollapseButtonIcon)
+    private void ExpandJobDetails(string detailsReportId, VisualElement jobDetailsContainer, CustomButton expandCollapseButton, VisualElement expandCollapseButtonIcon)
     {
+        this.reportElementExpandedStates[detailsReportId] = true;
         ChangeJobDetailsExpandedState(jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon, true);
     }
 
-    private void CollapseJobDetails(VisualElement jobDetailsContainer, CustomButton expandCollapseButton, VisualElement expandCollapseButtonIcon)
+    private void CollapseJobDetails(string detailsReportId, VisualElement jobDetailsContainer, CustomButton expandCollapseButton, VisualElement expandCollapseButtonIcon)
     {
+        this.reportElementExpandedStates[detailsReportId] = false;
         ChangeJobDetailsExpandedState(jobDetailsContainer, expandCollapseButton, expandCollapseButtonIcon, false);
     }
 
