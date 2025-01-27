@@ -21,8 +21,8 @@
             <CustomVisualElement name="views-container" class="views-container">
                 <CustomVisualElement name="main-views" class="main-views">
                     <ui:Instance template="DetailsReportsView" name="DetailsReportsView" class="main-view" style="display: none;" />
-                    <ui:Instance template="JobDetailsView" name="JobDetailsView" class="main-view" style="display: none;" />
-                    <ui:Instance template="LoginView" name="LoginView" class="main-view" />
+                    <ui:Instance template="JobDetailsView" name="JobDetailsView" class="main-view" />
+                    <ui:Instance template="LoginView" name="LoginView" class="main-view" style="display: none;" />
                     <ui:Instance template="UsersView" name="UsersView" class="main-view" style="display: none;" />
                     <ui:Instance template="NavigationButtons" name="NavigationButtons" />
                 </CustomVisualElement>
@@ -32,6 +32,6 @@
             </CustomVisualElement>
         </CustomVisualElement>
         <ui:Instance template="InteractionBlocker" name="InteractionBlocker" class="interaction-blocker" style="display: none;" />
-        <ui:Instance template="Popups" name="Popups" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; justify-content: center; align-items: center; display: none;" />
+        <ui:Instance template="Popups" name="Popups" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; justify-content: center; align-items: center;" />
     </CustomVisualElement>
 </ui:UXML>

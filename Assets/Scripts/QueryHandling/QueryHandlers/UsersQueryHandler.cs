@@ -93,7 +93,7 @@ public class UsersQueryHandler : QueryHandler
         DropdownField userTypeDropdownField = baseElement.Q<DropdownField>();
         VisualElement userTypeLabelContainer = baseElement.Q<VisualElement>("user-role-label-container");
         Action onDataChangeAction = () => this.OnUserDataChange.Invoke();
-        nameLabel.text = $"{user.DTM.username} - {user.DTM.email}";
+        nameLabel.text = $"{user.DTM.username} ({user.DTM.email})";
 
         SetupDeleteUserButton(deleteUserButton, user, onDataChangeAction);
         SetupUserRoleInput(userTypeDropdownField, userTypeLabelContainer, user, onDataChangeAction);
@@ -176,8 +176,7 @@ public class UsersQueryHandler : QueryHandler
             .ToList();
 
             userTypeDropdownField.value = AppController.Active.UserDataHandler.GetRoleEnum(user.RoleDTM.name).ToString();
-            VisualElementHelper.SetElementDisplay(userTypeLabelContainer, DisplayStyle.None);
-            VisualElementHelper.SetElementDisplay(userTypeDropdownField, DisplayStyle.Flex);
+            userTypeDropdownField.SetEnabled(true);
 
             userTypeDropdownField.RegisterValueChangedCallback(evt =>
             {
@@ -216,11 +215,7 @@ public class UsersQueryHandler : QueryHandler
         }
         else
         {
-            VisualElementHelper.SetElementDisplay(userTypeLabelContainer, DisplayStyle.Flex);
-            VisualElementHelper.SetElementDisplay(userTypeDropdownField, DisplayStyle.None);
-
-            userTypeLabel = userTypeLabelContainer.Q<CustomLabel>();
-            userTypeLabel.text = userRole.ToString();
+            userTypeDropdownField.SetEnabled(false);
         }
     }
 

@@ -5,10 +5,10 @@
         <CustomVisualElement name="report-details-container" class="report-details-container">
             <CustomVisualElement name="time-range-labels-container" class="time-range-labels-container">
                 <CustomVisualElement name="tag-label-container" class="time-range-label-container">
-                    <CustomLabel text="Time Range: " class="regular-font time-range-label" />
+                    <CustomLabel text="Time Range: " class="time-range-label large-font" />
                 </CustomVisualElement>
                 <CustomVisualElement name="time-label-container" class="time-range-label-container">
-                    <CustomLabel text="--" class="regular-font time-range-label" />
+                    <CustomLabel text="--" class="time-range-label large-font" />
                 </CustomVisualElement>
             </CustomVisualElement>
             <CustomVisualElement name="option-buttons-container" class="option-buttons-container">

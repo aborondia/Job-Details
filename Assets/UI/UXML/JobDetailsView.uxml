@@ -2,11 +2,11 @@
     <ui:Template name="CleanerRow" src="project://database/Assets/UI/UXML/CleanerRow.uxml?fileID=9197481963319205126&amp;guid=48236067c3f0d7b44ab26632e778212a&amp;type=3#CleanerRow" />
     <Style src="project://database/Assets/UI/USS/job-details-view.uss?fileID=7433441132597879392&amp;guid=70c26b4262b94244aae426f8bb2a51ad&amp;type=3#job-details-view" />
     <CustomVisualElement name="main" class="job-details-view-main">
-        <CustomVisualElement name="main-content" style="flex-grow: 1; flex-direction: column-reverse;">
-            <CustomVisualElement name="details-content-container" class="white-bg" style="flex-grow: 1; margin-bottom: 10px;">
-                <CustomInput multiline="true" placeholder-text="Details" style="white-space: normal; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />
+        <CustomVisualElement name="main-content" class="job-details-main">
+            <CustomVisualElement name="details-content-container" class="white-bg details-content-container">
+                <CustomInput multiline="true" placeholder-text="Details" hide-placeholder-on-focus="true" vertical-scroller-visibility="Auto" class="large-font" style="white-space: normal; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0;" />
             </CustomVisualElement>
-            <CustomVisualElement name="inputs-container" style="flex-direction: row; justify-content: space-between; width: 100%; flex-wrap: wrap;">
+            <CustomVisualElement name="inputs-container" class="inputs-container large-font" style="min-height: auto;">
                 <CustomVisualElement name="client-name-input-container" class="text-input-container">
                     <CustomInput placeholder-text="Client Name" class="text-input" />
                 </CustomVisualElement>

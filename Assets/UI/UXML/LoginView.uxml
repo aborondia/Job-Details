@@ -1,13 +1,13 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/USS/login-container.uss?fileID=7433441132597879392&amp;guid=e980b69dd4e8a5c4a9df4865c6f1f4af&amp;type=3#login-container" />
     <CustomVisualElement name="main" style="justify-content: space-between; width: 100%; align-items: center; height: 100%;">
-        <CustomVisualElement name="display-text-body" style="justify-content: space-around; align-items: center; display: flex; flex-grow: 1;">
+        <CustomVisualElement name="display-text-body" style="justify-content: space-around; align-items: center; display: flex;">
             <CustomVisualElement name="display-label-container">
                 <CustomLabel text="Please enter your verification code." class="x-large-font" style="white-space: normal; -unity-text-align: middle-center;" />
             </CustomVisualElement>
         </CustomVisualElement>
-        <CustomVisualElement name="inputs-container" class="centered-element" style="flex-grow: 1;">
-            <CustomVisualElement name="display-name-input-container" class="input-container" style="display: none;">
+        <CustomVisualElement name="inputs-container" class="centered-element inputs-container">
+            <CustomVisualElement name="display-name-input-container" class="input-container">
                 <CustomVisualElement name="name-input-floating-label-container" class="input-floating-label-container">
                     <CustomVisualElement name="floating-label-container" class="floating-label-container" style="display: none;">
                         <CustomLabel text="Display Name" class="large-font white-font" />
@@ -16,9 +16,9 @@
                         <CustomLabel text="Error" use-default-font-color="false" class="red1-font error-label" style="visibility: hidden;" />
                     </CustomVisualElement>
                 </CustomVisualElement>
-                <CustomInput placeholder-text="Username" hide-placeholder-on-focus="true" name="name-input" class="custom-input large-font" />
+                <CustomInput placeholder-text="Username" hide-placeholder-on-focus="true" name="name-input" class="custom-input regular-font large-font" />
             </CustomVisualElement>
-            <CustomVisualElement name="email-input-container" class="input-container" style="display: none;">
+            <CustomVisualElement name="email-input-container" class="input-container">
                 <CustomVisualElement name="email-input-floating-label-container" class="input-floating-label-container">
                     <CustomVisualElement name="floating-label-container" class="floating-label-container" style="display: none;">
                         <CustomLabel text="Email" class="large-font white-font" />
@@ -51,7 +51,7 @@
                 </CustomVisualElement>
                 <CustomInput hide-placeholder-on-focus="true" name="password-confirm-input" password="true" placeholder-text="Confirm Password" class="custom-input large-font" />
             </CustomVisualElement>
-            <CustomVisualElement name="code-input-container" class="input-container">
+            <CustomVisualElement name="code-input-container" class="input-container" style="display: none;">
                 <CustomVisualElement name="code-input-floating-label-container" class="input-floating-label-container">
                     <CustomVisualElement name="floating-label-container" class="floating-label-container" style="display: none;">
                         <CustomLabel text="Display Name" class="large-font white-font" />
@@ -64,20 +64,20 @@
             </CustomVisualElement>
         </CustomVisualElement>
         <CustomVisualElement name="navigation-buttons-container" class="centered-element" />
-        <CustomVisualElement name="options-container" class="options-container centered-element" style="flex-grow: 1;">
-            <CustomVisualElement name="register-button-container" class="option-button-container" style="width: 100%; max-width: none;">
+        <CustomVisualElement name="options-container" class="options-container centered-element">
+            <CustomVisualElement name="register-button-container" class="option-button-container" style="min-width: 100%; max-width: 100%;">
                 <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button">
-                    <CustomLabel text="Register" class="option-button-label regular-font" />
+                    <CustomLabel text="Register" class="option-button-label large-font" />
                 </CustomButton>
             </CustomVisualElement>
             <CustomVisualElement name="forgot-username-button-container" class="option-button-container">
                 <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button">
-                    <CustomLabel text="Forgot Username?" class="white-font option-button-label regular-font" />
+                    <CustomLabel text="Forgot Username?" class="white-font option-button-label large-font" />
                 </CustomButton>
             </CustomVisualElement>
             <CustomVisualElement name="forgot-password-button-container" class="option-button-container">
                 <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button">
-                    <CustomLabel text="Forgot Password?" class="white-font option-button-label regular-font" />
+                    <CustomLabel text="Forgot Password?" class="white-font option-button-label large-font" />
                 </CustomButton>
             </CustomVisualElement>
             <CustomVisualElement name="validate-registration-button-container" class="option-button-container" style="display: none;">

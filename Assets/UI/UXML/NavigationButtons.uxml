@@ -3,12 +3,12 @@
     <CustomVisualElement name="main" class="navigation-buttons-main">
         <CustomVisualElement name="cancel-button-container" class="navigation-button-container">
             <CustomButton class="navigation-button">
-                <CustomLabel text="BACK" class="large-font white-font" />
+                <CustomLabel text="BACK" class="white-font large-font" />
             </CustomButton>
         </CustomVisualElement>
         <CustomVisualElement name="submit-button-container" class="navigation-button-container">
             <CustomButton class="cursor-test navigation-button">
-                <CustomLabel text="SUBMIT" class="large-font white-font" />
+                <CustomLabel text="SUBMIT" class="white-font large-font" />
             </CustomButton>
         </CustomVisualElement>
     </CustomVisualElement>

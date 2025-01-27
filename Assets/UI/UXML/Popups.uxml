@@ -48,16 +48,25 @@
             <CustomVisualElement name="top" class="popup-top">
                 <CustomVisualElement name="content-input-container" class="send-email-content-input-container">
                     <CustomVisualElement name="header-label-container" class="send-email-header-label-container">
-                        <CustomLabel text="E-mail body (optional)" class="regular-font display-message-label" />
+                        <CustomLabel text="E-mail body (optional)" class="display-message-label large-font" />
                     </CustomVisualElement>
                     <CustomVisualElement name="body-input-container" class="send-email-body-input-container">
-                        <CustomInput multiline="true" placeholder-text="(Optional)" vertical-scroller-visibility="Auto" class="sen-email-body-input" />
+                        <CustomInput multiline="true" placeholder-text="(Optional)" vertical-scroller-visibility="Auto" class="sen-email-body-input regular-font" />
                     </CustomVisualElement>
                 </CustomVisualElement>
                 <CustomVisualElement name="recipient-scrollview-container" class="recipient-scrollview-container">
                     <CustomInput readonly="true" />
-                    <ui:ScrollView horizontal-scroller-visibility="Hidden" mouse-wheel-scroll-size="200" class="recipient-scrollview white-bg custom-scrollbar" style="display: none;">
-                        <CustomLabel text="Testing" class="regular-font" />
+                    <ui:ScrollView horizontal-scroller-visibility="Hidden" mouse-wheel-scroll-size="200" class="recipient-scrollview white-bg custom-scrollbar large-font" style="display: none;">
+                        <CustomLabel text="Testing" style="color: rgb(0, 0, 0);" />
+                        <CustomLabel text="Testing" style="color: rgb(0, 0, 0);" />
+                        <CustomLabel text="Testing" style="color: rgb(0, 0, 0);" />
+                        <CustomLabel text="Testing" style="color: rgb(0, 0, 0);" />
+                        <CustomLabel text="Testing" style="color: rgb(0, 0, 0);" />
+                        <CustomLabel text="Testing" style="color: rgb(0, 0, 0);" />
+                        <CustomLabel text="Testing" style="color: rgb(0, 0, 0);" />
+                        <CustomLabel text="Testing" style="color: rgb(0, 0, 0);" />
+                        <CustomLabel text="Testing" style="color: rgb(0, 0, 0);" />
+                        <CustomLabel text="Testing" style="color: rgb(0, 0, 0);" />
                     </ui:ScrollView>
                 </CustomVisualElement>
             </CustomVisualElement>

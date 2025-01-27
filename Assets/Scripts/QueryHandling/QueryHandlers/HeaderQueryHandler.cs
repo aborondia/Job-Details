@@ -110,11 +110,14 @@ public class HeaderQueryHandler : QueryHandler
 
     private void OnLogoutButtonPressed()
     {
-        AppController.Active.ServerCommunicator.LogOut(success =>
+        QueryController.Active.PopupsQueryHandler.OpenConfirmationPopup(() =>
         {
-            QueryController.Active.ChangeView(MainView.Login, Subview.Login_EnterCredentials);
-            QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null, "You have been logged out.");
-        });
+            AppController.Active.ServerCommunicator.LogOut(success =>
+            {
+                QueryController.Active.ChangeView(MainView.Login, Subview.Login_EnterCredentials);
+                QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null, "You have been logged out.");
+            });
+        }, "Are you sure you want to log out?");
     }
 
     private void UpdateHeaderLabel()
@@ -141,8 +144,7 @@ public class HeaderQueryHandler : QueryHandler
 
     private void UpdateUserNotification()
     {
-        if (AppController.Active.UserDataHandler.CurrentUser.RoleDTM.name != UserDataHandler._AdminRoleServerName
-        && AppController.Active.UserDataHandler.CurrentUser.RoleDTM.name != UserDataHandler._OwnerRoleServerName)
+        if (AppController.Active.UserDataHandler.CurrentUser.RoleDTM.name == UserDataHandler._UserRoleServerName)
         {
             VisualElementHelper.SetElementDisplay(this.teamButtonDisplayParent, DisplayStyle.None);
 

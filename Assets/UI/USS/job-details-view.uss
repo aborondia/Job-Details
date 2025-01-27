@@ -23,12 +23,12 @@
 }
 
 .text-input-container {
-    min-width: 45%;
-    margin-top: 10px;
-    max-width: 45%;
+    min-width: 49%;
+    margin-top: 5px;
+    max-width: 49%;
     flex-direction: row;
-    min-height: 50px;
-    max-height: 50px;
+    min-height: 60px;
+    margin-bottom: 5px;
 }
 
 .text-input {
@@ -40,21 +40,24 @@
     flex-direction: row;
     flex-grow: 1;
     justify-content: flex-end;
+    min-height: 60px;
 }
 
 .time-inputs-container {
-    min-width: 45%;
-    min-height: 50px;
-    margin-bottom: 10px;
+    min-width: 49%;
+    min-height: 60px;
+    margin-bottom: 5px;
     flex-direction: row;
     justify-content: space-between;
-    max-width: 45%;
-    max-height: 50px;
+    max-width: 49%;
+    margin-top: 5px;
 }
 
 .enum-input-container {
     min-width: 45%;
     max-width: 45%;
+    min-height: 60px;
+    justify-content: center;
 }
 
 .custom-input > .unity-text-field__input {
@@ -91,8 +94,8 @@
 .cleaner-row {
     min-height: 60px;
     max-height: 60px;
-    min-width: 45%;
-    max-width: 45%;
+    min-width: 49%;
+    max-width: 49%;
 }
 
 .cleaners-content {
@@ -142,15 +145,15 @@
 .cleaners-container {
     width: 100%;
     flex-direction: column;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+    margin-top: 5px;
 }
 
 .time-input-enum-filed {
 }
 
 .enum-input {
-    min-height: 50px;
-    max-height: 50px;
+    height: 100%;
 }
 
 .time-input-label-container {
@@ -166,12 +169,32 @@
 }
 
 .job-enums-container {
-    max-width: 45%;
-    min-width: 45%;
+    max-width: 49%;
+    min-width: 49%;
     flex-direction: row;
     justify-content: space-between;
-    max-height: 50px;
-    min-height: 50px;
+    min-height: 60px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.details-content-container {
     margin-top: 10px;
-    margin-bottom: 10px;
+    flex-grow: 1;
+    width: 100%;
+    max-height: 30%;
+}
+
+.inputs-container {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: wrap;
+    min-height: 50%;
+}
+
+.job-details-main {
+    flex-grow: 1;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
 }

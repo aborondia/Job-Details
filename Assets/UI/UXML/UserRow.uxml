@@ -2,7 +2,7 @@
     <Style src="project://database/Assets/UI/USS/user-row.uss?fileID=7433441132597879392&amp;guid=37393c7930cc27846885a0c1ea6c57d9&amp;type=3#user-row" />
     <CustomVisualElement name="main" style="height: 100%; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px; flex-direction: row; align-items: center; width: 100%;">
         <CustomVisualElement name="name-label-container" style="flex-grow: 1; height: 100%; justify-content: center;">
-            <CustomLabel text="User Name" class="regular-font" />
+            <CustomLabel text="User Name" class="large-font" style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;" />
         </CustomVisualElement>
         <CustomVisualElement name="delete-user-button-container" class="user-row-button-container">
             <CustomButton use-background-color="false" use-border="false" class="user-row-button">
@@ -26,10 +26,10 @@
         </CustomVisualElement>
         <CustomVisualElement name="user-type-container" class="user-type-container">
             <CustomVisualElement name="user-role-label-container" class="user-role-label-container" style="display: none;">
-                <CustomLabel text="Role" class="regular-font" style="-unity-text-align: middle-center;" />
+                <CustomLabel text="Role" class="large-font" style="-unity-text-align: middle-center;" />
             </CustomVisualElement>
             <CustomEnumField type="Enumerations.UserRoleEnum, Assembly-CSharp" name="user-role-input" style="display: none;" />
-            <ui:DropdownField index="-1" />
+            <ui:DropdownField enabled="true" />
         </CustomVisualElement>
     </CustomVisualElement>
 </ui:UXML>

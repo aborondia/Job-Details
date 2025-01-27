@@ -246,15 +246,6 @@ public static class JSONHelper
         return new RoleDTM(name, objectId);
     }
 
-    public static RoleDTM GetRole(string response)
-    {
-        JSONNode result = JSON.Parse(response)["results"].AsArray[0];
-        string name = result["name"];
-        string objectId = result["objectId"];
-
-        return new RoleDTM(name, objectId);
-    }
-
     public static Dictionary<string, User> GetUsers(string response)
     {
         Dictionary<string, User> users = new Dictionary<string, User>();
