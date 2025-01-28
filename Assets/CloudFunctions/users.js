@@ -2,11 +2,13 @@ const { v4: uuidv4 } = require("uuid");
 const sgMail = require("@sendgrid/mail");
 
 Parse.Cloud.define("userLogin", async (request) => {
-  const { username, password } = request.params;
+  let { username, password } = request.params;
 
   if (!username || !password) {
     throw new Error("Username and password are required.");
   }
+
+  username = username.toLowerCase();
 
   try {
     const user = await Parse.User.logIn(username, password);
@@ -32,7 +34,7 @@ Parse.Cloud.define("userLogin", async (request) => {
 });
 
 Parse.Cloud.define("userLogout", async (request) => {
-  const sessionToken = request.headers['x-parse-session-token'];
+  const sessionToken = request.headers["x-parse-session-token"];
 
   if (!sessionToken) {
     throw new Error("Session token is required for logout.");
@@ -56,11 +58,13 @@ Parse.Cloud.define("userLogout", async (request) => {
 });
 
 Parse.Cloud.define("checkRegistrationCredentials", async (request) => {
-  const { email, username } = request.params;
+  let { email, username } = request.params;
 
   if (!email && !username) {
     throw new Parse.Error(400, "Both email and username are missing.");
   }
+
+  username = username.toLowerCase();
 
   try {
     const emailQuery = new Parse.Query(Parse.User);
@@ -228,6 +232,7 @@ Parse.Cloud.define("getRole", async (request) => {
 
 Parse.Cloud.define("getUsersForAdmin", async (request) => {
   const user = request.user;
+
   if (!user) {
     throw new Parse.Error(
       401,
@@ -242,6 +247,7 @@ Parse.Cloud.define("getUsersForAdmin", async (request) => {
     const sanitizedUsers = users.map((user) => ({
       objectId: user.id,
       username: user.get("username"),
+      displayName: user.get("displayName"),
       email: user.get("email"),
       verified: user.get("verified"),
       roleId: user.get("roleId"),
@@ -255,6 +261,7 @@ Parse.Cloud.define("getUsersForAdmin", async (request) => {
 
 Parse.Cloud.define("getUsersForRegularUser", async (request) => {
   const user = request.user;
+
   if (!user) {
     throw new Parse.Error(
       401,
@@ -268,6 +275,7 @@ Parse.Cloud.define("getUsersForRegularUser", async (request) => {
 
     const sanitizedUsers = users.map((user) => ({
       username: user.get("username"),
+      displayName: user.get("displayName"),
       email: user.get("email"),
     }));
 
@@ -327,11 +335,14 @@ Parse.Cloud.define("updateUserRole", async (request) => {
 });
 
 Parse.Cloud.define("registerUser", async (request) => {
-  const { username, email, password, verificationUrlBase } = request.params;
+  let { username, displayName, email, password, verificationUrlBase } =
+    request.params;
 
   if (!username || !email || !password || !verificationUrlBase) {
     throw new Error("Missing required parameters.");
   }
+
+  username = username.toLowerCase();
 
   const token = (
     Math.random().toString(36).substr(2, 9) + Date.now()
@@ -340,6 +351,7 @@ Parse.Cloud.define("registerUser", async (request) => {
   const PendingUser = Parse.Object.extend("PendingUser");
   const pendingUser = new PendingUser();
   pendingUser.set("username", username);
+  pendingUser.set("displayName", displayName);
   pendingUser.set("email", email);
   pendingUser.set("password", password);
   pendingUser.set("token", token);
@@ -383,6 +395,7 @@ Parse.Cloud.define("verifyRegistration", async (request) => {
       try {
         const user = new Parse.User();
         user.set("username", pendingUser.get("username"));
+        user.set("displayName", pendingUser.get("displayName"));
         user.set("email", pendingUser.get("email"));
         user.set("password", pendingUser.get("password"));
         await user.signUp(

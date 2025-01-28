@@ -75,9 +75,4 @@ public class MailSender : MonoBehaviour
     }
 
     #endregion
-
-    private void DisplayError(string value)
-    {
-        Debug.LogError(value);
-    }
 }

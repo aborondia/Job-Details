@@ -1,6 +1,7 @@
 using System.Collections;
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public static class ActionHelper
 {
@@ -44,5 +45,32 @@ public static class ActionHelper
         yield return new WaitUntil(() => returnBoolDelegate.Invoke());
 
         action?.Invoke();
+    }
+
+    public static void OnBlur(BlurEvent evt, VisualElement parentElement, Action blurAction)
+    {
+        EventCallback<BlurEvent> newBlurEvent;
+        VisualElement eventTarget;
+
+        if (evt?.relatedTarget == null ||
+        (evt.relatedTarget.GetType().IsAssignableFrom(typeof(VisualElement))
+        && !parentElement.Contains(evt.relatedTarget as VisualElement)))
+        {
+            blurAction?.Invoke();
+        }
+        else
+        {
+            eventTarget = evt.relatedTarget as VisualElement;
+
+            if (eventTarget == parentElement)
+            {
+                return;
+            }
+
+            newBlurEvent = evt => OnBlur(evt, parentElement, blurAction);
+            newBlurEvent += evt => eventTarget.UnregisterCallback(newBlurEvent);
+
+            eventTarget.RegisterCallback(newBlurEvent);
+        }
     }
 }

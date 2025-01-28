@@ -10,7 +10,7 @@
     overflow: hidden;
     height: 100%;
     padding-top: 5px;
-    padding-right: 5px;
+    padding-right: 60px;
     padding-bottom: 5px;
     padding-left: 5px;
     flex-grow: 1;
@@ -19,13 +19,14 @@
 .hours-input-container {
     flex-direction: row;
     min-width: 100px;
-    padding-top: 5px;
-    padding-bottom: 5px;
 }
 
 .name-label {
     white-space: normal;
     text-overflow: ellipsis;
+    overflow: hidden;
+    height: 100%;
+    -unity-text-align: middle-left;
 }
 
 .name-selection-container {
@@ -62,4 +63,11 @@
 }
 
 .select-cleaner-button-icon-container {
+}
+
+.hours-dropdown-field {
+    margin-right: 5px;
+    margin-left: 5px;
+    min-width: 50px;
+    height: 100%;
 }

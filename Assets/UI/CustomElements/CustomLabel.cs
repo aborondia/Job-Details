@@ -60,7 +60,24 @@ public class CustomLabel : Label
             this.baseHeight = height;
             this.baseFontSize = fontSize;
 
+            QueryController.Active.OnScaleChangedEvent.AddListener(scale => UpdateLabelSize(scale));
+
             this.Initialized = true;
         }
+    }
+
+    private void UpdateLabelSize(float scale)
+    {
+        if (this.resolvedStyle.fontSize <= 0 | scale <= 0 || float.IsNaN(scale))
+        {
+            return;
+        }
+
+        if (this.baseFontSize <= 0)
+        {
+            this.baseFontSize = this.resolvedStyle.fontSize;
+        }
+
+        this.style.fontSize = this.baseFontSize * scale;
     }
 }

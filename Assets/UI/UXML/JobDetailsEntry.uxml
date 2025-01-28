@@ -19,7 +19,7 @@
                 </CustomVisualElement>
             </CustomVisualElement>
         </CustomVisualElement>
-        <CustomVisualElement name="option-buttons-container" class="option-buttons-container">
+        <CustomVisualElement name="option-buttons-container" class="job-option-buttons-container">
             <CustomVisualElement name="edit-button-container" class="option-button-container">
                 <CustomButton use-border="false" use-background-color="false" class="option-button">
                     <CustomVisualElement name="icon-container">

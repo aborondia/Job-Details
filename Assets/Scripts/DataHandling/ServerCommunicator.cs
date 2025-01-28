@@ -69,6 +69,7 @@ public class ServerCommunicator : MonoBehaviour
         UnityWebRequest request;
 
         form.AddField("username", userSignupDTM.username);
+        form.AddField("displayName", userSignupDTM.username);
         form.AddField("email", userSignupDTM.email);
         form.AddField("password", userSignupDTM.password);
         form.AddField("verificationUrlBase", apiUrl);

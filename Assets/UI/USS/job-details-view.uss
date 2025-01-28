@@ -48,7 +48,7 @@
     min-height: 60px;
     margin-bottom: 5px;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-end;
     max-width: 49%;
     margin-top: 5px;
 }
@@ -85,24 +85,26 @@
 .footer-button-label {
 }
 
-.time-input {
-    margin-right: 5px;
-    max-width: 30%;
-    min-width: 30%;
+.time-input-hour {
+    min-width: 22%;
+    margin-left: 1%;
+    margin-right: 1%;
+    max-width: 22%;
 }
 
 .cleaner-row {
     min-height: 60px;
-    max-height: 60px;
     min-width: 49%;
     max-width: 49%;
+    max-height: 60px;
+    margin-top: 5px;
 }
 
 .cleaners-content {
-    min-width: 300px;
     flex-direction: row;
     justify-content: space-between;
     flex-wrap: wrap;
+    width: 100%;
 }
 
 .cleaner-header {
@@ -150,6 +152,8 @@
 }
 
 .time-input-enum-filed {
+    margin-left: 5px;
+    flex-grow: 0;
 }
 
 .enum-input {
@@ -166,6 +170,8 @@
 
 .time-input-label {
     -unity-font-style: italic;
+    overflow: hidden;
+    white-space: normal;
 }
 
 .job-enums-container {
@@ -197,4 +203,20 @@
     flex-grow: 1;
     flex-direction: column-reverse;
     justify-content: flex-end;
+}
+
+.time-separator-label-container {
+    justify-content: center;
+    align-items: center;
+    min-width: 2%;
+}
+
+.time-separator-label {
+    -unity-text-align: middle-center;
+}
+
+.time-input-minute {
+    min-width: 20%;
+    margin-left: 1%;
+    max-width: 20%;
 }

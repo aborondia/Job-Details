@@ -19,8 +19,6 @@ public class JobDetail
     public DateTime StartTime => startTime;
     private DateTime finishTime;
     public DateTime FinishTime => finishTime;
-    private DateTime createdAt;
-    public DateTime CreatedAt => createdAt;
     private JobTypeEnum jobType = JobTypeEnum.BiWeekly;
     public JobTypeEnum JobType => jobType;
     private List<CleanerJobEntry> cleaners = new List<CleanerJobEntry>();
@@ -41,6 +39,7 @@ public class JobDetail
 
         this.startTime = DateTime.Now;
         this.startTime = this.startTime.AddHours(-this.startTime.Hour);
+        this.startTime = this.startTime.AddHours(12);
         this.startTime = this.startTime.AddMinutes(-this.startTime.Minute);
 
         this.finishTime = DateTime.Now;
@@ -73,12 +72,6 @@ public class JobDetail
         this.paymentType = paymentType;
         this.description = description;
         this.objectId = objectId;
-    }
-
-    public void OnServerCreation(string objectId, DateTime createdAt)
-    {
-        this.objectId = objectId;
-        this.createdAt = createdAt;
     }
 
     public void AddCleaner(CleanerJobEntry cleaner)

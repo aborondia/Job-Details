@@ -23,13 +23,15 @@ public class JobDetailsQueryHandler : QueryHandler
     private CustomInput dateInput;
     private VisualElement startTimeInputsContainer;
     private VisualElement startTimeInputContainer;
-    private CustomInput startTimeHourInput;
-    private CustomInput startTimeMinuteInput;
+    private DropdownField startTimeHourInput;
+    private DropdownField startTimeMinuteInputDouble;
+    private DropdownField startTimeMinuteInputSingle;
     private CustomEnumField startTimeOfDayField;
     private VisualElement finishTimeInputsContainer;
     private VisualElement finishTimeInputContainer;
-    private CustomInput finishTimeHourInput;
-    private CustomInput finishTimeMinuteInput;
+    private DropdownField finishTimeHourInput;
+    private DropdownField finishTimeMinuteDoubleInput;
+    private DropdownField finishTimeMinuteSingleInput;
     private CustomEnumField finishTimeOfDayField;
     private VisualElement jobTypeInputContainer;
     private CustomEnumField jobTypeInput;
@@ -49,6 +51,11 @@ public class JobDetailsQueryHandler : QueryHandler
     private DateTime? currentDatePickerDate;
 
     #region  Initlialization
+
+    public override void Initialize()
+    {
+        base.Initialize();
+    }
 
     protected override void InitializeElements()
     {
@@ -70,18 +77,20 @@ public class JobDetailsQueryHandler : QueryHandler
 
         this.startTimeInputsContainer = this.inputsContainer.Q<VisualElement>("start-time-inputs-container");
         this.startTimeInputContainer = this.startTimeInputsContainer.Q<VisualElement>("start-time-input-container");
-        this.startTimeHourInput = this.startTimeInputContainer.Q<CustomInput>("hour-input");
+        this.startTimeHourInput = this.startTimeInputContainer.Q<VisualElement>("hour-dropdown").Q<DropdownField>();
         this.startTimeHourInput.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
 
-        this.startTimeMinuteInput = this.startTimeInputContainer.Q<CustomInput>("minute-input");
+        this.startTimeMinuteInputDouble = this.startTimeInputContainer.Q<VisualElement>("minute-dropdown-double").Q<DropdownField>();
+        this.startTimeMinuteInputSingle = this.startTimeInputContainer.Q<VisualElement>("minute-dropdown-single").Q<DropdownField>();
         this.startTimeOfDayField = this.startTimeInputContainer.Q<CustomEnumField>();
 
         this.finishTimeInputsContainer = this.inputsContainer.Q<VisualElement>("finish-time-inputs-container");
         this.finishTimeInputContainer = this.finishTimeInputsContainer.Q<VisualElement>("finish-time-input-container");
-        this.finishTimeHourInput = this.finishTimeInputContainer.Q<CustomInput>("hour-input");
+        this.finishTimeHourInput = this.finishTimeInputContainer.Q<VisualElement>("hour-dropdown").Q<DropdownField>();
         this.finishTimeHourInput.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
 
-        this.finishTimeMinuteInput = this.finishTimeInputContainer.Q<CustomInput>("minute-input");
+        this.finishTimeMinuteDoubleInput = this.finishTimeInputContainer.Q<VisualElement>("minute-dropdown-double").Q<DropdownField>();
+        this.finishTimeMinuteSingleInput = this.finishTimeInputContainer.Q<VisualElement>("minute-dropdown-single").Q<DropdownField>();
         this.finishTimeOfDayField = this.finishTimeInputContainer.Q<CustomEnumField>();
         this.finishTimeOfDayField.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
 
@@ -112,11 +121,41 @@ public class JobDetailsQueryHandler : QueryHandler
 
     protected override void SetupButtons()
     {
-        this.addCleanerButton.RegisterCallback<ClickEvent>(evt => CreateCleanerRow());
+        this.addCleanerButton.RegisterCallback<ClickEvent>(evt =>
+        {
+            QueryController.Active.PopupsQueryHandler.OpenNameSelectPopup(
+                selectedName =>
+                {
+                    this.currentJobDetail.AddCleaner(new CleanerJobEntry(selectedName));
+                    RefreshJobDetail();
+                });
+        });
     }
 
     protected override void SetupInputs()
     {
+        List<string> hourInputChoices = new List<string>();
+        List<string> minuteDoubleInputChoices = new List<string>();
+        List<string> minuteSingleInputChoices = new List<string>();
+
+        for (int i = 0; i <= 12; i++)
+        {
+            if (i <= 5)
+            {
+                minuteDoubleInputChoices.Add(i.ToString());
+            }
+
+            if (i <= 9)
+            {
+                minuteSingleInputChoices.Add(i.ToString());
+            }
+
+            if (i > 0)
+            {
+                hourInputChoices.Add(i.ToString());
+            }
+        }
+
         UnityAction<DateTime> updateLabelAction = (DateTime dateTime) =>
         {
             this.currentDatePickerDate = dateTime;
@@ -135,10 +174,12 @@ public class JobDetailsQueryHandler : QueryHandler
             this.dateInput.RegisterCallback<ClickEvent>(evt => DatePickerController.Active.OpenDatePicker());
         }
 
-        SetupTimeInput(this.startTimeHourInput, RegexHelper.HourRegex);
-        SetupTimeInput(this.startTimeMinuteInput, RegexHelper.MinuteRegex);
-        SetupTimeInput(this.finishTimeHourInput, RegexHelper.HourRegex);
-        SetupTimeInput(this.finishTimeMinuteInput, RegexHelper.MinuteRegex);
+        SetupTimeDropDown(this.startTimeHourInput, hourInputChoices);
+        SetupTimeDropDown(this.startTimeMinuteInputDouble, minuteDoubleInputChoices);
+        SetupTimeDropDown(this.startTimeMinuteInputSingle, minuteSingleInputChoices);
+        SetupTimeDropDown(this.finishTimeHourInput, hourInputChoices);
+        SetupTimeDropDown(this.finishTimeMinuteDoubleInput, minuteDoubleInputChoices);
+        SetupTimeDropDown(this.finishTimeMinuteSingleInput, minuteSingleInputChoices);
     }
 
     private void SetupTimeInput(CustomInput input, Regex regex)
@@ -150,7 +191,7 @@ public class JobDetailsQueryHandler : QueryHandler
                 return;
             }
 
-            if (!regex.IsMatch(evt.newValue.Replace(".", "")))
+            if (!regex.IsMatch(evt.newValue.Replace(".", "")) && !regex.IsMatch(evt.newValue))
             {
                 if (regex.IsMatch(evt.previousValue))
                 {
@@ -163,6 +204,12 @@ public class JobDetailsQueryHandler : QueryHandler
             }
         });
     }
+
+    private void SetupTimeDropDown(DropdownField input, List<string> values)
+    {
+        input.choices = values;
+    }
+
     #endregion
 
     #region Open Job Details
@@ -172,7 +219,7 @@ public class JobDetailsQueryHandler : QueryHandler
         this.currentDetailsReport = detailsReport;
         this.editingExistingDetails = false;
         this.currentJobDetail = new JobDetail();
-        this.currentJobDetail.AddCleaner(new CleanerJobEntry(AppController.Active.UserDataHandler.CurrentUser.DTM.username, 0));
+        this.currentJobDetail.AddCleaner(new CleanerJobEntry(AppController.Active.UserDataHandler.CurrentUser.DTM.displayName));
         RefreshJobDetail();
         QueryController.Active.ChangeView(MainView.JobDetails, Subview.Default);
     }
@@ -226,6 +273,7 @@ public class JobDetailsQueryHandler : QueryHandler
         RefreshStartTime();
         RefreshFinishTime();
         RefreshCleanerRows();
+        RefreshAddCleanerButton();
         RefreshDetailsDescription();
     }
 
@@ -257,16 +305,9 @@ public class JobDetailsQueryHandler : QueryHandler
 
     private void RefreshDate()
     {
-        if (ReferenceEquals(this.currentJobDetail.JobDate, null))
+        if (ReferenceEquals(this.currentJobDetail.JobDate, null) || this.currentJobDetail.JobDate == DateTime.MinValue)
         {
-            this.dateInput.SetValueWithoutNotify(String.Empty);
-
-            return;
-        }
-
-        if (this.currentJobDetail.JobDate == DateTime.MinValue)
-        {
-            this.dateInput.SetValueWithoutNotify(String.Empty);
+            this.dateInput.SetValueWithoutNotify(DateTime.Now.ToShortDateString());
         }
         else
         {
@@ -312,7 +353,8 @@ public class JobDetailsQueryHandler : QueryHandler
 
         this.startTimeOfDayField.SetValueWithoutNotify(isPMStartTime ? Enumerations.TimeOfDayEnum.PM : Enumerations.TimeOfDayEnum.AM);
         this.startTimeHourInput.SetValueWithoutNotify(startHoursString);
-        this.startTimeMinuteInput.SetValueWithoutNotify(startMinutes.ToString());
+        this.startTimeMinuteInputDouble.SetValueWithoutNotify((startMinutes / 10).ToString());
+        this.startTimeMinuteInputSingle.SetValueWithoutNotify((startMinutes % 10).ToString());
     }
 
     private void RefreshFinishTime()
@@ -326,9 +368,11 @@ public class JobDetailsQueryHandler : QueryHandler
         finishHours = this.currentJobDetail.FinishTime.Hour;
         finishMinutes = this.currentJobDetail.FinishTime.Minute;
         finishHoursString = finishHours > 12 ? (finishHours - 12).ToString() : finishHours.ToString();
+
         this.finishTimeOfDayField.SetValueWithoutNotify(isPMFinishTime ? Enumerations.TimeOfDayEnum.PM : Enumerations.TimeOfDayEnum.AM);
         this.finishTimeHourInput.SetValueWithoutNotify(finishHoursString);
-        this.finishTimeMinuteInput.SetValueWithoutNotify(finishMinutes.ToString());
+        this.finishTimeMinuteDoubleInput.SetValueWithoutNotify((finishMinutes / 10).ToString());
+        this.finishTimeMinuteSingleInput.SetValueWithoutNotify((finishMinutes % 10).ToString());
     }
 
     private void RefreshCleanerRows()
@@ -346,10 +390,37 @@ public class JobDetailsQueryHandler : QueryHandler
         }
     }
 
+    private void RefreshAddCleanerButton()
+    {
+        IEnumerable<string> availableCleaners;
+
+        if (this.currentJobDetail.Cleaners.Count >= 6)
+        {
+            this.addCleanerButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
+
+            return;
+        }
+
+        availableCleaners = AppController.Active.UserDataHandler.Users.Keys
+        .Where(userName => !this.currentJobDetail.Cleaners
+        .Select(cleaner => cleaner.Name).Contains(userName));
+
+        if (availableCleaners.Count() > 0)
+        {
+            this.addCleanerButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
+        }
+        else
+        {
+            this.addCleanerButton.ReinitializeButton(CustomButton.ButtonStyleType.Disabled);
+        }
+    }
+
     private void RefreshDetailsDescription()
     {
-        if (ReferenceEquals(this.currentJobDetail.Description, null))
+        if (String.IsNullOrEmpty(this.currentJobDetail?.Description))
         {
+            this.detailsInput.SetValueWithoutNotify(String.Empty);
+
             return;
         }
 
@@ -388,19 +459,6 @@ public class JobDetailsQueryHandler : QueryHandler
         }
     }
 
-    private void OpenCleanerNameSelect(CleanerJobEntry cleanerJobEntry, Label nameLabel, ScrollView cleanerNameScrollView)
-    {
-        PopulateCleanerRowNameSelect(cleanerJobEntry, nameLabel, cleanerNameScrollView);
-
-        if (cleanerNameScrollView.childCount <= 0)
-        {
-            return;
-        }
-
-        VisualElementHelper.SetElementDisplay(cleanerNameScrollView, DisplayStyle.Flex);
-        cleanerNameScrollView.Focus();
-    }
-
     #endregion
 
     #region CRUD
@@ -411,9 +469,11 @@ public class JobDetailsQueryHandler : QueryHandler
         DateTime startTime = new DateTime();
         DateTime finishTime = new DateTime();
         double startHoursValue;
-        double startMinutesValue;
+        double startMinutesDoubleValue;
+        double startMinutesSingleValue;
         double finishHoursValue;
-        double finishMinutesValue;
+        double finishMinutesDoubleValue;
+        double finishMinutesSingleValue;
         int startHoursModifier;
         int finishHoursModifier;
 
@@ -421,9 +481,11 @@ public class JobDetailsQueryHandler : QueryHandler
         {
             if (DateTime.TryParse(this.dateInput.value, out jobDate)
             && double.TryParse(this.startTimeHourInput.value, out startHoursValue)
-            && double.TryParse(this.startTimeMinuteInput.value, out startMinutesValue)
+            && double.TryParse(this.startTimeMinuteInputSingle.value, out startMinutesSingleValue)
+            && double.TryParse(this.startTimeMinuteInputDouble.value, out startMinutesDoubleValue)
             && double.TryParse(this.finishTimeHourInput.value, out finishHoursValue)
-            && double.TryParse(this.finishTimeMinuteInput.value, out finishMinutesValue))
+            && double.TryParse(this.finishTimeMinuteSingleInput.value, out finishMinutesSingleValue)
+            && double.TryParse(this.finishTimeMinuteDoubleInput.value, out finishMinutesDoubleValue))
             {
                 startTime = DateTime.Parse(this.dateInput.value);
                 finishTime = DateTime.Parse(this.dateInput.value);
@@ -432,10 +494,10 @@ public class JobDetailsQueryHandler : QueryHandler
                 finishHoursModifier = (Enumerations.TimeOfDayEnum)this.finishTimeOfDayField.value == Enumerations.TimeOfDayEnum.AM ? 0 : 12;
 
                 startTime = startTime.AddHours(startHoursValue + startHoursModifier);
-                startTime = startTime.AddMinutes(startMinutesValue);
+                startTime = startTime.AddMinutes(startMinutesSingleValue + (startMinutesDoubleValue * 10));
 
                 finishTime = finishTime.AddHours(finishHoursValue + finishHoursModifier);
-                finishTime = finishTime.AddMinutes(finishMinutesValue);
+                finishTime = finishTime.AddMinutes(finishMinutesSingleValue + (finishMinutesDoubleValue * 10));
             }
         }
 
@@ -457,31 +519,42 @@ public class JobDetailsQueryHandler : QueryHandler
 
     #region Cleaner Row
 
-    private void CreateCleanerRow(CleanerJobEntry cleanerJobEntry = null)
+    private void CreateCleanerRow(CleanerJobEntry cleanerJobEntry)
     {
         VisualElement newCleanerElement = this.cleanerRowBase.Instantiate();
         VisualElement nameLabelContainer = newCleanerElement.Q<VisualElement>("name-label-container");
         CustomLabel nameLabel = nameLabelContainer.Q<CustomLabel>();
-        ScrollView cleanerNameScrollView = newCleanerElement.Q<ScrollView>();
         VisualElement selectCleanerNameButtonContainer = newCleanerElement.Q<VisualElement>("select-cleaner-button-container");
         CustomButton selectCleanerNameButton = selectCleanerNameButtonContainer.Q<CustomButton>();
         VisualElement deleteCleanerRowButtonContainer = newCleanerElement.Q<VisualElement>("delete-button-container");
         CustomButton deleteCleanerRowButton = deleteCleanerRowButtonContainer.Q<CustomButton>();
         VisualElement hoursInputContainer = newCleanerElement.Q<VisualElement>("hours-input-container");
         CustomInput hoursInput = hoursInputContainer.Q<CustomInput>();
+        Action editCleanerNameAction = () =>
+        {
+            QueryController.Active.PopupsQueryHandler.OpenNameSelectPopup(
+                selectedName =>
+                {
+                    cleanerJobEntry.SetName(selectedName);
+                    RefreshJobDetail();
+                }
+            );
+        };
         Action deleteCleanerRowAction = () =>
         {
-            this.currentJobDetail.RemoveCleaner(cleanerJobEntry);
-
-            newCleanerElement.parent.Remove(newCleanerElement);
+            QueryController.Active.PopupsQueryHandler.OpenConfirmationPopup(() =>
+            {
+                this.currentJobDetail.RemoveCleaner(cleanerJobEntry);
+                RefreshJobDetail();
+            });
         };
 
         if (ReferenceEquals(cleanerJobEntry, null))
         {
-            cleanerJobEntry = new CleanerJobEntry();
+            return;
         }
 
-        if (!String.IsNullOrEmpty(cleanerJobEntry.Name) && AppController.Active.UserDataHandler.Users.ContainsKey(cleanerJobEntry.Name))
+        if (!String.IsNullOrEmpty(cleanerJobEntry.Name))
         {
             cleanerJobEntry.SetName(cleanerJobEntry.Name);
             nameLabel.text = cleanerJobEntry.Name;
@@ -489,62 +562,15 @@ public class JobDetailsQueryHandler : QueryHandler
 
         newCleanerElement.AddToClassList("cleaner-row");
 
-        cleanerNameScrollView.contentContainer.Clear();
-        cleanerNameScrollView.focusable = true;
-
-        cleanerNameScrollView.RegisterCallback<BlurEvent>(evt =>
-        {
-            VisualElementHelper.SetElementDisplay(cleanerNameScrollView, DisplayStyle.None);
-
-            if (String.IsNullOrEmpty(cleanerJobEntry?.Name))
-            {
-                deleteCleanerRowAction.Invoke();
-            }
-        });
-
         deleteCleanerRowButton.RegisterCallback<ClickEvent>(evt => deleteCleanerRowAction.Invoke());
-        selectCleanerNameButton.RegisterCallback<ClickEvent>(evt => OpenCleanerNameSelect(cleanerJobEntry, nameLabel, cleanerNameScrollView));
+        selectCleanerNameButton.RegisterCallback<ClickEvent>(evt => editCleanerNameAction.Invoke());
 
         SetupTimeInput(hoursInput, RegexHelper.FloatRegex);
         SetupCleanerHoursInput(cleanerJobEntry, hoursInput);
 
+        hoursInput.value = cleanerJobEntry.HoursWorked.ToString();
+
         this.cleanersContent.Add(newCleanerElement);
-
-        if (String.IsNullOrEmpty(cleanerJobEntry.Name))
-        {
-            OpenCleanerNameSelect(cleanerJobEntry, nameLabel, cleanerNameScrollView);
-        }
-    }
-
-    private void PopulateCleanerRowNameSelect(CleanerJobEntry cleanerJobEntry, Label nameLabel, ScrollView cleanerNameScrollView)
-    {
-        cleanerNameScrollView.contentContainer.Clear();
-
-        foreach (var entry in AppController.Active.UserDataHandler.Users)
-        {
-            CustomLabel cleanerNameLabel;
-
-            if (entry.Value.RoleDTM.name == UserDataHandler._DeveloperRoleServerName)
-            {
-                continue;
-            }
-
-            cleanerNameLabel = new CustomLabel();
-            cleanerNameLabel.AddToClassList("regular-font");
-            cleanerNameLabel.style.color = Color.black;
-
-            cleanerNameLabel.text = entry.Key;
-
-            cleanerNameLabel.RegisterCallback<ClickEvent>(evt =>
-            {
-                cleanerJobEntry.SetName(cleanerNameLabel.text);
-                nameLabel.text = cleanerNameLabel.text;
-                VisualElementHelper.SetElementDisplay(cleanerNameScrollView, DisplayStyle.None);
-                this.currentJobDetail.AddCleaner(cleanerJobEntry);
-            });
-
-            cleanerNameScrollView.contentContainer.Add(cleanerNameLabel);
-        }
     }
 
     private void SetupCleanerHoursInput(CleanerJobEntry cleanerJobEntry, CustomInput hoursInput)

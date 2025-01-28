@@ -3,6 +3,7 @@ using UnityEngine.UIElements;
 using System.Linq;
 using MainView = Enumerations.MainView;
 using Subview = Enumerations.Subview;
+using UnityEngine;
 
 public class HeaderQueryHandler : QueryHandler
 {
@@ -117,7 +118,7 @@ public class HeaderQueryHandler : QueryHandler
                 QueryController.Active.ChangeView(MainView.Login, Subview.Login_EnterCredentials);
                 QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null, "You have been logged out.");
             });
-        }, "Are you sure you want to log out?");
+        }, null, "Are you sure you want to log out?");
     }
 
     private void UpdateHeaderLabel()

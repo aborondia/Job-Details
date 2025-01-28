@@ -93,7 +93,7 @@ public class UsersQueryHandler : QueryHandler
         DropdownField userTypeDropdownField = baseElement.Q<DropdownField>();
         VisualElement userTypeLabelContainer = baseElement.Q<VisualElement>("user-role-label-container");
         Action onDataChangeAction = () => this.OnUserDataChange.Invoke();
-        nameLabel.text = $"{user.DTM.username} ({user.DTM.email})";
+        nameLabel.text = $"{user.DTM.displayName} ({user.DTM.email})";
 
         SetupDeleteUserButton(deleteUserButton, user, onDataChangeAction);
         SetupUserRoleInput(userTypeDropdownField, userTypeLabelContainer, user, onDataChangeAction);

@@ -5,6 +5,7 @@ public class UserDTM
 {
     public string objectId { get; set; }
     public string username { get; set; }
+    public string displayName { get; set; }
     public string email { get; set; }
     public bool verified { get; set; }
     public string sessionToken { get; set; }

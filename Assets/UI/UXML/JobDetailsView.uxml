@@ -1,4 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Template name="CustomDropdownFiled" src="project://database/Assets/UI/UXML/CustomDropdownFiled.uxml?fileID=9197481963319205126&amp;guid=631f7dfeea3d0ed45b1846f7da722414&amp;type=3#CustomDropdownFiled" />
     <ui:Template name="CleanerRow" src="project://database/Assets/UI/UXML/CleanerRow.uxml?fileID=9197481963319205126&amp;guid=48236067c3f0d7b44ab26632e778212a&amp;type=3#CleanerRow" />
     <Style src="project://database/Assets/UI/USS/job-details-view.uss?fileID=7433441132597879392&amp;guid=70c26b4262b94244aae426f8bb2a51ad&amp;type=3#job-details-view" />
     <CustomVisualElement name="main" class="job-details-view-main">
@@ -29,8 +30,14 @@
                         <CustomLabel text="Start Time" use-default-font-color="false" class="gray1-font regular-font time-input-label" />
                     </CustomVisualElement>
                     <CustomVisualElement name="start-time-input-container" class="time-input-container">
-                        <CustomInput placeholder-text="hr" hide-placeholder-on-focus="true" name="hour-input" class="time-input" />
-                        <CustomInput placeholder-text="min" hide-placeholder-on-focus="true" name="minute-input" class="time-input" />
+                        <ui:Instance template="CustomDropdownFiled" name="hour-dropdown" class="time-input-hour" />
+                        <CustomVisualElement name="time-separator-label-container" class="time-separator-label-container">
+                            <CustomLabel text=":" class="x-large-font time-separator-label" />
+                        </CustomVisualElement>
+                        <ui:Instance template="CustomDropdownFiled" name="minute-dropdown-double" class="time-input-minute" />
+                        <ui:Instance template="CustomDropdownFiled" name="minute-dropdown-single" class="time-input-minute" />
+                        <CustomInput placeholder-text="hr" hide-placeholder-on-focus="true" name="hour-input" class="time-input" style="display: none;" />
+                        <CustomInput placeholder-text="min" hide-placeholder-on-focus="true" name="minute-input" class="time-input" style="display: none;" />
                         <CustomEnumField type="Enumerations.TimeOfDayEnum, Assembly-CSharp" class="time-input-enum-filed" />
                     </CustomVisualElement>
                 </CustomVisualElement>
@@ -39,8 +46,14 @@
                         <CustomLabel text="Finish Time" use-default-font-color="false" class="gray1-font regular-font time-input-label" />
                     </CustomVisualElement>
                     <CustomVisualElement name="finish-time-input-container" class="time-input-container">
-                        <CustomInput placeholder-text="hr" hide-placeholder-on-focus="true" name="hour-input" class="time-input" />
-                        <CustomInput placeholder-text="min" hide-placeholder-on-focus="true" name="minute-input" class="time-input" />
+                        <CustomInput placeholder-text="hr" hide-placeholder-on-focus="true" name="hour-input" class="time-input" style="display: none;" />
+                        <CustomInput placeholder-text="min" hide-placeholder-on-focus="true" name="minute-input" class="time-input" style="display: none;" />
+                        <ui:Instance template="CustomDropdownFiled" name="hour-dropdown" class="time-input-hour" />
+                        <CustomVisualElement name="time-separator-label-container" class="time-separator-label-container">
+                            <CustomLabel text=":" class="x-large-font time-separator-label" />
+                        </CustomVisualElement>
+                        <ui:Instance template="CustomDropdownFiled" name="minute-dropdown-double" class="time-input-minute" />
+                        <ui:Instance template="CustomDropdownFiled" name="minute-dropdown-single" class="time-input-minute" />
                         <CustomEnumField type="Enumerations.TimeOfDayEnum, Assembly-CSharp" class="time-input-enum-filed" />
                     </CustomVisualElement>
                 </CustomVisualElement>

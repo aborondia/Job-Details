@@ -113,6 +113,9 @@
     justify-content: center;
     min-height: 60px;
     margin-bottom: 5px;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-left: 5px;
 }
 
 .send-email-popup {
@@ -140,4 +143,36 @@
     padding-right: 5px;
     padding-bottom: 5px;
     padding-left: 5px;
+}
+
+.name-select-popup {
+    min-width: 40%;
+    min-height: 20%;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}
+
+.name-scrollview-container {
+    width: 100%;
+    flex-direction: row;
+    margin-bottom: 5px;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    min-height: 60px;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}
+
+.label-container {
+    justify-content: center;
+    align-items: center;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
 }

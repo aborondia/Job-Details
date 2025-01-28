@@ -28,8 +28,8 @@
 .info-label {
 }
 
-.option-buttons-container {
-    width: 15%;
+.job-option-buttons-container {
+    flex-direction: row;
 }
 
 .option-button-container {

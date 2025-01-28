@@ -7,9 +7,15 @@ public class CleanerJobEntry
 
     public CleanerJobEntry() { }
 
-    public CleanerJobEntry(string name, float hoursWorked)
+    public CleanerJobEntry(string cleanerName)
     {
-        this.name = name;
+        this.name = cleanerName;
+        this.hoursWorked = 1;
+    }
+
+    public CleanerJobEntry(string cleanerName, float hoursWorked)
+    {
+        this.name = cleanerName;
         this.hoursWorked = hoursWorked;
     }
 

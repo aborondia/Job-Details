@@ -46,6 +46,7 @@ public class QueryController : MonoBehaviour
     public UnityEvent OnMainViewChangedEvent = new UnityEvent();
     public UnityEvent OnSubviewChangedEvent = new UnityEvent();
     public UnityEvent OnAnyViewChangedEvent = new UnityEvent();
+    public UnityEvent<float> OnScaleChangedEvent = new UnityEvent<float>();
 
     #region Initialization
 
@@ -88,6 +89,7 @@ public class QueryController : MonoBehaviour
         GetAllQueryHandlers();
         InitializeAllQueryHandlers();
 
+        this.rootDocument.rootVisualElement.RegisterCallback<GeometryChangedEvent>(evt => OnScaleChanged());
         this.OnMainViewChangedEvent.Invoke();
 
         this.initialized = true;
@@ -227,6 +229,16 @@ public class QueryController : MonoBehaviour
         {
             VisualElementHelper.SetElementDisplay(this.interactionBlocker, DisplayStyle.None);
         }
+    }
+
+    private void OnScaleChanged()
+    {
+        float currentWidth = this.rootDocument.rootVisualElement.resolvedStyle.width;
+        float currentHeight = this.rootDocument.rootVisualElement.resolvedStyle.height;
+        float widthScale = (currentWidth / this.rootDocument.panelSettings.referenceResolution.x) / 2;
+        float heightScale = (currentHeight / this.rootDocument.panelSettings.referenceResolution.y) / 2;
+        float scale = widthScale + heightScale;
+        this.OnScaleChangedEvent.Invoke(scale);
     }
 
     #endregion

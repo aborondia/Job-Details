@@ -258,6 +258,7 @@ public static class JSONHelper
             userDTM = new UserDTM();
             userDTM.objectId = node["objectId"];
             userDTM.username = node["username"];
+            userDTM.displayName = node["displayName"];
             userDTM.email = node["email"];
             userDTM.verified = node["verified"];
             userDTM.roleId = node["roleId"];

@@ -1,0 +1,16 @@
+.username-selection-entry {
+  min-height: 60px;
+}
+
+.username-selection-entry {
+  color: rgba(0, 0, 0, 255);
+  overflow: hidden;
+  -unity-text-align: middle-left;
+  text-overflow: ellipsis;
+  white-space: normal;
+  max-height: 100px;
+}
+
+.username-selection-entry CustomLabel:hover {
+  background-color: var(--gray-transparent);
+}

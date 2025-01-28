@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/USS/custom-dropdown-field.uss?fileID=7433441132597879392&amp;guid=9a095ce4d38b51448bd565073fd97a19&amp;type=3#custom-dropdown-field" />
+    <CustomVisualElement name="main" style="width: 100%; height: 100%;">
+        <ui:DropdownField choices="12,2,3" index="0" class="dropdown-field large-font" />
+    </CustomVisualElement>
+</ui:UXML>
