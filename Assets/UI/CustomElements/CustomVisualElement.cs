@@ -5,62 +5,35 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class CustomVisualElement : VisualElement
+[UxmlElement]
+public partial class CustomVisualElement : VisualElement
 {
-    public new class UxmlFactory : UxmlFactory<CustomVisualElement, UxmlTraits> { }
-    public UxmlTraits uxmlTraits;
-    public new class UxmlTraits : VisualElement.UxmlTraits
+    public enum SizeConstraint
     {
-        UxmlBoolAttributeDescription m_Regenerate_In_Editor =
-        new UxmlBoolAttributeDescription { name = "regenerate-in-editor", defaultValue = false };
-        UxmlBoolAttributeDescription m_Is_Image = new UxmlBoolAttributeDescription { name = "is-image", defaultValue = false };
-        UxmlFloatAttributeDescription m_Largest_Dimension =
-        new UxmlFloatAttributeDescription { name = "largest-dimension", defaultValue = 1 };
-        UxmlBoolAttributeDescription m_Enforce_Largest_Dimension =
-        new UxmlBoolAttributeDescription { name = "enforce-largest-dimension", defaultValue = false };
-
-        public override IEnumerable<UxmlChildElementDescription> uxmlChildElementsDescription
-        {
-            get { yield break; }
-        }
-
-        public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
-        {
-            base.Init(ve, bag, cc);
-            CustomVisualElement ate = ve as CustomVisualElement;
-            ate.initialized = false;
-            ate.isImage = m_Is_Image.GetValueFromBag(bag, cc);
-            ate.largestDimension = m_Largest_Dimension.GetValueFromBag(bag, cc);
-            ate.enforceLargestDimension = m_Enforce_Largest_Dimension.GetValueFromBag(bag, cc);
-
-            if (m_Regenerate_In_Editor.GetValueFromBag(bag, cc))
-            {
-                (ate as CustomVisualElement).InitializeValues();
-            }
-
-            if (Application.isPlaying)
-            {
-                ate.generateVisualContent += mgc =>
-                {
-                    (mgc.visualElement as CustomVisualElement).InitializeValues();
-                    (mgc.visualElement as CustomVisualElement).CheckSizeChange();
-                };
-            }
-        }
+        None,
+        EnforceSmallest,
+        EnforceLargest,
     }
 
-    public bool InitializeMesgGenerationContextComplete = false;
+    public CustomVisualElement()
+    {
+        RegisterCallback<GeometryChangedEvent>(e => InitializeValues());
+        RegisterCallback<DetachFromPanelEvent>(e => { });
+    }
+
+    [UxmlAttribute][SerializeField] private float largestDimension = 100;
+    [UxmlAttribute][SerializeField] private float smallestDimension = 75;
+    [UxmlAttribute][SerializeField] private SizeConstraint sizeConstraint = SizeConstraint.EnforceSmallest;
     private bool isImage;
-    private float largestDimension;
-    private bool enforceLargestDimension;
     private string mostRecentIconClass;
+    [UxmlAttribute][SerializeField] private bool shouldInitialize;
 
     protected virtual void InitializeValues()
     {
         string currentIconClass = this.GetClasses().FirstOrDefault(cic => !string.IsNullOrEmpty(cic) && cic.Length >= 3 && cic.Substring(0, 3) == "gi-" && !cic.Equals(this.mostRecentIconClass));
         bool reinitialize = !string.IsNullOrEmpty(currentIconClass) && !currentIconClass.Equals(this.mostRecentIconClass);
 
-        if (this.initialized && !reinitialize)
+        if (!this.shouldInitialize && !reinitialize)
         {
             return;
         }
@@ -80,49 +53,54 @@ public class CustomVisualElement : VisualElement
         if (this.isImage)
         {
             this.pickingMode = PickingMode.Ignore;
-            
-            if (this.enforceLargestDimension)
+
+            if (ReferenceEquals(this.resolvedStyle.backgroundImage.sprite?.rect, null))
             {
-                if (ReferenceEquals(this.resolvedStyle.backgroundImage.sprite?.rect, null))
-                {
-                    return;
-                }
+                return;
+            }
 
-                float currentWidth = this.resolvedStyle.backgroundImage.sprite.rect.width;
-                float currentHeight = this.resolvedStyle.backgroundImage.sprite.rect.height;
-                float largestSpriteDimension;
-                float percentDifference;
+            float currentWidth = this.resolvedStyle.backgroundImage.sprite.rect.width;
+            float currentHeight = this.resolvedStyle.backgroundImage.sprite.rect.height;
+            float largestSpriteDimension;
+            float percentDifference;
+            float finalHeight;
+            float finalWidth;
 
-                if (currentWidth > currentHeight)
-                {
-                    largestSpriteDimension = currentWidth;
-                }
-                else
-                {
-                    largestSpriteDimension = currentHeight;
-                }
-
-                percentDifference = this.largestDimension / largestSpriteDimension;
-
-                this.style.width = currentWidth * percentDifference;
-                this.style.height = currentHeight * percentDifference;
+            if (currentWidth > currentHeight)
+            {
+                largestSpriteDimension = currentWidth;
             }
             else
             {
-                this.baseWidth = this.resolvedStyle.backgroundImage.sprite.rect.width;
-                this.baseHeight = this.resolvedStyle.backgroundImage.sprite.rect.height;
-                this.style.width = this.baseWidth;
-                this.style.height = this.baseHeight;
+                largestSpriteDimension = currentHeight;
             }
 
-            this.initialized = true;
+            switch (this.sizeConstraint)
+            {
+                case SizeConstraint.EnforceLargest:
+                    percentDifference = largestSpriteDimension / this.largestDimension;
+                    finalHeight = currentHeight * percentDifference;
+                    finalWidth = currentWidth * percentDifference;
+                    break;
+                case SizeConstraint.EnforceSmallest:
+                    percentDifference = this.smallestDimension / largestSpriteDimension;
+                    finalHeight = currentHeight * percentDifference;
+                    finalWidth = currentWidth * percentDifference;
+                    break;
+                default:
+                    finalHeight = currentHeight;
+                    finalWidth = currentWidth;
+                    break;
+            }
+
+            this.style.width = finalWidth;
+            this.style.height = finalHeight;
+
+            this.shouldInitialize = false;
         }
         else if (width > 0 && height > 0)
         {
-            this.baseWidth = width;
-            this.baseHeight = height;
-
-            this.initialized = true;
+            this.shouldInitialize = false;
         }
 
         this.mostRecentIconClass = currentIconClass;
@@ -133,7 +111,7 @@ public class CustomVisualElement : VisualElement
         float currentWidth;
         float currentHeight;
 
-        if (!this.initialized)
+        if (!this.shouldInitialize)
         {
             return;
         }
@@ -145,22 +123,6 @@ public class CustomVisualElement : VisualElement
         {
             return;
         }
-
-        if (currentWidth != this.baseWidth || currentHeight != this.baseHeight)
-        {
-            this.currentSizePercent = (currentHeight + currentWidth) / (this.baseHeight + this.baseWidth);
-        }
     }
 
-    protected float currentSizePercent = 1;
-    public float CurrentSizeModifier
-    {
-        get
-        {
-            return this.currentSizePercent;
-        }
-    }
-    protected float baseWidth;
-    protected float baseHeight;
-    public bool initialized { get; set; }
 }

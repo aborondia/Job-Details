@@ -23,7 +23,7 @@
             <CustomVisualElement name="edit-button-container" class="option-button-container">
                 <CustomButton use-border="false" use-background-color="false" class="option-button">
                     <CustomVisualElement name="icon-container">
-                        <CustomVisualElement name="icon" largest-dimension="30" enforce-largest-dimension="true" regenerate-in-editor="true" class="gi-edit" />
+                        <CustomVisualElement name="icon" largest-dimension="50" enforce-largest-dimension="true" regenerate-in-editor="true" class="gi-edit" />
                     </CustomVisualElement>
                 </CustomButton>
             </CustomVisualElement>

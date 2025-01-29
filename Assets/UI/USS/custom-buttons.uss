@@ -6,8 +6,8 @@
   transition-duration: var(--transition-time);
   transition-timing-function: ease;
   transition-property: all;
-  min-height: 60px;
-  min-width: 60px;
+  min-height: 100px;
+  min-width: 100px;
 }
 
 .custom-button.hover-text * {

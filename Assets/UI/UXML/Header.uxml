@@ -16,7 +16,7 @@
                 <CustomVisualElement name="team-button-container" class="right-header-button-container">
                     <CustomButton name="CustomButton" use-background-color="false" use-border="false" regenerate-in-editor="true" class="add-button right-header-button">
                         <CustomVisualElement name="icon-container" class="right-header-button-icon-container">
-                            <CustomVisualElement name="icon" largest-dimension="50" regenerate-in-editor="true" enforce-largest-dimension="true" class="gi-team right-header-button-icon" />
+                            <CustomVisualElement name="icon" regenerate-in-editor="true" enforce-largest-dimension="true" class="gi-team right-header-button-icon" />
                         </CustomVisualElement>
                         <CustomVisualElement name="notification-container" class="red1-bg notification-container">
                             <CustomLabel name="notification-label" text="99" class="x-small-font notification-label" />
