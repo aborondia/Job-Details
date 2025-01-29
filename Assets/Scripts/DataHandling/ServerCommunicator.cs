@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using ResponseDelegateString = ActionHelper.StringDelegate;
 using ResponseDelegateBool = ActionHelper.BoolDelegate;
+using Cysharp.Threading.Tasks;
 
 public class ServerCommunicator : MonoBehaviour
 {
@@ -60,10 +61,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartCreatingUser(userSignupDTM, responseDelegateBool));
+        StartCreatingUser(userSignupDTM, responseDelegateBool).Forget();
     }
 
-    private IEnumerator StartCreatingUser(UserSignupDTM userSignupDTM, ResponseDelegateBool responseDelegateBool)
+    private async UniTaskVoid StartCreatingUser(UserSignupDTM userSignupDTM, ResponseDelegateBool responseDelegateBool)
     {
         WWWForm form = new WWWForm();
         UnityWebRequest request;
@@ -78,7 +79,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -100,10 +101,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartCheckRegistrationCredentials(displayName, email, returnStringDelegate));
+        StartCheckRegistrationCredentials(displayName, email, returnStringDelegate).Forget();
     }
 
-    private IEnumerator StartCheckRegistrationCredentials(string displayName, string email, ResponseDelegateString returnStringDelegate)
+    private async UniTaskVoid StartCheckRegistrationCredentials(string displayName, string email, ResponseDelegateString returnStringDelegate)
     {
         WWWForm form = new WWWForm();
         form.AddField("username", displayName);
@@ -114,7 +115,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Revocable-Session", "1");
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -135,10 +136,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartDeletingUser(id, successAction));
+        StartDeletingUser(id, successAction).Forget();
     }
 
-    private IEnumerator StartDeletingUser(string id, Action successAction)
+    private async UniTaskVoid StartDeletingUser(string id, Action successAction)
     {
         string url = $"{this.ClassesUrl}/_User/{id}";
 
@@ -148,7 +149,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -174,10 +175,10 @@ public class ServerCommunicator : MonoBehaviour
 
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartUpdatingUser(user, successAction));
+        StartUpdatingUser(user, successAction).Forget();
     }
 
-    private IEnumerator StartUpdatingUser(User user, Action successAction)
+    private async UniTaskVoid StartUpdatingUser(User user, Action successAction)
     {
         UserDTM dtm = user.DTM;
         string url = $"{this.ClassesUrl}/_User/{user.DTM.objectId}";
@@ -192,7 +193,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -211,10 +212,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartGettingUsersForRegularUser(responseDelegate));
+        StartGettingUsersForRegularUser(responseDelegate).Forget();
     }
 
-    private IEnumerator StartGettingUsersForRegularUser(ResponseDelegateString responseDelegate)
+    private async UniTaskVoid StartGettingUsersForRegularUser(ResponseDelegateString responseDelegate)
     {
         UnityWebRequest request = new UnityWebRequest($"{this.FunctionsUrl}/getUsersForRegularUser", "POST");
         byte[] bodyRaw = new UTF8Encoding().GetBytes("{}");
@@ -226,7 +227,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -246,10 +247,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartGettingUsersForAdmin(responseDelegate));
+        StartGettingUsersForAdmin(responseDelegate).Forget();
     }
 
-    private IEnumerator StartGettingUsersForAdmin(ResponseDelegateString responseDelegate)
+    private async UniTaskVoid StartGettingUsersForAdmin(ResponseDelegateString responseDelegate)
     {
         UnityWebRequest request = new UnityWebRequest($"{this.FunctionsUrl}/getUsersForAdmin", "POST");
         byte[] bodyRaw = new UTF8Encoding().GetBytes("{}");
@@ -261,7 +262,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -281,10 +282,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartLoggingIn(userSignInDTM));
+        StartLoggingIn(userSignInDTM).Forget();
     }
 
-    private IEnumerator StartLoggingIn(UserSignInDTM userSignInDTM)
+    private async UniTaskVoid StartLoggingIn(UserSignInDTM userSignInDTM)
     {
         WWWForm form = new WWWForm();
         form.AddField("username", userSignInDTM.userName);
@@ -295,7 +296,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Revocable-Session", "1");
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -319,17 +320,17 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartGettingRole(roleId, responseDelegate));
+        StartGettingRole(roleId, responseDelegate).Forget();
     }
 
-    private IEnumerator StartGettingRole(string roleId, ResponseDelegateString responseDelegate)
+    private async UniTaskVoid StartGettingRole(string roleId, ResponseDelegateString responseDelegate)
     {
         WWWForm form = new WWWForm();
         form.AddField("objectId", roleId);
         UnityWebRequest request = UnityWebRequest.Post(this.FunctionsUrl + "/getRole", form);
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -356,17 +357,17 @@ public class ServerCommunicator : MonoBehaviour
 
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartLoggingOut(responseDelegateBool));
+        StartLoggingOut(responseDelegateBool).Forget();
     }
 
-    private IEnumerator StartLoggingOut(ResponseDelegateBool responseDelegateBool)
+    private async UniTaskVoid StartLoggingOut(ResponseDelegateBool responseDelegateBool)
     {
         UnityWebRequest request = new UnityWebRequest($"{this.FunctionsUrl}/userLogout", "POST");
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -396,10 +397,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartSendingForgottenUsername(email, responseDelegateBool));
+        StartSendingForgottenUsername(email, responseDelegateBool).Forget();
     }
 
-    private IEnumerator StartSendingForgottenUsername(string email, ResponseDelegateBool responseDelegateBool)
+    private async UniTaskVoid StartSendingForgottenUsername(string email, ResponseDelegateBool responseDelegateBool)
     {
         WWWForm form = new WWWForm();
         UnityWebRequest request;
@@ -410,7 +411,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -430,10 +431,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartSendingForgotPasswordRequest(email, responseDelegateBool));
+        StartSendingForgotPasswordRequest(email, responseDelegateBool).Forget();
     }
 
-    private IEnumerator StartSendingForgotPasswordRequest(string email, ResponseDelegateBool responseDelegateBool)
+    private async UniTaskVoid StartSendingForgotPasswordRequest(string email, ResponseDelegateBool responseDelegateBool)
     {
         WWWForm form = new WWWForm();
         UnityWebRequest request;
@@ -444,7 +445,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -464,10 +465,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartSendingResetPasswordRequest(code, password, responseDelegateBool));
+        StartSendingResetPasswordRequest(code, password, responseDelegateBool).Forget();
     }
 
-    private IEnumerator StartSendingResetPasswordRequest(string code, string password, ResponseDelegateBool responseDelegateBool)
+    private async UniTaskVoid StartSendingResetPasswordRequest(string code, string password, ResponseDelegateBool responseDelegateBool)
     {
         WWWForm form = new WWWForm();
         UnityWebRequest request;
@@ -479,7 +480,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -503,10 +504,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartGettingRoles(responseDelegate));
+        StartGettingRoles(responseDelegate).Forget();
     }
 
-    private IEnumerator StartGettingRoles(ResponseDelegateString responseDelegate)
+    private async UniTaskVoid StartGettingRoles(ResponseDelegateString responseDelegate)
     {
         string url = $"{this.ClassesUrl}/_Role";
 
@@ -514,7 +515,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -537,10 +538,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartGettingUserRole(responseDelegate, userObjectId));
+        StartGettingUserRole(responseDelegate, userObjectId).Forget();
     }
 
-    private IEnumerator StartGettingUserRole(ResponseDelegateString responseDelegate, string userObjectId)
+    private async UniTaskVoid StartGettingUserRole(ResponseDelegateString responseDelegate, string userObjectId)
     {
         UnityWebRequest request;
         Dictionary<string, object> whereDict = new Dictionary<string, object>
@@ -563,7 +564,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -583,10 +584,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartRemovingUserRole(dtm, successAction));
+        StartRemovingUserRole(dtm, successAction).Forget();
     }
 
-    private IEnumerator StartRemovingUserRole(RoleDTM dtm, Action successAction)
+    private async UniTaskVoid StartRemovingUserRole(RoleDTM dtm, Action successAction)
     {
         string url = $"{this.RolesUrl}/{dtm.objectId}";
         string jsonBody = JsonConvert.SerializeObject(dtm);
@@ -600,7 +601,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -619,10 +620,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartUpdatingRole(dtm, successAction));
+        StartUpdatingRole(dtm, successAction).Forget();
     }
 
-    private IEnumerator StartUpdatingRole(RoleUpdateDTM dtm, Action successAction)
+    private async UniTaskVoid StartUpdatingRole(RoleUpdateDTM dtm, Action successAction)
     {
         string url = $"{this.FunctionsUrl}/updateUserRole";
         string jsonBody = JsonConvert.SerializeObject(dtm);
@@ -636,7 +637,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -655,10 +656,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartVerifyingUser(userId, successAction));
+        StartVerifyingUser(userId, successAction).Forget();
     }
 
-    private IEnumerator StartVerifyingUser(string userId, Action successAction)
+    private async UniTaskVoid StartVerifyingUser(string userId, Action successAction)
     {
         string url = $"{this.FunctionsUrl}/verifyUser";
         WWWForm form = new WWWForm();
@@ -669,7 +670,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -688,10 +689,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartVerifyingRegistration(confirmationCode, successAction));
+        StartVerifyingRegistration(confirmationCode, successAction).Forget();
     }
 
-    private IEnumerator StartVerifyingRegistration(string confirmationCode, Action successAction)
+    private async UniTaskVoid StartVerifyingRegistration(string confirmationCode, Action successAction)
     {
         string url = $"{this.FunctionsUrl}/verifyRegistration";
         WWWForm form = new WWWForm();
@@ -701,7 +702,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -733,10 +734,10 @@ public class ServerCommunicator : MonoBehaviour
 
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartCreatingDetailsReport(responseDelegate));
+        StartCreatingDetailsReport(responseDelegate).Forget();
     }
 
-    private IEnumerator StartCreatingDetailsReport(ResponseDelegateString responseDelegate)
+    private async UniTaskVoid StartCreatingDetailsReport(ResponseDelegateString responseDelegate)
     {
         UnityWebRequest request = new UnityWebRequest($"{this.FunctionsUrl}/createDetailsReport", "POST");
         string jsonBody = $"{{\"createdBy\":\"{this.currentUserDTM.objectId}\"}}";
@@ -749,7 +750,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -772,10 +773,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartGettingDetailsReports(responseDelegate));
+        StartGettingDetailsReports(responseDelegate).Forget();
     }
 
-    private IEnumerator StartGettingDetailsReports(ResponseDelegateString responseDelegate)
+    private async UniTaskVoid StartGettingDetailsReports(ResponseDelegateString responseDelegate)
     {
         string url = $"{this.FunctionsUrl}/retrieveDetailReports";
         WWWForm form = new WWWForm();
@@ -787,7 +788,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -807,10 +808,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartDeletingDetailsReport(id, responseDelegate));
+        StartDeletingDetailsReport(id, responseDelegate).Forget();
     }
 
-    private IEnumerator StartDeletingDetailsReport(string id, ResponseDelegateBool responseDelegate)
+    private async UniTaskVoid StartDeletingDetailsReport(string id, ResponseDelegateBool responseDelegate)
     {
         string url = $"{this.FunctionsUrl}/deleteDetailReport";
         WWWForm form = new WWWForm();
@@ -822,7 +823,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -853,10 +854,10 @@ public class ServerCommunicator : MonoBehaviour
 
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartCreatingJobDetails(jobDetails, responseDelegate));
+        StartCreatingJobDetails(jobDetails, responseDelegate).Forget();
     }
 
-    private IEnumerator StartCreatingJobDetails(JobDetail jobDetails, ResponseDelegateBool responseDelegate = null)
+    private async UniTaskVoid StartCreatingJobDetails(JobDetail jobDetails, ResponseDelegateBool responseDelegate = null)
     {
         string url = $"{this.FunctionsUrl}/createJobDetail";
         UnityWebRequest request = new UnityWebRequest(url, "POST");
@@ -871,7 +872,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -891,10 +892,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartGettingJobDetails(detailsReportObjectId, responseDelegate));
+        StartGettingJobDetails(detailsReportObjectId, responseDelegate).Forget();
     }
 
-    private IEnumerator StartGettingJobDetails(string detailsReportObjectId, ResponseDelegateString responseDelegate)
+    private async UniTaskVoid StartGettingJobDetails(string detailsReportObjectId, ResponseDelegateString responseDelegate)
     {
         string url = $"{this.ClassesUrl}/JobDetail";
         UnityWebRequest request = UnityWebRequest.Get(url);
@@ -903,7 +904,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -933,10 +934,10 @@ public class ServerCommunicator : MonoBehaviour
 
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartUpdatingJobDetails(jobDetails, responseDelegate));
+        StartUpdatingJobDetails(jobDetails, responseDelegate).Forget();
     }
 
-    private IEnumerator StartUpdatingJobDetails(JobDetail jobDetails, ResponseDelegateBool responseDelegate)
+    private async UniTaskVoid StartUpdatingJobDetails(JobDetail jobDetails, ResponseDelegateBool responseDelegate)
     {
         string url = $"{this.ClassesUrl}/JobDetail/{jobDetails.ObjectId}";
         JobDetailsDTM dtm = new JobDetailsDTM(this.currentUserDTM.objectId, jobDetails);
@@ -951,7 +952,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -979,10 +980,10 @@ public class ServerCommunicator : MonoBehaviour
 
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartDeletingJobDetails(id, responseDelegate));
+        StartDeletingJobDetails(id, responseDelegate).Forget();
     }
 
-    private IEnumerator StartDeletingJobDetails(string id, ResponseDelegateBool responseDelegate)
+    private async UniTaskVoid StartDeletingJobDetails(string id, ResponseDelegateBool responseDelegate)
     {
         string url = $"{this.ClassesUrl}/JobDetail/{id}";
         UnityWebRequest request = UnityWebRequest.Delete(url);
@@ -991,7 +992,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -1018,10 +1019,10 @@ public class ServerCommunicator : MonoBehaviour
     {
         this.OnRequestStartedEvent.Invoke();
 
-        StartCoroutine(StartSendingEmail(customMailMessage, responseDelegate));
+        StartSendingEmail(customMailMessage, responseDelegate).Forget();
     }
 
-    private IEnumerator StartSendingEmail(CustomMailMessage customMailMessage, ResponseDelegateBool responseDelegate)
+    private async UniTaskVoid StartSendingEmail(CustomMailMessage customMailMessage, ResponseDelegateBool responseDelegate)
     {
         UnityWebRequest request = new UnityWebRequest($"{this.FunctionsUrl}/sendEmail", "POST");
         string jsonBody = JsonConvert.SerializeObject(customMailMessage);
@@ -1035,7 +1036,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        yield return request.SendWebRequest();
+        await request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
         {

@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
+using Cysharp.Threading.Tasks;
 
 public class CustomButton : Button
 {
@@ -429,7 +429,7 @@ public class CustomButton : Button
             {
                 if (!ReferenceEquals(CoroutineHelper.Active, null))
                 {
-                    CoroutineHelper.Active.StartCoroutine(WaitForInitializationToComplete());
+                    WaitForInitializationToComplete().Forget();
                 }
 
                 if (this.useBackgroundColor)
@@ -519,9 +519,9 @@ public class CustomButton : Button
         }
     }
 
-    private IEnumerator WaitForInitializationToComplete()
+    private async UniTaskVoid WaitForInitializationToComplete()
     {
-        yield return new WaitUntil(() => this.baseInitializationComplete && this.firstInitializationComplete);
+        await UniTask.WaitUntil(() => this.baseInitializationComplete && this.firstInitializationComplete);
 
         OnFirstInitializationComplete();
     }

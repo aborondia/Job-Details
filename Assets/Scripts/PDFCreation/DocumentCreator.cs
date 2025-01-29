@@ -2,10 +2,10 @@ using sharpPDF;
 using sharpPDF.Fonts;
 using sharpPDF.Enumerators;
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine.Networking;
+using Cysharp.Threading.Tasks;
 
 [RequireComponent(typeof(JobDetailsContentCreator))]
 public class DocumentCreator : MonoBehaviour
@@ -55,11 +55,11 @@ public class DocumentCreator : MonoBehaviour
         this.rectanglePDFColor = new pdfColor((int)this.rectangleColor.r, (int)this.rectangleColor.g, (int)this.rectangleColor.b);
     }
 
-    private IEnumerator GetFontReference(string fontReference)
+    private async UniTaskVoid GetFontReference(string fontReference)
     {
         UnityWebRequest www = UnityWebRequest.Get(Path.Combine(Application.streamingAssetsPath, "Fonts", $"{fontReference}.afm"));
 
-        yield return www.SendWebRequest();
+        await www.SendWebRequest();
 
         this.fontReference = www.downloadHandler.data;
 
