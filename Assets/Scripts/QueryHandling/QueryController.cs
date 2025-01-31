@@ -28,6 +28,8 @@ public class QueryController : MonoBehaviour
     public NavigationButtonsQueryHandler NavigationButtonsQueryHandler => navigationButtonsQueryHandler;
     [SerializeField] private PopupsQueryHandler popupsQueryHandler;
     public PopupsQueryHandler PopupsQueryHandler => popupsQueryHandler;
+    [SerializeField] private TimeSelectQueryHandler timeSelectQueryHandler;
+    public TimeSelectQueryHandler TimeSelectQueryHandler => timeSelectQueryHandler;
     [SerializeField] private GameObject queryHandlersParent;
     [SerializeField] private QueryHandler[] queryhandlers;
     private VisualElement interactionBlocker;

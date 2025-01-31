@@ -1,9 +1,20 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/USS/radial-time-select.uss?fileID=7433441132597879392&amp;guid=3cfc619273c2b414cb503dce3d92ad41&amp;type=3#radial-time-select" />
-    <CustomVisualElement name="main" class="black-border" style="width: 100%; height: 100%; background-color: rgb(255, 255, 255); border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px; border-top-left-radius: 100%; border-top-right-radius: 100%; border-bottom-right-radius: 100%; border-bottom-left-radius: 100%; max-width: 500px; max-height: 500px; min-width: 500px; min-height: 500px; align-self: center;">
+    <CustomVisualElement name="main" class="black-border" style="width: 100%; height: 100%; background-color: rgb(255, 255, 255); border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px; border-top-left-radius: 100%; border-top-right-radius: 100%; border-bottom-right-radius: 100%; border-bottom-left-radius: 100%; max-width: 500px; max-height: 500px; min-width: 500px; min-height: 500px; align-self: center; flex-direction: row; justify-content: center; align-items: flex-start;">
         <CustomVisualElement name="center-reference" class="center-reference" />
         <CustomVisualElement name="selected-label-highlight" class="green1-border selected-label-highlight" />
         <CustomVisualElement name="hour-labels-container" style="position: absolute; width: 100%; height: 100%;" />
         <CustomVisualElement name="minute-labels-container" style="position: absolute; width: 100%; height: 100%;" />
+        <CustomVisualElement name="time-display-container" class="time-display-container">
+            <CustomVisualElement name="hour-label-container" class="time-display-label-container">
+                <CustomLabel text="12" use-default-font-color="false" class="x-large-font time-display-label" />
+            </CustomVisualElement>
+            <CustomVisualElement name="separator-label-container" class="time-display-label-container">
+                <CustomLabel text=":" use-default-font-color="false" class="x-large-font time-display-label" />
+            </CustomVisualElement>
+            <CustomVisualElement name="minutes-label-container" class="time-display-label-container">
+                <CustomLabel text="59" use-default-font-color="false" class="x-large-font time-display-label" />
+            </CustomVisualElement>
+        </CustomVisualElement>
     </CustomVisualElement>
 </ui:UXML>

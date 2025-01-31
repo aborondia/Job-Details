@@ -5,8 +5,8 @@
     <ui:Template name="LoginView" src="project://database/Assets/UI/UXML/LoginView.uxml?fileID=9197481963319205126&amp;guid=89d909090d3f6294da705065ec479b62&amp;type=3#LoginView" />
     <ui:Template name="UsersView" src="project://database/Assets/UI/UXML/UsersView.uxml?fileID=9197481963319205126&amp;guid=c32e76048e2543d42b27f7be8d793b7d&amp;type=3#UsersView" />
     <ui:Template name="NavigationButtons" src="project://database/Assets/UI/UXML/NavigationButtons.uxml?fileID=9197481963319205126&amp;guid=9bd7d60b0e6be9f4db2e578e98e88249&amp;type=3#NavigationButtons" />
-    <ui:Template name="RadialTimeSelect" src="project://database/Assets/UI/UXML/RadialTimeSelect.uxml?fileID=9197481963319205126&amp;guid=cf222b675c2be6443a75938ca12e5c29&amp;type=3#RadialTimeSelect" />
     <ui:Template name="InteractionBlocker" src="project://database/Assets/UI/UXML/InteractionBlocker.uxml?fileID=9197481963319205126&amp;guid=fe2c3c6167d5e1844a6a716a6c4650c5&amp;type=3#InteractionBlocker" />
+    <ui:Template name="RadialTimeSelect" src="project://database/Assets/UI/UXML/RadialTimeSelect.uxml?fileID=9197481963319205126&amp;guid=cf222b675c2be6443a75938ca12e5c29&amp;type=3#RadialTimeSelect" />
     <ui:Template name="Popups" src="project://database/Assets/UI/UXML/Popups.uxml?fileID=9197481963319205126&amp;guid=70250a05a1f06bd4cb0cc9da376ac202&amp;type=3#Popups" />
     <Style src="project://database/Assets/UI/USS/root.uss?fileID=7433441132597879392&amp;guid=7a2186fad6b55d945aceae12b11b37ba&amp;type=3#root" />
     <Style src="project://database/Assets/UI/USS/global-colors.uss?fileID=7433441132597879392&amp;guid=95fa0ffd1caf2d94496c697ddec4f348&amp;type=3#global-colors" />
@@ -21,8 +21,8 @@
             <ui:Instance template="Header" name="Header" style="width: 100%; flex-direction: row; min-height: 10%; max-height: 10%;" />
             <CustomVisualElement name="views-container" class="views-container">
                 <CustomVisualElement name="main-views" class="main-views">
-                    <ui:Instance template="DetailsReportsView" name="DetailsReportsView" class="main-view" />
-                    <ui:Instance template="JobDetailsView" name="JobDetailsView" class="main-view" style="display: none;" />
+                    <ui:Instance template="DetailsReportsView" name="DetailsReportsView" class="main-view" style="display: none;" />
+                    <ui:Instance template="JobDetailsView" name="JobDetailsView" class="main-view" />
                     <ui:Instance template="LoginView" name="LoginView" class="main-view" style="display: none;" />
                     <ui:Instance template="UsersView" name="UsersView" class="main-view" style="display: none;" />
                     <ui:Instance template="NavigationButtons" name="NavigationButtons" />
@@ -31,9 +31,9 @@
             <CustomVisualElement name="debug-info" picking-mode="Ignore" style="position: absolute; top: 0; right: 0;">
                 <CustomLabel text="Debug" class="yellow1-font" />
             </CustomVisualElement>
-            <ui:Instance template="RadialTimeSelect" name="RadialTimeSelect" style="width: 50%; height: 50%; position: absolute; top: 25%; left: 25%;" />
         </CustomVisualElement>
         <ui:Instance template="InteractionBlocker" name="InteractionBlocker" class="interaction-blocker" style="display: none;" />
+        <ui:Instance template="RadialTimeSelect" name="RadialTimeSelect" style="position: absolute; top: 25%; left: 25%; min-width: 50%; min-height: 50%;" />
         <ui:Instance template="Popups" name="Popups" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; justify-content: center; align-items: center; display: none;" />
         <CustomVisualElement name="draw-canvas" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
     </CustomVisualElement>

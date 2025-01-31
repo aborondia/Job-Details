@@ -23,12 +23,14 @@ public class JobDetailsQueryHandler : QueryHandler
     private CustomInput dateInput;
     private VisualElement startTimeInputsContainer;
     private VisualElement startTimeInputContainer;
+    private CustomInput startTimeInput;
     private DropdownField startTimeHourInput;
     private DropdownField startTimeMinuteInputDouble;
     private DropdownField startTimeMinuteInputSingle;
     private CustomEnumField startTimeOfDayField;
     private VisualElement finishTimeInputsContainer;
     private VisualElement finishTimeInputContainer;
+    private CustomInput finishTimeInput;
     private DropdownField finishTimeHourInput;
     private DropdownField finishTimeMinuteDoubleInput;
     private DropdownField finishTimeMinuteSingleInput;
@@ -45,10 +47,13 @@ public class JobDetailsQueryHandler : QueryHandler
     private VisualElement detailsContentContainer;
     private CustomInput detailsInput;
     private DetailsReport currentDetailsReport;
+    private JobDetail originalJobDetail;
     private JobDetail currentJobDetail;
     public JobDetail CurrentJobDetail => currentJobDetail;
     private bool editingExistingDetails;
     private DateTime? currentDatePickerDate;
+    private TimeContentHolder currentStartTime = new TimeContentHolder(0, 0);
+    private TimeContentHolder currentFinishTime = new TimeContentHolder(0, 0);
 
     #region  Initlialization
 
@@ -80,6 +85,20 @@ public class JobDetailsQueryHandler : QueryHandler
         this.startTimeHourInput = this.startTimeInputContainer.Q<VisualElement>("hour-dropdown").Q<DropdownField>();
         this.startTimeHourInput.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
 
+        this.startTimeInput = this.startTimeInputContainer.Q<CustomInput>("time-input");
+        this.startTimeInput.RegisterCallback<ClickEvent>(evt =>
+        {
+            QueryController.Active.TimeSelectQueryHandler.OpenTimeSelect(timeHolder =>
+            {
+                if (!ReferenceEquals(timeHolder, null))
+                {
+                    this.currentStartTime.Hour = timeHolder.Hour;
+                    this.currentStartTime.Minutes = timeHolder.Minutes;
+                    OnJobDetailsChanged();
+                }
+            }, TimeSelectQueryHandler.TimeType.Hour, this.currentStartTime.Hour.Value, this.currentStartTime.Minutes.Value);
+        });
+
         this.startTimeMinuteInputDouble = this.startTimeInputContainer.Q<VisualElement>("minute-dropdown-double").Q<DropdownField>();
         this.startTimeMinuteInputSingle = this.startTimeInputContainer.Q<VisualElement>("minute-dropdown-single").Q<DropdownField>();
         this.startTimeOfDayField = this.startTimeInputContainer.Q<CustomEnumField>();
@@ -87,7 +106,21 @@ public class JobDetailsQueryHandler : QueryHandler
         this.finishTimeInputsContainer = this.inputsContainer.Q<VisualElement>("finish-time-inputs-container");
         this.finishTimeInputContainer = this.finishTimeInputsContainer.Q<VisualElement>("finish-time-input-container");
         this.finishTimeHourInput = this.finishTimeInputContainer.Q<VisualElement>("hour-dropdown").Q<DropdownField>();
-        this.finishTimeHourInput.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
+        this.finishTimeHourInput.RegisterValueChangedCallback(evt => OnJobDetailsChanged());
+
+        this.finishTimeInput = this.finishTimeInputContainer.Q<CustomInput>("time-input");
+        this.finishTimeInput.RegisterCallback<ClickEvent>(evt =>
+        {
+            QueryController.Active.TimeSelectQueryHandler.OpenTimeSelect(timeHolder =>
+            {
+                if (!ReferenceEquals(timeHolder, null))
+                {
+                    this.currentFinishTime.Hour = timeHolder.Hour;
+                    this.currentFinishTime.Minutes = timeHolder.Minutes;
+                    OnJobDetailsChanged();
+                }
+            }, TimeSelectQueryHandler.TimeType.Hour, this.currentFinishTime.Hour.Value, this.currentFinishTime.Minutes.Value);
+        });
 
         this.finishTimeMinuteDoubleInput = this.finishTimeInputContainer.Q<VisualElement>("minute-dropdown-double").Q<DropdownField>();
         this.finishTimeMinuteSingleInput = this.finishTimeInputContainer.Q<VisualElement>("minute-dropdown-single").Q<DropdownField>();
@@ -212,13 +245,14 @@ public class JobDetailsQueryHandler : QueryHandler
 
     #endregion
 
-    #region Open Job Details
+    #region Open/Close Job Details
 
     public void OpenNewJobDetails(DetailsReport detailsReport)
     {
         this.currentDetailsReport = detailsReport;
         this.editingExistingDetails = false;
-        this.currentJobDetail = new JobDetail();
+        this.originalJobDetail = new JobDetail();
+        this.currentJobDetail = this.originalJobDetail;
         this.currentJobDetail.AddCleaner(new CleanerJobEntry(AppController.Active.UserDataHandler.CurrentUser.DTM.displayName));
         RefreshJobDetail();
         QueryController.Active.ChangeView(MainView.JobDetails, Subview.Default);
@@ -228,9 +262,18 @@ public class JobDetailsQueryHandler : QueryHandler
     {
         this.currentDetailsReport = detailsReport;
         this.editingExistingDetails = true;
-        this.currentJobDetail = jobDetail;
+        this.originalJobDetail = jobDetail;
+        this.currentJobDetail = new JobDetail();
+        SetJobDetailProperties(this.originalJobDetail, this.currentJobDetail);
         RefreshJobDetail();
         QueryController.Active.ChangeView(MainView.JobDetails, Subview.Default);
+    }
+
+    public void CloseJobDetails()
+    {
+        this.originalJobDetail = null;
+        this.currentJobDetail = null;
+        QueryController.Active.ReturnToPreviousView();
     }
 
     #endregion
@@ -259,7 +302,7 @@ public class JobDetailsQueryHandler : QueryHandler
 
     private void OnJobDetailsChanged()
     {
-        SetJobDetailProperties();
+        SetCurrentDetailProperties();
         RefreshJobDetail();
     }
 
@@ -342,37 +385,35 @@ public class JobDetailsQueryHandler : QueryHandler
     private void RefreshStartTime()
     {
         bool isPMStartTime;
-        int startHours;
-        int startMinutes;
         string startHoursString;
+        string startMinutesString;
+
+        this.currentStartTime.Hour = this.currentJobDetail.StartTime.Hour;
+        this.currentStartTime.Minutes = this.currentJobDetail.StartTime.Minute;
 
         isPMStartTime = this.currentJobDetail.StartTime.Hour > 12;
-        startHours = this.currentJobDetail.StartTime.Hour;
-        startMinutes = this.currentJobDetail.StartTime.Minute;
-        startHoursString = startHours > 12 ? (startHours - 12).ToString() : startHours.ToString();
+        startHoursString = this.currentStartTime.Hour > 12 ? (this.currentStartTime.Hour - 12).ToString() : this.currentStartTime.Hour.ToString();
+        startMinutesString = this.currentStartTime.Minutes > 9 ? this.currentStartTime.Minutes.ToString() : $"0{this.currentStartTime.Minutes}";
 
         this.startTimeOfDayField.SetValueWithoutNotify(isPMStartTime ? Enumerations.TimeOfDayEnum.PM : Enumerations.TimeOfDayEnum.AM);
-        this.startTimeHourInput.SetValueWithoutNotify(startHoursString);
-        this.startTimeMinuteInputDouble.SetValueWithoutNotify((startMinutes / 10).ToString());
-        this.startTimeMinuteInputSingle.SetValueWithoutNotify((startMinutes % 10).ToString());
+        this.startTimeInput.SetValueWithoutNotify($"{startHoursString}:{startMinutesString}");
     }
 
     private void RefreshFinishTime()
     {
         bool isPMFinishTime;
-        int finishHours;
-        int finishMinutes;
         string finishHoursString;
+        string finishMinutesString;
+
+        this.currentFinishTime.Hour = this.currentJobDetail.FinishTime.Hour;
+        this.currentFinishTime.Minutes = this.currentJobDetail.FinishTime.Minute;
 
         isPMFinishTime = this.currentJobDetail.FinishTime.Hour > 12;
-        finishHours = this.currentJobDetail.FinishTime.Hour;
-        finishMinutes = this.currentJobDetail.FinishTime.Minute;
-        finishHoursString = finishHours > 12 ? (finishHours - 12).ToString() : finishHours.ToString();
+        finishHoursString = this.currentFinishTime.Hour > 12 ? (this.currentFinishTime.Hour - 12).ToString() : this.currentFinishTime.Hour.ToString();
+        finishMinutesString = this.currentFinishTime.Minutes > 9 ? this.currentFinishTime.Minutes.ToString() : $"0{this.currentFinishTime.Minutes}";
 
         this.finishTimeOfDayField.SetValueWithoutNotify(isPMFinishTime ? Enumerations.TimeOfDayEnum.PM : Enumerations.TimeOfDayEnum.AM);
-        this.finishTimeHourInput.SetValueWithoutNotify(finishHoursString);
-        this.finishTimeMinuteDoubleInput.SetValueWithoutNotify((finishMinutes / 10).ToString());
-        this.finishTimeMinuteSingleInput.SetValueWithoutNotify((finishMinutes % 10).ToString());
+        this.finishTimeInput.SetValueWithoutNotify($"{finishHoursString}:{finishMinutesString}");
     }
 
     private void RefreshCleanerRows()
@@ -433,7 +474,12 @@ public class JobDetailsQueryHandler : QueryHandler
 
     public void SaveDetails()
     {
-        SetJobDetailProperties();
+        SetCurrentDetailProperties();
+
+        if (!ReferenceEquals(this.currentJobDetail, this.originalJobDetail))
+        {
+            SetJobDetailProperties(this.currentJobDetail, this.originalJobDetail);
+        }
 
         ActionHelper.BoolDelegate responseDelegate = success =>
         {
@@ -451,11 +497,11 @@ public class JobDetailsQueryHandler : QueryHandler
 
         if (this.editingExistingDetails)
         {
-            AppController.Active.ServerCommunicator.UpdateJobDetails(this.currentJobDetail, responseDelegate);
+            AppController.Active.ServerCommunicator.UpdateJobDetails(this.originalJobDetail, responseDelegate);
         }
         else
         {
-            AppController.Active.ServerCommunicator.CreateJobDetails(this.currentJobDetail, responseDelegate);
+            AppController.Active.ServerCommunicator.CreateJobDetails(this.originalJobDetail, responseDelegate);
         }
     }
 
@@ -463,42 +509,52 @@ public class JobDetailsQueryHandler : QueryHandler
 
     #region CRUD
 
-    private bool SetJobDetailProperties()
+    private bool SetJobDetailProperties(JobDetail original, JobDetail target)
+    {
+        target.SetJobDetailProperties(
+            original.DetailsReportId,
+            original.ClientName,
+            original.ClientAddress,
+            original.JobDate,
+            original.StartTime,
+            original.FinishTime,
+            original.JobType,
+            original.Cleaners.ConvertAll(cleaner => new CleanerJobEntry(cleaner)),
+            // new List<CleanerJobEntry>(original.Cleaners),
+            original.PaymentType,
+            original.Description,
+            original.ObjectId
+            );
+
+        return true;
+    }
+
+    private bool SetCurrentDetailProperties()
     {
         DateTime jobDate = new DateTime();
         DateTime startTime = new DateTime();
         DateTime finishTime = new DateTime();
-        double startHoursValue;
-        double startMinutesDoubleValue;
-        double startMinutesSingleValue;
-        double finishHoursValue;
-        double finishMinutesDoubleValue;
-        double finishMinutesSingleValue;
         int startHoursModifier;
         int finishHoursModifier;
 
         if (DataValidationChecker.IsDateTimeStringValid(this.dateInput.value))
         {
-            if (DateTime.TryParse(this.dateInput.value, out jobDate)
-            && double.TryParse(this.startTimeHourInput.value, out startHoursValue)
-            && double.TryParse(this.startTimeMinuteInputSingle.value, out startMinutesSingleValue)
-            && double.TryParse(this.startTimeMinuteInputDouble.value, out startMinutesDoubleValue)
-            && double.TryParse(this.finishTimeHourInput.value, out finishHoursValue)
-            && double.TryParse(this.finishTimeMinuteSingleInput.value, out finishMinutesSingleValue)
-            && double.TryParse(this.finishTimeMinuteDoubleInput.value, out finishMinutesDoubleValue))
+            if (!DateTime.TryParse(this.dateInput.value, out jobDate))
             {
-                startTime = DateTime.Parse(this.dateInput.value);
-                finishTime = DateTime.Parse(this.dateInput.value);
-
-                startHoursModifier = (Enumerations.TimeOfDayEnum)this.startTimeOfDayField.value == Enumerations.TimeOfDayEnum.AM ? 0 : 12;
-                finishHoursModifier = (Enumerations.TimeOfDayEnum)this.finishTimeOfDayField.value == Enumerations.TimeOfDayEnum.AM ? 0 : 12;
-
-                startTime = startTime.AddHours(startHoursValue + startHoursModifier);
-                startTime = startTime.AddMinutes(startMinutesSingleValue + (startMinutesDoubleValue * 10));
-
-                finishTime = finishTime.AddHours(finishHoursValue + finishHoursModifier);
-                finishTime = finishTime.AddMinutes(finishMinutesSingleValue + (finishMinutesDoubleValue * 10));
+                jobDate = DateTime.Now;
             }
+
+            startTime = DateTime.Parse(this.dateInput.value);
+            finishTime = DateTime.Parse(this.dateInput.value);
+
+            startHoursModifier = (Enumerations.TimeOfDayEnum)this.startTimeOfDayField.value == Enumerations.TimeOfDayEnum.AM ? 0 : 12;
+            finishHoursModifier = (Enumerations.TimeOfDayEnum)this.finishTimeOfDayField.value == Enumerations.TimeOfDayEnum.AM ? 0 : 12;
+
+            startTime = startTime.AddHours(this.currentStartTime.Hour.Value + startHoursModifier);
+            startTime = startTime.AddMinutes(this.currentStartTime.Minutes.Value);
+
+            finishTime = finishTime.AddHours(this.currentFinishTime.Hour.Value + finishHoursModifier);
+            finishTime = finishTime.AddMinutes(this.currentFinishTime.Minutes.Value);
         }
 
         this.currentJobDetail.SetJobDetailProperties(

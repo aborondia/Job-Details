@@ -9,7 +9,7 @@
                 <CustomVisualElement name="label-container" class="user-row-button-label-container" style="display: none;">
                     <CustomLabel class="user-row-button-label small-font" />
                 </CustomVisualElement>
-                <CustomVisualElement name="icon-container" class="user-row-button-icon-container">
+                <CustomVisualElement name="icon-container" class="icon-container user-row-button-icon-container">
                     <CustomVisualElement name="icon" enforce-largest-dimension="true" largest-dimension="25" regenerate-in-editor="true" class="user-row-button-icon gi-recycle-bin red1-img" />
                 </CustomVisualElement>
             </CustomButton>
@@ -19,7 +19,7 @@
                 <CustomVisualElement name="label-container" class="user-row-button-label-container">
                     <CustomLabel text="Verify User? " class="user-row-button-label small-font" />
                 </CustomVisualElement>
-                <CustomVisualElement name="icon-container" class="user-row-button-icon-container">
+                <CustomVisualElement name="icon-container" class="icon-container user-row-button-icon-container">
                     <CustomVisualElement name="icon" enforce-largest-dimension="true" largest-dimension="25" regenerate-in-editor="true" class="gi-checkmark green1-img user-row-button-icon" />
                 </CustomVisualElement>
             </CustomButton>

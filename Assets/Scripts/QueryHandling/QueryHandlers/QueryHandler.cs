@@ -15,6 +15,7 @@ public abstract class QueryHandler : MonoBehaviour
     protected Dictionary<Subview, List<VisualElement>> subviewElements;
     protected bool initialized;
     public bool Initialized => initialized;
+    protected int instanceId;
     protected abstract void InitializeElements();
     protected abstract void SetViewElements();
     protected abstract void SetupInputs();
@@ -24,6 +25,7 @@ public abstract class QueryHandler : MonoBehaviour
 
     protected virtual void Awake()
     {
+        this.instanceId = GetInstanceID();
     }
 
     protected virtual void Start()

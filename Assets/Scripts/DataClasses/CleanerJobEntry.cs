@@ -13,6 +13,12 @@ public class CleanerJobEntry
         this.hoursWorked = 1;
     }
 
+    public CleanerJobEntry(CleanerJobEntry original)
+    {
+        this.name = original.name;
+        this.hoursWorked = original.hoursWorked;
+    }
+
     public CleanerJobEntry(string cleanerName, float hoursWorked)
     {
         this.name = cleanerName;

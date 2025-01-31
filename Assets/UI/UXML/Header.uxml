@@ -7,7 +7,7 @@
         <CustomVisualElement name="right-header-container" class="right-header-container">
             <CustomVisualElement name="add-details-report-button-container" class="right-header-button-container">
                 <CustomButton name="CustomButton" use-background-color="false" use-border="false" regenerate-in-editor="true" class="right-header-button">
-                    <CustomVisualElement name="icon-container" class="right-header-button-icon-container">
+                    <CustomVisualElement name="icon-container" class="icon-container right-header-button-icon-container">
                         <CustomVisualElement name="icon" largest-dimension="50" regenerate-in-editor="true" enforce-largest-dimension="true" class="gi-plus green1-img right-header-button-icon" />
                     </CustomVisualElement>
                 </CustomButton>
@@ -15,7 +15,7 @@
             <CustomVisualElement name="team-button-display-parent">
                 <CustomVisualElement name="team-button-container" class="right-header-button-container">
                     <CustomButton name="CustomButton" use-background-color="false" use-border="false" regenerate-in-editor="true" class="add-button right-header-button">
-                        <CustomVisualElement name="icon-container" class="right-header-button-icon-container">
+                        <CustomVisualElement name="icon-container" class="icon-container right-header-button-icon-container">
                             <CustomVisualElement name="icon" regenerate-in-editor="true" enforce-largest-dimension="true" class="gi-team right-header-button-icon" />
                         </CustomVisualElement>
                         <CustomVisualElement name="notification-container" class="red1-bg notification-container">
@@ -26,7 +26,7 @@
             </CustomVisualElement>
             <CustomVisualElement name="logout-button-container" class="right-header-button-container">
                 <CustomButton name="CustomButton" use-background-color="false" use-border="false" regenerate-in-editor="true" class="right-header-button">
-                    <CustomVisualElement name="icon-container" class="right-header-button-icon-container">
+                    <CustomVisualElement name="icon-container" class="icon-container right-header-button-icon-container">
                         <CustomVisualElement name="icon" largest-dimension="50" regenerate-in-editor="true" enforce-largest-dimension="true" class="right-header-button-icon white-img gi-logout" />
                     </CustomVisualElement>
                 </CustomButton>

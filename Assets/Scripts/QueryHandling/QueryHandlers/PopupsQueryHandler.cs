@@ -66,7 +66,6 @@ public class PopupsQueryHandler : QueryHandler
     #endregion
 
     private string currentUserNameSelection;
-    private int instanceId;
     private Action blurAction;
     private Action closePopupsAction;
 
@@ -74,7 +73,6 @@ public class PopupsQueryHandler : QueryHandler
     {
         base.Initialize();
 
-        this.instanceId = GetInstanceID();
         this.parentElement.focusable = true;
         this.parentElement.RegisterCallback<BlurEvent>(evt => ActionHelper.OnBlur(evt, this.parentElement, this.blurAction));
         SetupClosePopupAction();

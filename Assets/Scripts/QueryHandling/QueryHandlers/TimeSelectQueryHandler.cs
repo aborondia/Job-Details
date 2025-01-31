@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -18,32 +19,46 @@ public class TimeSelectQueryHandler : QueryHandler
     private VisualElement drawCanvas;
     private VisualElement hourLabelsContainer;
     private VisualElement minuteLabelsContainer;
+    private VisualElement timeDisplayContainer;
+    private VisualElement timeDisplayHourLabelContainer;
+    private CustomLabel timeDisplayHourLabel;
+    private VisualElement timeDisplayMinutesLabelContainer;
+    private CustomLabel timeDisplayMinutesLabel;
     private TimeLabel currentLabel;
     private List<TimeLabel> hourLabels;
     private List<TimeLabel> minuteLabels;
-    [SerializeField] private TimeType curentTimeSelectType = TimeType.Minute;
+    private TimeType currentTimeSelectType = TimeType.Hour;
     private bool isDragging;
     private float currentAngle;
+    private bool timeSelectOpen = false;
+    private int selectedHour;
+    private int selectedMinutes;
+    private Action<TimeContentHolder> onTimeSelectedAction;
+
+    #region Initialization
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        this.HideParent();
+    }
 
     protected override void InitializeElements()
     {
+        this.parentElement.focusable = true;
+        this.parentElement.RegisterCallback<BlurEvent>(evt => ActionHelper.OnBlur(evt, this.parentElement, () => CloseTimeSelect(false)));
         this.drawCanvas = QueryController.Active.RootDocument.rootVisualElement.Q<VisualElement>("root").Q<VisualElement>("draw-canvas");
 
         this.dial = this.parentElement.Q<VisualElement>("main");
         this.hourLabelsContainer = this.parentElement.Q<VisualElement>("hour-labels-container");
         this.minuteLabelsContainer = this.parentElement.Q<VisualElement>("minute-labels-container");
         this.clockCenterReference = this.dial.Q<VisualElement>("center-reference");
-
-        if (this.curentTimeSelectType == TimeType.Hour)
-        {
-            VisualElementHelper.SetElementDisplay(this.hourLabelsContainer, DisplayStyle.Flex);
-            VisualElementHelper.SetElementDisplay(this.minuteLabelsContainer, DisplayStyle.None);
-        }
-        else
-        {
-            VisualElementHelper.SetElementDisplay(this.hourLabelsContainer, DisplayStyle.None);
-            VisualElementHelper.SetElementDisplay(this.minuteLabelsContainer, DisplayStyle.Flex);
-        }
+        this.timeDisplayContainer = this.parentElement.Q<VisualElement>("time-display-container");
+        this.timeDisplayHourLabelContainer = this.timeDisplayContainer.Q<VisualElement>("hour-label-container");
+        this.timeDisplayHourLabel = this.timeDisplayHourLabelContainer.Q<CustomLabel>();
+        this.timeDisplayMinutesLabelContainer = this.timeDisplayContainer.Q<VisualElement>("minutes-label-container");
+        this.timeDisplayMinutesLabel = this.timeDisplayMinutesLabelContainer.Q<CustomLabel>();
 
         this.drawCanvas.generateVisualContent += mgc =>
         {
@@ -78,8 +93,24 @@ public class TimeSelectQueryHandler : QueryHandler
             }
         };
 
-        GenerateClockFace();
+        CreateTimeLabels();
 
+        // dial.RegisterCallback<GeometryChangedEvent>(evt => PositionLabels());
+        dial.RegisterCallback<PointerDownEvent>(OnPointerDown);
+        dial.RegisterCallback<PointerMoveEvent>(OnPointerMove);
+        dial.RegisterCallback<PointerUpEvent>(OnPointerUp);
+    }
+
+    protected override void SetViewElements()
+    {
+    }
+
+    protected override void SetupInputs()
+    {
+    }
+
+    protected override void SetupButtons()
+    {
         dial.RegisterCallback<PointerDownEvent>(evt => this.isDragging = true);
         dial.RegisterCallback<PointerUpEvent>(evt =>
         {
@@ -87,23 +118,10 @@ public class TimeSelectQueryHandler : QueryHandler
         });
     }
 
-    private void LateUpdate()
-    {
-        if (!ReferenceEquals(this.drawCanvas, null))
-        {
-            this.drawCanvas.MarkDirtyRepaint();
-        }
-    }
-
-    private void GenerateClockFace()
+    private void CreateTimeLabels()
     {
         CreateHourLabels();
         CreateMinuteLabels();
-
-        dial.RegisterCallback<GeometryChangedEvent>(evt => PositionLabels());
-        dial.RegisterCallback<PointerDownEvent>(OnPointerDown);
-        dial.RegisterCallback<PointerMoveEvent>(OnPointerMove);
-        dial.RegisterCallback<PointerUpEvent>(OnPointerUp);
     }
 
     private void CreateHourLabels()
@@ -120,7 +138,7 @@ public class TimeSelectQueryHandler : QueryHandler
 
     private void CreateHourTimeLabel(int value)
     {
-        TimeLabel timeLabel = new TimeLabel(value, value.ToString(), TimeType.Hour, PositionHelper.GetHourLabelExtentTarget(value));
+        TimeLabel timeLabel = new TimeLabel(value, TimeType.Hour, PositionHelper.GetHourLabelExtentTarget(value));
         timeLabel.AddToClassList("hour-label");
         this.hourLabelsContainer.Add(timeLabel);
         this.hourLabels.Add(timeLabel);
@@ -129,33 +147,148 @@ public class TimeSelectQueryHandler : QueryHandler
     private void CreateMinuteLabels()
     {
         this.minuteLabels = new List<TimeLabel>();
-        string label;
 
         for (int i = 0; i < 60; i++)
         {
-            if (i % 5 != 0)
-            {
-                label = String.Empty;
-            }
-            else if (i < 10)
-            {
-                label = $"0{i}";
-            }
-            else
-            {
-                label = $"{i}";
-            }
-
-            CreateMinuteTimeLabel(i, label);
+            CreateMinuteTimeLabel(i);
         }
     }
 
-    private void CreateMinuteTimeLabel(int value, string label)
+    private void CreateMinuteTimeLabel(int value)
     {
-        TimeLabel timeLabel = new TimeLabel(value, label, TimeType.Minute, PositionHelper.GetMinuteLabelExtentTarget(value));
+        TimeLabel timeLabel = new TimeLabel(value, TimeType.Minute, PositionHelper.GetMinuteLabelExtentTarget(value));
         timeLabel.AddToClassList("hour-label");
         this.minuteLabelsContainer.Add(timeLabel);
         this.minuteLabels.Add(timeLabel);
+    }
+
+    #endregion
+
+    #region Actions
+
+    public void OpenTimeSelect(
+        Action<TimeContentHolder> timeSelectAction,
+        TimeType timeType = TimeType.Hour,
+        int initialHour = 0,
+        int initialMinutes = 0)
+    {
+        if (this.timeSelectOpen)
+        {
+            return;
+        }
+
+        QueryController.Active.BlockInteractions(this.instanceId);
+
+        this.onTimeSelectedAction = timeSelectAction;
+        this.currentTimeSelectType = timeType;
+        this.selectedHour = initialHour;
+        this.selectedMinutes = initialMinutes;
+        this.timeSelectOpen = true;
+
+        UpdateTimeDisplayLabels();
+        ShowParent();
+        RefreshDisplay();
+        WhileClockOpen().Forget();
+        this.parentElement.Focus();
+    }
+
+    public void CloseTimeSelect(bool invokeCompletion)
+    {
+
+        if (invokeCompletion)
+        {
+            this.onTimeSelectedAction?.Invoke(new TimeContentHolder(this.selectedHour, this.selectedMinutes));
+        }else{
+            this.onTimeSelectedAction?.Invoke(null);
+        }
+
+        this.timeSelectOpen = false;
+        HideParent();
+        QueryController.Active.UnblockInteractions(this.instanceId);
+    }
+
+
+    private void OnPointerDown(PointerDownEvent evt)
+    {
+        this.isDragging = true;
+        Vector2 pointerPos = evt.localPosition;
+        this.currentAngle = GetAngleFromPosition(pointerPos);
+        UpdatePointerPosition(this.currentAngle);
+    }
+
+    private void OnPointerMove(PointerMoveEvent evt)
+    {
+        if (this.isDragging)
+        {
+            Vector2 pointerPos = evt.localPosition;
+            this.currentAngle = GetAngleFromPosition(pointerPos);
+            UpdatePointerPosition(this.currentAngle);
+        }
+    }
+
+    private void OnPointerUp(PointerUpEvent evt)
+    {
+        this.isDragging = false;
+
+        if (this.currentTimeSelectType == TimeType.Hour)
+        {
+            this.selectedHour = this.currentLabel.Value;
+            this.currentTimeSelectType = TimeType.Minute;
+        }
+        else
+        {
+            this.selectedMinutes = this.currentLabel.Value;
+            CloseTimeSelect(true);
+        }
+
+        this.currentLabel = null;
+
+        RefreshDisplay();
+    }
+
+    #endregion
+
+    #region Update
+
+    private async UniTaskVoid WhileClockOpen()
+    {
+        await UniTask.WaitWhile(() =>
+        {
+            PositionLabels();
+            this.drawCanvas.MarkDirtyRepaint();
+
+            return this.timeSelectOpen;
+        });
+    }
+
+    private void UpdateTimeDisplayLabels()
+    {
+        this.timeDisplayHourLabel.text = this.selectedHour.ToString();
+        this.timeDisplayMinutesLabel.text = this.selectedMinutes > 9 ? this.selectedMinutes.ToString() : $"0{this.selectedMinutes}";
+    }
+
+    private void UpdateTimeDisplayHourLabel(int value)
+    {
+        this.timeDisplayHourLabel.text = value.ToString();
+    }
+
+    private void UpdateTimeDisplayMinutesLabel(int value)
+    {
+        this.timeDisplayMinutesLabel.text = value > 9 ? value.ToString() : $"0{value}";
+    }
+
+    private void RefreshDisplay()
+    {
+        if (this.currentTimeSelectType == TimeType.Hour)
+        {
+            VisualElementHelper.SetElementDisplay(this.hourLabelsContainer, DisplayStyle.Flex);
+            VisualElementHelper.SetElementDisplay(this.minuteLabelsContainer, DisplayStyle.None);
+        }
+        else
+        {
+            VisualElementHelper.SetElementDisplay(this.hourLabelsContainer, DisplayStyle.None);
+            VisualElementHelper.SetElementDisplay(this.minuteLabelsContainer, DisplayStyle.Flex);
+        }
     }
 
     private void PositionLabels()
@@ -163,9 +296,9 @@ public class TimeSelectQueryHandler : QueryHandler
         float dialSize = this.dial.resolvedStyle.width;
         float labelSize;
         float radius;
-        int timeCount = this.curentTimeSelectType == TimeType.Hour ? total_hours : total_minutes;
+        int timeCount = this.currentTimeSelectType == TimeType.Hour ? total_hours : total_minutes;
         float angleStep = 360f / timeCount;
-        List<TimeLabel> timeLabels = this.curentTimeSelectType == TimeType.Hour ? this.hourLabels : this.minuteLabels;
+        List<TimeLabel> timeLabels = this.currentTimeSelectType == TimeType.Hour ? this.hourLabels : this.minuteLabels;
 
 
         for (int i = 0; i < timeCount; i++)
@@ -192,15 +325,29 @@ public class TimeSelectQueryHandler : QueryHandler
 
     private void SetClosestLabel(float angle)
     {
-        int totalLabels = this.curentTimeSelectType == TimeType.Hour ? total_hours : total_minutes;
-        List<TimeLabel> currentCollection = this.curentTimeSelectType == TimeType.Hour ? this.hourLabels : this.minuteLabels;
+        int totalLabels = this.currentTimeSelectType == TimeType.Hour ? total_hours : total_minutes;
+        List<TimeLabel> currentCollection = this.currentTimeSelectType == TimeType.Hour ? this.hourLabels : this.minuteLabels;
         float correctedAngle = GetCorrectedAngle(angle);
 
         float angleStep = 360f / totalLabels;
         int nearestLabelIndex = Mathf.RoundToInt(correctedAngle / angleStep) % totalLabels;
 
         this.currentLabel = currentCollection[nearestLabelIndex];
+
+        switch (this.currentTimeSelectType)
+        {
+            case TimeType.Hour:
+                UpdateTimeDisplayHourLabel(this.currentLabel.Value);
+                break;
+            case TimeType.Minute:
+                UpdateTimeDisplayMinutesLabel(this.currentLabel.Value);
+                break;
+        }
     }
+
+    #endregion
+
+    #region Getters/Setters
 
     private float GetCorrectedAngle(float angle)
     {
@@ -243,38 +390,5 @@ public class TimeSelectQueryHandler : QueryHandler
         return new Vector2(x, y);
     }
 
-    private void OnPointerDown(PointerDownEvent evt)
-    {
-        this.isDragging = true;
-        Vector2 pointerPos = evt.localPosition;
-        this.currentAngle = GetAngleFromPosition(pointerPos);
-        UpdatePointerPosition(this.currentAngle);
-    }
-
-    private void OnPointerMove(PointerMoveEvent evt)
-    {
-        if (this.isDragging)
-        {
-            Vector2 pointerPos = evt.localPosition;
-            this.currentAngle = GetAngleFromPosition(pointerPos);
-            UpdatePointerPosition(this.currentAngle);
-        }
-    }
-
-    private void OnPointerUp(PointerUpEvent evt)
-    {
-        this.isDragging = false;
-    }
-
-    protected override void SetViewElements()
-    {
-    }
-
-    protected override void SetupInputs()
-    {
-    }
-
-    protected override void SetupButtons()
-    {
-    }
+    #endregion
 }

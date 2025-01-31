@@ -128,6 +128,9 @@ public class NavigationButtonsQueryHandler : QueryHandler
     {
         switch (QueryController.Active.CurrentMainView)
         {
+            case MainView.JobDetails:
+                QueryController.Active.JobDetailsQueryHandler.CloseJobDetails();
+            break;
             default:
                 QueryController.Active.ReturnToPreviousView();
                 break;
