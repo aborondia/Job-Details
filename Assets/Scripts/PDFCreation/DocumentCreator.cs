@@ -49,7 +49,7 @@ public class DocumentCreator : MonoBehaviour
 #if UNITY_EDITOR
         this.font = this.document.getFontReference("Helvetica");
 #else
-                StartCoroutine(GetFontReference("Helvetica"));
+                GetFontReference("Helvetica");
 #endif
         this.borderLinePDFColor = new pdfColor((int)this.lineColor.r, (int)this.lineColor.g, (int)this.lineColor.b);
         this.rectanglePDFColor = new pdfColor((int)this.rectangleColor.r, (int)this.rectangleColor.g, (int)this.rectangleColor.b);

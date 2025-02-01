@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/USS/radial-time-select.uss?fileID=7433441132597879392&amp;guid=3cfc619273c2b414cb503dce3d92ad41&amp;type=3#radial-time-select" />
-    <CustomVisualElement name="main" class="black-border" style="width: 100%; height: 100%; background-color: rgb(255, 255, 255); border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px; border-top-left-radius: 100%; border-top-right-radius: 100%; border-bottom-right-radius: 100%; border-bottom-left-radius: 100%; max-width: 500px; max-height: 500px; min-width: 500px; min-height: 500px; align-self: center; flex-direction: row; justify-content: center; align-items: flex-start;">
+    <CustomVisualElement name="main" class="black-border" style="background-color: rgb(255, 255, 255); border-top-width: 3px; border-right-width: 3px; border-bottom-width: 3px; border-left-width: 3px; border-top-left-radius: 100%; border-top-right-radius: 100%; border-bottom-right-radius: 100%; border-bottom-left-radius: 100%; flex-direction: row; justify-content: center; width: 100%; height: 100%; align-content: flex-start; align-items: stretch;">
         <CustomVisualElement name="center-reference" class="center-reference" />
         <CustomVisualElement name="selected-label-highlight" class="green1-border selected-label-highlight" />
         <CustomVisualElement name="hour-labels-container" style="position: absolute; width: 100%; height: 100%;" />

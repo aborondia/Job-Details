@@ -3,35 +3,37 @@
     <Style src="project://database/Assets/UI/USS/details-report-entry.uss?fileID=7433441132597879392&amp;guid=e42ddeb8475faf04489af6f788d101ad&amp;type=3#details-report-entry" />
     <CustomVisualElement name="main" class="details-report-main gray1-border">
         <CustomVisualElement name="report-details-container" class="report-details-container">
-            <CustomVisualElement name="time-range-labels-container" class="time-range-labels-container">
-                <CustomVisualElement name="tag-label-container" class="time-range-label-container">
-                    <CustomLabel text="Time Range: " class="time-range-label large-font" />
+            <CustomVisualElement name="content" style="flex-direction: row; align-items: center; padding-left: 6%; flex-grow: 1;">
+                <CustomVisualElement name="time-range-labels-container" class="time-range-labels-container">
+                    <CustomVisualElement name="tag-label-container" class="time-range-label-container">
+                        <CustomLabel text="Time Range: " class="time-range-label large-font" />
+                    </CustomVisualElement>
+                    <CustomVisualElement name="time-label-container" class="time-range-label-container">
+                        <CustomLabel text="--" class="time-range-label large-font" />
+                    </CustomVisualElement>
                 </CustomVisualElement>
-                <CustomVisualElement name="time-label-container" class="time-range-label-container">
-                    <CustomLabel text="--" class="time-range-label large-font" />
-                </CustomVisualElement>
-            </CustomVisualElement>
-            <CustomVisualElement name="option-buttons-container" class="option-buttons-container">
-                <CustomVisualElement name="email-button-container" class="option-button-container">
-                    <CustomButton use-background-color="false" use-border="false" class="option-button">
-                        <CustomVisualElement name="icon-container" class="icon-container">
-                            <CustomVisualElement name="icon" enforce-largest-dimension="true" regenerate-in-editor="true" should-initialize="true" class="gi-mail" />
-                        </CustomVisualElement>
-                    </CustomButton>
-                </CustomVisualElement>
-                <CustomVisualElement name="add-details-button-container" class="option-button-container">
-                    <CustomButton use-background-color="false" use-border="false" class="option-button">
-                        <CustomVisualElement name="icon-container" class="icon-container">
-                            <CustomVisualElement name="icon" enforce-largest-dimension="true" regenerate-in-editor="true" initialized="false" class="gi-plus green1-img" />
-                        </CustomVisualElement>
-                    </CustomButton>
-                </CustomVisualElement>
-                <CustomVisualElement name="delete-report-button-container" class="option-button-container">
-                    <CustomButton use-background-color="false" use-border="false" class="option-button">
-                        <CustomVisualElement name="icon-container" class="icon-container">
-                            <CustomVisualElement name="icon" largest-dimension="30" enforce-largest-dimension="true" regenerate-in-editor="true" class="gi-recycle-bin red1-img" />
-                        </CustomVisualElement>
-                    </CustomButton>
+                <CustomVisualElement name="option-buttons-container" class="option-buttons-container">
+                    <CustomVisualElement name="email-button-container" class="option-button-container">
+                        <CustomButton use-background-color="false" use-border="false" class="option-button">
+                            <CustomVisualElement name="icon-container" class="icon-container">
+                                <CustomVisualElement name="icon" enforce-largest-dimension="true" regenerate-in-editor="true" should-initialize="true" class="gi-mail" />
+                            </CustomVisualElement>
+                        </CustomButton>
+                    </CustomVisualElement>
+                    <CustomVisualElement name="add-details-button-container" class="option-button-container">
+                        <CustomButton use-background-color="false" use-border="false" class="option-button">
+                            <CustomVisualElement name="icon-container" class="icon-container">
+                                <CustomVisualElement name="icon" enforce-largest-dimension="true" regenerate-in-editor="true" initialized="false" class="gi-plus green1-img" />
+                            </CustomVisualElement>
+                        </CustomButton>
+                    </CustomVisualElement>
+                    <CustomVisualElement name="delete-report-button-container" class="option-button-container">
+                        <CustomButton use-background-color="false" use-border="false" class="option-button">
+                            <CustomVisualElement name="icon-container" class="icon-container">
+                                <CustomVisualElement name="icon" largest-dimension="30" enforce-largest-dimension="true" regenerate-in-editor="true" class="gi-recycle-bin red1-img" />
+                            </CustomVisualElement>
+                        </CustomButton>
+                    </CustomVisualElement>
                 </CustomVisualElement>
             </CustomVisualElement>
         </CustomVisualElement>
@@ -39,9 +41,9 @@
             <ui:Instance template="JobDetailsEntry" name="JobDetailsEntry" />
             <ui:Instance template="JobDetailsEntry" name="JobDetailsEntry" />
         </CustomVisualElement>
-        <CustomVisualElement name="expand-collapse-button-container" style="height: 100%; width: 82%; position: absolute;">
-            <CustomButton use-background-color="false" use-border="false" name="CustomButton" style="align-items: flex-start; justify-content: flex-start;">
-                <CustomVisualElement name="icon-container" class="icon-container" style="min-width: 5%; justify-content: center; align-items: center; min-height: 60px;">
+        <CustomVisualElement name="expand-collapse-button-container" style="height: 100%; position: absolute; max-width: 75%; width: 75%;">
+            <CustomButton use-background-color="false" use-border="false" name="CustomButton" style="align-items: flex-start; justify-content: flex-start; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
+                <CustomVisualElement name="icon-container" class="icon-container" style="justify-content: center; align-items: flex-start;">
                     <CustomVisualElement name="icon" largest-dimension="30" enforce-largest-dimension="true" regenerate-in-editor="true" class="gi-chevron-down" />
                 </CustomVisualElement>
             </CustomButton>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -169,9 +170,10 @@ public class TimeSelectQueryHandler : QueryHandler
     public void OpenTimeSelect(
         Action<TimeContentHolder> timeSelectAction,
         TimeType timeType = TimeType.Hour,
-        int initialHour = 0,
+        int initialHour = 12,
         int initialMinutes = 0)
     {
+
         if (this.timeSelectOpen)
         {
             return;
@@ -180,9 +182,9 @@ public class TimeSelectQueryHandler : QueryHandler
         QueryController.Active.BlockInteractions(this.instanceId);
 
         this.onTimeSelectedAction = timeSelectAction;
-        this.currentTimeSelectType = timeType;
-        this.selectedHour = initialHour;
-        this.selectedMinutes = initialMinutes;
+        SetSelectedHour(initialHour);
+        SetSelectedMinutes(initialMinutes);
+        SetCurrentTimeSelectType(timeType);
         this.timeSelectOpen = true;
 
         UpdateTimeDisplayLabels();
@@ -190,19 +192,23 @@ public class TimeSelectQueryHandler : QueryHandler
         RefreshDisplay();
         WhileClockOpen().Forget();
         this.parentElement.Focus();
+        VisualElementHelper.SetElementDisplay(this.drawCanvas, DisplayStyle.Flex);
     }
 
     public void CloseTimeSelect(bool invokeCompletion)
     {
-
         if (invokeCompletion)
         {
             this.onTimeSelectedAction?.Invoke(new TimeContentHolder(this.selectedHour, this.selectedMinutes));
-        }else{
+        }
+        else
+        {
             this.onTimeSelectedAction?.Invoke(null);
         }
 
         this.timeSelectOpen = false;
+        SetCurrentLabel(null);
+        VisualElementHelper.SetElementDisplay(this.drawCanvas, DisplayStyle.None);
         HideParent();
         QueryController.Active.UnblockInteractions(this.instanceId);
     }
@@ -232,16 +238,14 @@ public class TimeSelectQueryHandler : QueryHandler
 
         if (this.currentTimeSelectType == TimeType.Hour)
         {
-            this.selectedHour = this.currentLabel.Value;
-            this.currentTimeSelectType = TimeType.Minute;
+            SetSelectedHour(this.currentLabel.Value);
+            SetCurrentTimeSelectType(TimeType.Minute);
         }
         else
         {
-            this.selectedMinutes = this.currentLabel.Value;
+            SetSelectedMinutes(this.currentLabel.Value);
             CloseTimeSelect(true);
         }
-
-        this.currentLabel = null;
 
         RefreshDisplay();
     }
@@ -252,8 +256,22 @@ public class TimeSelectQueryHandler : QueryHandler
 
     private async UniTaskVoid WhileClockOpen()
     {
+        float targetSize;
+        float parentWidth;
+        float parentHeight;
+
         await UniTask.WaitWhile(() =>
         {
+            parentWidth = this.dial.parent.resolvedStyle.width;
+            parentHeight = this.dial.parent.resolvedStyle.height;
+            targetSize = parentWidth < parentHeight ? parentWidth : parentHeight;
+
+            if (this.dial.resolvedStyle.width != targetSize || this.dial.resolvedStyle.width != targetSize)
+            {
+                this.dial.style.width = targetSize;
+                this.dial.style.height = targetSize;
+            }
+
             PositionLabels();
             this.drawCanvas.MarkDirtyRepaint();
 
@@ -263,8 +281,8 @@ public class TimeSelectQueryHandler : QueryHandler
 
     private void UpdateTimeDisplayLabels()
     {
-        this.timeDisplayHourLabel.text = this.selectedHour.ToString();
-        this.timeDisplayMinutesLabel.text = this.selectedMinutes > 9 ? this.selectedMinutes.ToString() : $"0{this.selectedMinutes}";
+        UpdateTimeDisplayHourLabel(this.selectedHour);
+        UpdateTimeDisplayMinutesLabel(this.selectedMinutes);
     }
 
     private void UpdateTimeDisplayHourLabel(int value)
@@ -332,7 +350,7 @@ public class TimeSelectQueryHandler : QueryHandler
         float angleStep = 360f / totalLabels;
         int nearestLabelIndex = Mathf.RoundToInt(correctedAngle / angleStep) % totalLabels;
 
-        this.currentLabel = currentCollection[nearestLabelIndex];
+        SetCurrentLabel(currentCollection[nearestLabelIndex]);
 
         switch (this.currentTimeSelectType)
         {
@@ -348,6 +366,47 @@ public class TimeSelectQueryHandler : QueryHandler
     #endregion
 
     #region Getters/Setters
+
+    private void SetCurrentTimeSelectType(TimeType timeType)
+    {
+        TimeLabel currentTimeLabel;
+
+        this.currentTimeSelectType = timeType;
+
+        switch (timeType)
+        {
+            case TimeType.Hour:
+                currentTimeLabel = this.hourLabels.FirstOrDefault(label => label.Value == this.selectedHour);
+                break;
+            case TimeType.Minute:
+                currentTimeLabel = this.minuteLabels.FirstOrDefault(label => label.Value == this.selectedMinutes);
+                break;
+            default:
+                return;
+        }
+
+        if (!ReferenceEquals(currentTimeLabel, null))
+        {
+            SetCurrentLabel(currentTimeLabel);
+        }
+    }
+
+    private void SetCurrentLabel(TimeLabel timeLabel)
+    {
+        this.currentLabel = timeLabel;
+    }
+
+    private void SetSelectedHour(int value)
+    {
+        this.selectedHour = value;
+        UpdateTimeDisplayHourLabel(value);
+    }
+
+    private void SetSelectedMinutes(int value)
+    {
+        this.selectedMinutes = value;
+        UpdateTimeDisplayMinutesLabel(value);
+    }
 
     private float GetCorrectedAngle(float angle)
     {

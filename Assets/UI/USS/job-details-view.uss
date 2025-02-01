@@ -27,7 +27,7 @@
     margin-top: 5px;
     max-width: 49%;
     flex-direction: row;
-    min-height: 60px;
+    min-height: 15%;
     margin-bottom: 5px;
 }
 
@@ -41,11 +41,12 @@
     flex-grow: 1;
     justify-content: flex-end;
     min-height: 60px;
+    height: 100%;
 }
 
 .time-inputs-container {
     min-width: 49%;
-    min-height: 60px;
+    min-height: 15%;
     margin-bottom: 5px;
     flex-direction: row;
     justify-content: flex-end;
@@ -56,8 +57,8 @@
 .enum-input-container {
     min-width: 45%;
     max-width: 45%;
-    min-height: 60px;
     justify-content: center;
+    height: 100%;
 }
 
 .custom-input > .unity-text-field__input {
@@ -94,15 +95,16 @@
 
 .cleaner-row {
     min-height: 60px;
-    min-width: 49%;
-    max-width: 49%;
+    min-width: 33%;
+    max-width: 33%;
     max-height: 60px;
     margin-top: 5px;
+    margin-right: 0.3%;
 }
 
 .cleaners-content {
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-start;
     flex-wrap: wrap;
     width: 100%;
 }
@@ -128,7 +130,7 @@
 }
 
 .add-cleaner-button-container {
-    min-width: 60px;
+    min-width: 8%;
     height: 100%;
 }
 
@@ -166,6 +168,7 @@
     padding-right: 5px;
     padding-bottom: 5px;
     padding-left: 5px;
+    height: 100%;
 }
 
 .time-input-label {
@@ -179,7 +182,7 @@
     min-width: 49%;
     flex-direction: row;
     justify-content: space-between;
-    min-height: 60px;
+    min-height: 15%;
     margin-top: 5px;
     margin-bottom: 5px;
 }
@@ -189,6 +192,7 @@
     flex-grow: 1;
     width: 100%;
     max-height: 30%;
+    min-height: 20%;
 }
 
 .inputs-container {

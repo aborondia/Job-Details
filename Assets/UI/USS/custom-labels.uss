@@ -14,23 +14,23 @@
 }
 
 .x-small-font {
-    font-size: 8px;
+    font-size: 6px;
 }
 
 .small-font {
-    font-size: 16px;
+    font-size: 8px;
 }
 
 .regular-font {
-    font-size: 24px;
+    font-size: 16px;
 }
 
 .large-font {
-    font-size: 36px;
+    font-size: 24px;
 }
 
 .x-large-font {
-    font-size: 48px;
+    font-size: 36px;
 }
 
 .big-font{

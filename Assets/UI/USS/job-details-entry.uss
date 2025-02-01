@@ -30,12 +30,15 @@
 
 .job-option-buttons-container {
     flex-direction: row;
+    min-width: 25%;
+    justify-content: flex-end;
+    max-width: 25%;
 }
 
 .option-button-container {
-    min-width: 60px;
-    height: 100%;
-    margin-left: 10px;
+    min-width: 33%;
+    padding-right: 1.5%;
+    padding-left: 1.5%;
 }
 
 .option-button {

@@ -64,20 +64,20 @@
             </CustomVisualElement>
         </CustomVisualElement>
         <CustomVisualElement name="navigation-buttons-container" class="centered-element" />
-        <CustomVisualElement name="options-container" class="options-container centered-element">
+        <CustomVisualElement name="options-container" class="options-container centered-element regular-font">
             <CustomVisualElement name="register-button-container" class="option-button-container" style="min-width: 100%; max-width: 100%;">
                 <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button">
-                    <CustomLabel text="Register" class="option-button-label large-font" />
+                    <CustomLabel text="Register" class="option-button-label" />
                 </CustomButton>
             </CustomVisualElement>
             <CustomVisualElement name="forgot-username-button-container" class="option-button-container">
                 <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button">
-                    <CustomLabel text="Forgot Username?" class="white-font option-button-label large-font" />
+                    <CustomLabel text="Forgot Username?" class="white-font option-button-label" />
                 </CustomButton>
             </CustomVisualElement>
             <CustomVisualElement name="forgot-password-button-container" class="option-button-container">
                 <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button">
-                    <CustomLabel text="Forgot Password?" class="white-font option-button-label large-font" />
+                    <CustomLabel text="Forgot Password?" class="white-font option-button-label" />
                 </CustomButton>
             </CustomVisualElement>
             <CustomVisualElement name="validate-registration-button-container" class="option-button-container" style="display: none;">

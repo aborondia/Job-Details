@@ -1,9 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <ui:Template name="CustomDropdownFiled" src="project://database/Assets/UI/UXML/CustomDropdownFiled.uxml?fileID=9197481963319205126&amp;guid=631f7dfeea3d0ed45b1846f7da722414&amp;type=3#CustomDropdownFiled" />
     <Style src="project://database/Assets/UI/USS/cleaner-row.uss?fileID=7433441132597879392&amp;guid=eea161ef31f384b429cf62eff7b533f1&amp;type=3#cleaner-row" />
     <Style src="project://database/Assets/UI/USS/name-select-dropdown.uss?fileID=7433441132597879392&amp;guid=789727474196e7f4197c7d4ce0b0cb69&amp;type=3#name-select-dropdown" />
     <CustomVisualElement name="main" class="cleaner-row-main">
-        <CustomVisualElement name="delete-button-container" style="width: 50px;">
+        <CustomVisualElement name="delete-button-container" style="min-width: 15%;">
             <CustomButton use-background-color="false" use-border="false">
                 <CustomVisualElement name="icon-container" class="icon-container" style="width: 100%; height: 100%; justify-content: center; align-items: center;">
                     <CustomVisualElement name="icon" regenerate-in-editor="true" enforce-largest-dimension="true" largest-dimension="30" class="gi-recycle-bin red1-img" />
@@ -25,9 +24,8 @@
                 <CustomLabel text="Cleaner Name" use-default-font-color="false" class="username-selection-entry" />
             </ui:ScrollView>
         </CustomVisualElement>
-        <ui:Instance template="CustomDropdownFiled" name="hours-dropdown" class="hours-dropdown-field" style="display: none;" />
         <CustomVisualElement name="hours-input-container" class="hours-input-container">
-            <CustomInput placeholder-text="Hours" style="width: 100%;" />
+            <CustomInput placeholder-text="Hours" keyboard-type="NumberPad" class="regular-font" />
         </CustomVisualElement>
     </CustomVisualElement>
 </ui:UXML>

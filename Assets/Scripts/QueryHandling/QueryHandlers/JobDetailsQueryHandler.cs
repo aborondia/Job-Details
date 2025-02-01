@@ -520,7 +520,6 @@ public class JobDetailsQueryHandler : QueryHandler
             original.FinishTime,
             original.JobType,
             original.Cleaners.ConvertAll(cleaner => new CleanerJobEntry(cleaner)),
-            // new List<CleanerJobEntry>(original.Cleaners),
             original.PaymentType,
             original.Description,
             original.ObjectId

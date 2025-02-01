@@ -77,6 +77,7 @@
                         <ui:Instance template="CleanerRow" name="CleanerRow" class="cleaner-row" />
                         <ui:Instance template="CleanerRow" name="CleanerRow" class="cleaner-row" />
                         <ui:Instance template="CleanerRow" name="CleanerRow" class="cleaner-row" />
+                        <ui:Instance template="CleanerRow" name="CleanerRow" class="cleaner-row" />
                     </CustomVisualElement>
                 </CustomVisualElement>
             </CustomVisualElement>
