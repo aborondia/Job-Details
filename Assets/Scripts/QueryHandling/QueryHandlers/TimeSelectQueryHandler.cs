@@ -36,6 +36,7 @@ public class TimeSelectQueryHandler : QueryHandler
     private int selectedHour;
     private int selectedMinutes;
     private Action<TimeContentHolder> onTimeSelectedAction;
+    private EventCallback<PointerMoveEvent> onPointerMoveEvent;
 
     #region Initialization
 
@@ -98,8 +99,8 @@ public class TimeSelectQueryHandler : QueryHandler
         CreateTimeLabels();
 
         dial.RegisterCallback<PointerDownEvent>(OnPointerDown);
-        dial.RegisterCallback<PointerMoveEvent>(OnPointerMove);
-        dial.RegisterCallback<PointerUpEvent>(OnPointerUp);
+
+        this.onPointerMoveEvent = evt => OnPointerMove(evt);
     }
 
     protected override void SetViewElements()
@@ -112,11 +113,6 @@ public class TimeSelectQueryHandler : QueryHandler
 
     protected override void SetupButtons()
     {
-        dial.RegisterCallback<PointerDownEvent>(evt => this.isDragging = true);
-        dial.RegisterCallback<PointerUpEvent>(evt =>
-        {
-            this.isDragging = false;
-        });
     }
 
     private void CreateTimeLabels()
@@ -222,16 +218,26 @@ public class TimeSelectQueryHandler : QueryHandler
         Vector2 pointerPos = evt.localPosition;
         this.currentAngle = GetAngleFromPosition(pointerPos);
         UpdatePointerPosition(this.currentAngle);
+        WhilePointerDown().Forget();
+
+        QueryController.Active.RootDocument.rootVisualElement.RegisterCallback<PointerMoveEvent>(this.onPointerMoveEvent);
     }
 
     private void OnPointerMove(PointerMoveEvent evt)
     {
         if (this.isDragging)
         {
-            Vector2 pointerPos = evt.localPosition;
+            Vector2 pointerPos = this.dial.WorldToLocal(evt.position);
             this.currentAngle = GetAngleFromPosition(pointerPos);
             UpdatePointerPosition(this.currentAngle);
         }
+    }
+
+    private async UniTaskVoid WhilePointerDown()
+    {
+        await UniTask.WaitWhile(() => Input.GetMouseButton(0));
+
+        OnPointerUp(null);
     }
 
     private void OnPointerUp(PointerUpEvent evt)
@@ -248,6 +254,8 @@ public class TimeSelectQueryHandler : QueryHandler
             SetSelectedMinutes(this.currentLabel.Value);
             CloseTimeSelect(true);
         }
+
+        QueryController.Active.RootDocument.rootVisualElement.UnregisterCallback<PointerMoveEvent>(this.onPointerMoveEvent);
 
         RefreshDisplay();
     }

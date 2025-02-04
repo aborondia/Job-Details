@@ -101,7 +101,8 @@ public class UsersQueryHandler : QueryHandler
         switch (user.RoleDTM.name)
         {
             case UserDataHandler._AdminRoleServerName:
-                if (AppController.Active.UserDataHandler.CurrentUser.RoleDTM.name == UserDataHandler._OwnerRoleServerName)
+                if (AppController.Active.UserDataHandler.CurrentUser.RoleDTM.name == UserDataHandler._OwnerRoleServerName
+                || AppController.Active.UserDataHandler.CurrentUser.RoleDTM.name == UserDataHandler._DeveloperRoleServerName)
                 {
                     deleteUserButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
                     canDeleteUser = true;
@@ -113,16 +114,24 @@ public class UsersQueryHandler : QueryHandler
                 }
                 break;
             case UserDataHandler._OwnerRoleServerName:
-                VisualElementHelper.SetElementDisplay(deleteUserButton.parent, DisplayStyle.None);
-                canDeleteUser = false;
+                if (AppController.Active.UserDataHandler.CurrentUser.RoleDTM.name == UserDataHandler._DeveloperRoleServerName)
+                {
+                    deleteUserButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
+                    canDeleteUser = true;
+                }
+                else
+                {
+                    VisualElementHelper.SetElementDisplay(deleteUserButton.parent, DisplayStyle.None);
+                    canDeleteUser = false;
+                }
                 break;
             case UserDataHandler._UserRoleServerName:
                 deleteUserButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
                 canDeleteUser = true;
                 break;
             default:
-                deleteUserButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
-                canDeleteUser = true;
+                VisualElementHelper.SetElementDisplay(deleteUserButton.parent, DisplayStyle.None);
+                canDeleteUser = false;
                 break;
         }
 
@@ -204,6 +213,7 @@ public class UsersQueryHandler : QueryHandler
         }
         else
         {
+            userTypeDropdownField.value = AppController.Active.UserDataHandler.GetRoleEnum(user.RoleDTM.name).ToString();
             userTypeDropdownField.SetEnabled(false);
         }
     }

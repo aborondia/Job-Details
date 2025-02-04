@@ -33,6 +33,7 @@ public class PopupsQueryHandler : QueryHandler
     private CustomLabel notificationMessageLabel;
     private VisualElement notificationConfirmButtonContainer;
     private CustomButton notificationConfirmButton;
+    private CustomLabel notificationConfirmButtonLabel;
     #endregion
 
     #region Send Email Popup
@@ -97,6 +98,7 @@ public class PopupsQueryHandler : QueryHandler
         this.notificationMessageLabel = this.notificationMessageLabelContainer.Q<CustomLabel>();
         this.notificationConfirmButtonContainer = this.notificationPopup.Q<VisualElement>("confirm-button-container");
         this.notificationConfirmButton = this.notificationConfirmButtonContainer.Q<CustomButton>();
+        this.notificationConfirmButtonLabel = this.notificationConfirmButton.Q<CustomLabel>();
 
         this.sendEmailPopup = this.parentElement.Q<VisualElement>("send-email-popup");
         this.sendEmailContentInputContainer = this.sendEmailPopup.Q<VisualElement>("content-input-container");
@@ -186,13 +188,14 @@ public class PopupsQueryHandler : QueryHandler
         this.cancelAction = cancelAction;
     }
 
-    public void OpenNotificationPopup(Action confirmAction, string message, bool canNavigateAway = true)
+    public void OpenNotificationPopup(Action confirmAction, string message, bool canNavigateAway = true, string buttonText = "Okay")
     {
         ShowParent();
         OnOpeningPopup(canNavigateAway);
 
         VisualElementHelper.SetElementDisplay(this.notificationPopup, DisplayStyle.Flex);
         this.notificationMessageLabel.text = message;
+        this.notificationConfirmButtonLabel.text = buttonText;
         this.confirmAction = confirmAction;
     }
 

@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using UnityEngine.Events;
 using SimpleJSON;
 using System.Linq;
+using Enumerations;
 
 public class JobDetailsQueryHandler : QueryHandler
 {
@@ -92,6 +93,7 @@ public class JobDetailsQueryHandler : QueryHandler
         });
 
         this.startTimeOfDayField = this.startTimeInputContainer.Q<CustomEnumField>();
+        this.startTimeOfDayField.RegisterCallback<ChangeEvent<Enum>>(evt => OnJobDetailsChanged());
 
         this.finishTimeInputsContainer = this.inputsContainer.Q<VisualElement>("finish-time-inputs-container");
         this.finishTimeInputContainer = this.finishTimeInputsContainer.Q<VisualElement>("finish-time-input-container");
@@ -111,7 +113,7 @@ public class JobDetailsQueryHandler : QueryHandler
         });
 
         this.finishTimeOfDayField = this.finishTimeInputContainer.Q<CustomEnumField>();
-        this.finishTimeOfDayField.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
+        this.finishTimeOfDayField.RegisterCallback<ChangeEvent<Enum>>(evt => OnJobDetailsChanged());
 
         this.jobTypeInputContainer = this.inputsContainer.Q<VisualElement>("job-type-input-container");
         this.jobTypeInput = this.jobTypeInputContainer.Q<CustomEnumField>();
@@ -341,7 +343,7 @@ public class JobDetailsQueryHandler : QueryHandler
     {
         if (ReferenceEquals(this.currentJobDetail.JobType, null))
         {
-            this.jobTypeInput.SetValueWithoutNotify((Enumerations.JobTypeEnum)0);
+            this.jobTypeInput.SetValueWithoutNotify((JobTypeEnum)0);
 
             return;
         }
@@ -353,7 +355,7 @@ public class JobDetailsQueryHandler : QueryHandler
     {
         if (ReferenceEquals(this.currentJobDetail.PaymentType, null))
         {
-            this.paymentTypeInput.SetValueWithoutNotify((Enumerations.PaymentTypeEnum)0);
+            this.paymentTypeInput.SetValueWithoutNotify((PaymentTypeEnum)0);
 
             return;
         }
@@ -370,11 +372,11 @@ public class JobDetailsQueryHandler : QueryHandler
         this.currentStartTime.Hour = this.currentJobDetail.StartTime.Hour;
         this.currentStartTime.Minutes = this.currentJobDetail.StartTime.Minute;
 
-        isPMStartTime = this.currentJobDetail.StartTime.Hour > 12;
+        isPMStartTime = this.currentJobDetail.StartTime.Hour >= 12;
         startHoursString = this.currentStartTime.Hour > 12 ? (this.currentStartTime.Hour - 12).ToString() : this.currentStartTime.Hour.ToString();
         startMinutesString = this.currentStartTime.Minutes > 9 ? this.currentStartTime.Minutes.ToString() : $"0{this.currentStartTime.Minutes}";
 
-        this.startTimeOfDayField.SetValueWithoutNotify(isPMStartTime ? Enumerations.TimeOfDayEnum.PM : Enumerations.TimeOfDayEnum.AM);
+        this.startTimeOfDayField.SetValueWithoutNotify(isPMStartTime ? TimeOfDayEnum.PM : TimeOfDayEnum.AM);
         this.startTimeInput.SetValueWithoutNotify($"{startHoursString}:{startMinutesString}");
     }
 
@@ -387,11 +389,11 @@ public class JobDetailsQueryHandler : QueryHandler
         this.currentFinishTime.Hour = this.currentJobDetail.FinishTime.Hour;
         this.currentFinishTime.Minutes = this.currentJobDetail.FinishTime.Minute;
 
-        isPMFinishTime = this.currentJobDetail.FinishTime.Hour > 12;
+        isPMFinishTime = this.currentJobDetail.FinishTime.Hour >= 12;
         finishHoursString = this.currentFinishTime.Hour > 12 ? (this.currentFinishTime.Hour - 12).ToString() : this.currentFinishTime.Hour.ToString();
         finishMinutesString = this.currentFinishTime.Minutes > 9 ? this.currentFinishTime.Minutes.ToString() : $"0{this.currentFinishTime.Minutes}";
 
-        this.finishTimeOfDayField.SetValueWithoutNotify(isPMFinishTime ? Enumerations.TimeOfDayEnum.PM : Enumerations.TimeOfDayEnum.AM);
+        this.finishTimeOfDayField.SetValueWithoutNotify(isPMFinishTime ? TimeOfDayEnum.PM : TimeOfDayEnum.AM);
         this.finishTimeInput.SetValueWithoutNotify($"{finishHoursString}:{finishMinutesString}");
     }
 
@@ -515,25 +517,22 @@ public class JobDetailsQueryHandler : QueryHandler
         int startHoursModifier;
         int finishHoursModifier;
 
-        if (DataValidationChecker.IsDateTimeStringValid(this.dateInput.value))
+        if (!DateTime.TryParse(this.dateInput.value, out jobDate))
         {
-            if (!DateTime.TryParse(this.dateInput.value, out jobDate))
-            {
-                jobDate = DateTime.Now;
-            }
-
-            startTime = DateTime.Parse(this.dateInput.value);
-            finishTime = DateTime.Parse(this.dateInput.value);
-
-            startHoursModifier = (Enumerations.TimeOfDayEnum)this.startTimeOfDayField.value == Enumerations.TimeOfDayEnum.AM ? 0 : 12;
-            finishHoursModifier = (Enumerations.TimeOfDayEnum)this.finishTimeOfDayField.value == Enumerations.TimeOfDayEnum.AM ? 0 : 12;
-
-            startTime = startTime.AddHours(this.currentStartTime.Hour.Value + startHoursModifier);
-            startTime = startTime.AddMinutes(this.currentStartTime.Minutes.Value);
-
-            finishTime = finishTime.AddHours(this.currentFinishTime.Hour.Value + finishHoursModifier);
-            finishTime = finishTime.AddMinutes(this.currentFinishTime.Minutes.Value);
+            jobDate = DateTime.Now;
         }
+
+        startTime = DateTime.Parse(this.dateInput.value);
+        finishTime = DateTime.Parse(this.dateInput.value);
+
+        startHoursModifier = (TimeOfDayEnum)this.startTimeOfDayField.value == TimeOfDayEnum.AM ? 0 : 12;
+        finishHoursModifier = (TimeOfDayEnum)this.finishTimeOfDayField.value == TimeOfDayEnum.AM ? 0 : 12;
+
+        startTime = startTime.AddHours(this.currentStartTime.Hour.Value + startHoursModifier);
+        startTime = startTime.AddMinutes(this.currentStartTime.Minutes.Value);
+
+        finishTime = finishTime.AddHours(this.currentFinishTime.Hour.Value + finishHoursModifier);
+        finishTime = finishTime.AddMinutes(this.currentFinishTime.Minutes.Value);
 
         this.currentJobDetail.SetJobDetailProperties(
             this.currentDetailsReport.ObjectId,
@@ -542,9 +541,9 @@ public class JobDetailsQueryHandler : QueryHandler
             jobDate,
             startTime,
             finishTime,
-            (Enumerations.JobTypeEnum)this.jobTypeInput.value,
+            (JobTypeEnum)this.jobTypeInput.value,
             this.currentJobDetail.Cleaners,
-            (Enumerations.PaymentTypeEnum)this.paymentTypeInput.value,
+            (PaymentTypeEnum)this.paymentTypeInput.value,
             this.detailsInput.value,
             this.currentJobDetail.ObjectId);
 

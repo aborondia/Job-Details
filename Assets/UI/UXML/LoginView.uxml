@@ -80,12 +80,12 @@
                     <CustomLabel text="Forgot Password?" class="white-font option-button-label" />
                 </CustomButton>
             </CustomVisualElement>
-            <CustomVisualElement name="validate-registration-button-container" class="option-button-container" style="display: none;">
+            <CustomVisualElement name="validate-registration-button-container" class="option-button-container" style="display: none; max-width: 100%; min-width: 100%;">
                 <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button">
                     <CustomLabel text="Enter Registration Code" name="CustomLabel" class="option-button-label regular-font" />
                 </CustomButton>
             </CustomVisualElement>
-            <CustomVisualElement name="reset-password-button-container" class="option-button-container" style="display: none;">
+            <CustomVisualElement name="reset-password-button-container" class="option-button-container" style="display: none; max-width: 100%; min-width: 100%;">
                 <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button">
                     <CustomLabel text="Already have a code?" class="white-font option-button-label regular-font" />
                 </CustomButton>
