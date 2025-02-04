@@ -88,7 +88,7 @@ public partial class CustomVisualElement : VisualElement
             switch (this.sizeConstraint)
             {
                 case SizeConstraint.EnforceLargest:
-                    percentDifference = largestSpriteDimension / this.largestDimension;
+                    percentDifference = this.largestDimension / largestSpriteDimension;
                     finalHeight = currentHeight * percentDifference;
                     finalWidth = currentWidth * percentDifference;
                     break;

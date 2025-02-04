@@ -174,7 +174,7 @@ public class NavigationButtonsQueryHandler : QueryHandler
                 this.submitButtonLabel.text = "Save";
                 break;
             default:
-                this.submitButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
+                // this.submitButton.ReinitializeButton(CustomButton.ButtonStyleType.Regular);
                 this.submitButtonLabel.text = "Submit";
                 break;
         }

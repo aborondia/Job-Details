@@ -15,6 +15,7 @@ public class TimeSelectQueryHandler : QueryHandler
     }
     private const int total_hours = 12;
     private const int total_minutes = 60;
+    [SerializeField] private float labelOffset = 5f;
     private VisualElement dial;
     private VisualElement clockCenterReference;
     private VisualElement drawCanvas;
@@ -96,7 +97,6 @@ public class TimeSelectQueryHandler : QueryHandler
 
         CreateTimeLabels();
 
-        // dial.RegisterCallback<GeometryChangedEvent>(evt => PositionLabels());
         dial.RegisterCallback<PointerDownEvent>(OnPointerDown);
         dial.RegisterCallback<PointerMoveEvent>(OnPointerMove);
         dial.RegisterCallback<PointerUpEvent>(OnPointerUp);
@@ -140,6 +140,7 @@ public class TimeSelectQueryHandler : QueryHandler
     private void CreateHourTimeLabel(int value)
     {
         TimeLabel timeLabel = new TimeLabel(value, TimeType.Hour, PositionHelper.GetHourLabelExtentTarget(value));
+        timeLabel.AddToClassList("time-label");
         timeLabel.AddToClassList("hour-label");
         this.hourLabelsContainer.Add(timeLabel);
         this.hourLabels.Add(timeLabel);
@@ -158,7 +159,8 @@ public class TimeSelectQueryHandler : QueryHandler
     private void CreateMinuteTimeLabel(int value)
     {
         TimeLabel timeLabel = new TimeLabel(value, TimeType.Minute, PositionHelper.GetMinuteLabelExtentTarget(value));
-        timeLabel.AddToClassList("hour-label");
+        timeLabel.AddToClassList("time-label");
+        timeLabel.AddToClassList("minute-label");
         this.minuteLabelsContainer.Add(timeLabel);
         this.minuteLabels.Add(timeLabel);
     }
@@ -260,19 +262,22 @@ public class TimeSelectQueryHandler : QueryHandler
         float parentWidth;
         float parentHeight;
 
+        ActionHelper.ExecuteActionNextFrame(() => PositionLabels());
+
         await UniTask.WaitWhile(() =>
         {
             parentWidth = this.dial.parent.resolvedStyle.width;
             parentHeight = this.dial.parent.resolvedStyle.height;
             targetSize = parentWidth < parentHeight ? parentWidth : parentHeight;
 
-            if (this.dial.resolvedStyle.width != targetSize || this.dial.resolvedStyle.width != targetSize)
+            if (this.dial.resolvedStyle.width != targetSize || this.dial.resolvedStyle.height != targetSize)
             {
                 this.dial.style.width = targetSize;
                 this.dial.style.height = targetSize;
+
+                ActionHelper.ExecuteActionNextFrame(() => PositionLabels());
             }
 
-            PositionLabels();
             this.drawCanvas.MarkDirtyRepaint();
 
             return this.timeSelectOpen;
@@ -307,6 +312,8 @@ public class TimeSelectQueryHandler : QueryHandler
             VisualElementHelper.SetElementDisplay(this.hourLabelsContainer, DisplayStyle.None);
             VisualElementHelper.SetElementDisplay(this.minuteLabelsContainer, DisplayStyle.Flex);
         }
+
+        ActionHelper.ExecuteActionNextFrame(() => PositionLabels());
     }
 
     private void PositionLabels()
@@ -325,7 +332,7 @@ public class TimeSelectQueryHandler : QueryHandler
             float angle = angleStep * i;
 
             labelSize = timeLabels[i].resolvedStyle.width;
-            radius = (dialSize / 2) - (labelSize / 2);
+            radius = (dialSize / 2) - (labelSize / 2) - this.labelOffset;
 
             Vector2 pos = GetPositionAtAngle(angle, radius, dialSize);
 

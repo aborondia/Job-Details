@@ -29,7 +29,7 @@
                 <CustomLabel text="Role" class="large-font" style="-unity-text-align: middle-center;" />
             </CustomVisualElement>
             <CustomEnumField type="Enumerations.UserRoleEnum, Assembly-CSharp" name="user-role-input" style="display: none;" />
-            <ui:DropdownField enabled="true" style="padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+            <ui:DropdownField enabled="true" choices="RegularUser" index="0" style="padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
         </CustomVisualElement>
     </CustomVisualElement>
 </ui:UXML>

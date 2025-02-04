@@ -3,16 +3,19 @@
     <Style src="project://database/Assets/UI/USS/details-report-entry.uss?fileID=7433441132597879392&amp;guid=e42ddeb8475faf04489af6f788d101ad&amp;type=3#details-report-entry" />
     <CustomVisualElement name="main" class="details-report-main gray1-border">
         <CustomVisualElement name="report-details-container" class="report-details-container">
-            <CustomVisualElement name="content" style="flex-direction: row; align-items: center; padding-left: 6%; flex-grow: 1;">
-                <CustomVisualElement name="time-range-labels-container" class="time-range-labels-container">
-                    <CustomVisualElement name="tag-label-container" class="time-range-label-container">
-                        <CustomLabel text="Time Range: " class="time-range-label large-font" />
+            <CustomVisualElement name="content" style="flex-direction: column; align-items: flex-start; flex-grow: 1;">
+                <CustomVisualElement name="time-range-labels-container" class="time-range-labels-container" style="flex-direction: row; justify-content: flex-start; align-items: center; flex-wrap: wrap;">
+                    <CustomVisualElement name="tag-label-container" class="time-range-label-container" style="margin-right: 5px;">
+                        <CustomLabel text="Time Range:" class="time-range-label large-font" />
                     </CustomVisualElement>
                     <CustomVisualElement name="time-label-container" class="time-range-label-container">
                         <CustomLabel text="--" class="time-range-label large-font" />
                     </CustomVisualElement>
                 </CustomVisualElement>
                 <CustomVisualElement name="option-buttons-container" class="option-buttons-container">
+                    <CustomVisualElement name="options-label-container" style="flex-grow: 1; height: 100%; justify-content: center;">
+                        <CustomLabel text="Options" class="large-font" />
+                    </CustomVisualElement>
                     <CustomVisualElement name="email-button-container" class="option-button-container">
                         <CustomButton use-background-color="false" use-border="false" class="option-button">
                             <CustomVisualElement name="icon-container" class="icon-container">
@@ -41,10 +44,10 @@
             <ui:Instance template="JobDetailsEntry" name="JobDetailsEntry" />
             <ui:Instance template="JobDetailsEntry" name="JobDetailsEntry" />
         </CustomVisualElement>
-        <CustomVisualElement name="expand-collapse-button-container" style="height: 100%; position: absolute; max-width: 75%; width: 75%;">
+        <CustomVisualElement name="expand-collapse-button-container" style="height: 100%; position: absolute; right: 180px; width: 100%; align-items: stretch; justify-content: flex-start;">
             <CustomButton use-background-color="false" use-border="false" name="CustomButton" style="align-items: flex-start; justify-content: flex-start; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
-                <CustomVisualElement name="icon-container" class="icon-container" style="justify-content: center; align-items: flex-start;">
-                    <CustomVisualElement name="icon" largest-dimension="30" enforce-largest-dimension="true" regenerate-in-editor="true" class="gi-chevron-down" />
+                <CustomVisualElement name="icon-container" picking-mode="Ignore" class="icon-container" style="justify-content: center; align-items: flex-start; right: -180px;">
+                    <CustomVisualElement name="icon" largest-dimension="30" enforce-largest-dimension="true" regenerate-in-editor="true" size-constraint="EnforceLargest" class="gi-chevron-down" />
                 </CustomVisualElement>
             </CustomButton>
         </CustomVisualElement>

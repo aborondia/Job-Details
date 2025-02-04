@@ -2,13 +2,13 @@
     <Style src="project://database/Assets/UI/USS/navigation-buttons.uss?fileID=7433441132597879392&amp;guid=49968d3af89e60c4f8196a93a0ec54f8&amp;type=3#navigation-buttons" />
     <CustomVisualElement name="main" class="navigation-buttons-main">
         <CustomVisualElement name="cancel-button-container" class="navigation-button-container">
-            <CustomButton class="navigation-button">
-                <CustomLabel text="BACK" class="white-font large-font" />
+            <CustomButton name="CustomButton" class="navigation-button">
+                <CustomLabel text="BACK" class="white-font large-font" style="-unity-text-align: middle-center;" />
             </CustomButton>
         </CustomVisualElement>
         <CustomVisualElement name="submit-button-container" class="navigation-button-container">
             <CustomButton class="cursor-test navigation-button">
-                <CustomLabel text="SUBMIT" class="white-font large-font" />
+                <CustomLabel text="SUBMIT" class="white-font large-font" style="-unity-text-align: middle-center;" />
             </CustomButton>
         </CustomVisualElement>
     </CustomVisualElement>

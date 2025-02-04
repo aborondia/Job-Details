@@ -6,6 +6,7 @@ using MainView = Enumerations.MainView;
 using Subview = Enumerations.Subview;
 using System.Linq;
 using CircularBuffer;
+using Cysharp.Threading.Tasks;
 
 public class QueryController : MonoBehaviour
 {
@@ -68,7 +69,7 @@ public class QueryController : MonoBehaviour
         VisualElementHelper.SetElementDisplay(this.debugInfo, DisplayStyle.Flex);
         this.OnAnyViewChangedEvent.AddListener(() => this.debugInfoLabel.text = $"{this.currentMainView} - {this.currentSubview}");
 #else
-        VisualElementHelper.SetElementDisplay(this.debugInfo, DisplayStyle.None);
+                VisualElementHelper.SetElementDisplay(this.debugInfo, DisplayStyle.None);
 #endif
 
         Initialize();

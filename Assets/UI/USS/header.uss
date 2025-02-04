@@ -1,16 +1,17 @@
 .main-header {
-    min-height: 60px;
+    min-height: 75px;
     flex-direction: row;
     justify-content: space-between;
     border-bottom-width: 1px;
     width: 100%;
+    max-height: 75px;
 }
 
 .header-label-container {
-    padding-top: 5px;
-    padding-right: 5px;
-    padding-bottom: 5px;
-    padding-left: 5px;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
     flex-grow: 1;
     justify-content: center;
 }
@@ -18,14 +19,11 @@
 .header-label {
 }
 
-.right-header-container {
-    height: 100%;
-    justify-content: flex-end;
-}
-
 .right-header-button-container {
     height: 100%;
-    min-width: 75px;
+    min-width: 50px;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 .right-header-button {
@@ -47,7 +45,9 @@
     padding-right: 5px;
     padding-bottom: 5px;
     padding-left: 5px;
-    min-width: 25%;
+    justify-content: flex-end;
+    height: 100%;
+    min-width: 180px;
 }
 
 .notification-container {

@@ -24,16 +24,10 @@ public class JobDetailsQueryHandler : QueryHandler
     private VisualElement startTimeInputsContainer;
     private VisualElement startTimeInputContainer;
     private CustomInput startTimeInput;
-    private DropdownField startTimeHourInput;
-    private DropdownField startTimeMinuteInputDouble;
-    private DropdownField startTimeMinuteInputSingle;
     private CustomEnumField startTimeOfDayField;
     private VisualElement finishTimeInputsContainer;
     private VisualElement finishTimeInputContainer;
     private CustomInput finishTimeInput;
-    private DropdownField finishTimeHourInput;
-    private DropdownField finishTimeMinuteDoubleInput;
-    private DropdownField finishTimeMinuteSingleInput;
     private CustomEnumField finishTimeOfDayField;
     private VisualElement jobTypeInputContainer;
     private CustomEnumField jobTypeInput;
@@ -82,8 +76,6 @@ public class JobDetailsQueryHandler : QueryHandler
 
         this.startTimeInputsContainer = this.inputsContainer.Q<VisualElement>("start-time-inputs-container");
         this.startTimeInputContainer = this.startTimeInputsContainer.Q<VisualElement>("start-time-input-container");
-        this.startTimeHourInput = this.startTimeInputContainer.Q<VisualElement>("hour-dropdown").Q<DropdownField>();
-        this.startTimeHourInput.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
 
         this.startTimeInput = this.startTimeInputContainer.Q<CustomInput>("time-input");
         this.startTimeInput.RegisterCallback<ClickEvent>(evt =>
@@ -99,14 +91,10 @@ public class JobDetailsQueryHandler : QueryHandler
             }, TimeSelectQueryHandler.TimeType.Hour, this.currentStartTime.Hour.Value, this.currentStartTime.Minutes.Value);
         });
 
-        this.startTimeMinuteInputDouble = this.startTimeInputContainer.Q<VisualElement>("minute-dropdown-double").Q<DropdownField>();
-        this.startTimeMinuteInputSingle = this.startTimeInputContainer.Q<VisualElement>("minute-dropdown-single").Q<DropdownField>();
         this.startTimeOfDayField = this.startTimeInputContainer.Q<CustomEnumField>();
 
         this.finishTimeInputsContainer = this.inputsContainer.Q<VisualElement>("finish-time-inputs-container");
         this.finishTimeInputContainer = this.finishTimeInputsContainer.Q<VisualElement>("finish-time-input-container");
-        this.finishTimeHourInput = this.finishTimeInputContainer.Q<VisualElement>("hour-dropdown").Q<DropdownField>();
-        this.finishTimeHourInput.RegisterValueChangedCallback(evt => OnJobDetailsChanged());
 
         this.finishTimeInput = this.finishTimeInputContainer.Q<CustomInput>("time-input");
         this.finishTimeInput.RegisterCallback<ClickEvent>(evt =>
@@ -122,8 +110,6 @@ public class JobDetailsQueryHandler : QueryHandler
             }, TimeSelectQueryHandler.TimeType.Hour, this.currentFinishTime.Hour.Value, this.currentFinishTime.Minutes.Value);
         });
 
-        this.finishTimeMinuteDoubleInput = this.finishTimeInputContainer.Q<VisualElement>("minute-dropdown-double").Q<DropdownField>();
-        this.finishTimeMinuteSingleInput = this.finishTimeInputContainer.Q<VisualElement>("minute-dropdown-single").Q<DropdownField>();
         this.finishTimeOfDayField = this.finishTimeInputContainer.Q<CustomEnumField>();
         this.finishTimeOfDayField.RegisterCallback<BlurEvent>(evt => OnJobDetailsChanged());
 
@@ -161,7 +147,7 @@ public class JobDetailsQueryHandler : QueryHandler
                 {
                     this.currentJobDetail.AddCleaner(new CleanerJobEntry(selectedName));
                     RefreshJobDetail();
-                });
+                }, this.currentJobDetail.Cleaners.Select(cleaner => cleaner.Name).ToHashSet());
         });
     }
 
@@ -206,13 +192,6 @@ public class JobDetailsQueryHandler : QueryHandler
         {
             this.dateInput.RegisterCallback<ClickEvent>(evt => DatePickerController.Active.OpenDatePicker());
         }
-
-        SetupTimeDropDown(this.startTimeHourInput, hourInputChoices);
-        SetupTimeDropDown(this.startTimeMinuteInputDouble, minuteDoubleInputChoices);
-        SetupTimeDropDown(this.startTimeMinuteInputSingle, minuteSingleInputChoices);
-        SetupTimeDropDown(this.finishTimeHourInput, hourInputChoices);
-        SetupTimeDropDown(this.finishTimeMinuteDoubleInput, minuteDoubleInputChoices);
-        SetupTimeDropDown(this.finishTimeMinuteSingleInput, minuteSingleInputChoices);
     }
 
     private void SetupTimeInput(CustomInput input, Regex regex)

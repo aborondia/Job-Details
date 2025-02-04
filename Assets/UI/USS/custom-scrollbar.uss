@@ -109,9 +109,6 @@ ScrollView Scroller ScrollerSlider #unity-drag-container #unity-dragger-border {
     min-width: 15px;
 }
 
-.custom-scrollbar {
-}
-
 .custom-scrollbar-horizontal > Scroller {
     background-color: var(--gray3);
     border-top-left-radius: 5px;

@@ -126,7 +126,7 @@ public class HeaderQueryHandler : QueryHandler
         switch (QueryController.Active.CurrentMainView)
         {
             case MainView.DetailsReports:
-                this.headerLabel.text = "Details Reports";
+                this.headerLabel.text = "Reports";
                 break;
             case MainView.JobDetails:
                 this.headerLabel.text = "Details";

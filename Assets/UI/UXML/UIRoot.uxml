@@ -18,14 +18,14 @@
     <Style src="project://database/Assets/UI/USS/custom-inputs.uss?fileID=7433441132597879392&amp;guid=70287a2dcf738d94cae4d88df76e4bfd&amp;type=3#custom-inputs" />
     <CustomVisualElement name="root" class="root-body">
         <CustomVisualElement name="body" class="root-body">
-            <ui:Instance template="Header" name="Header" style="width: 100%; flex-direction: row; min-height: 10%; max-height: 10%;" />
+            <ui:Instance template="Header" name="Header" style="width: 100%; flex-direction: row; max-height: 75px; height: 10%; min-height: 75px;" />
             <CustomVisualElement name="views-container" class="views-container">
                 <CustomVisualElement name="main-views" class="main-views">
                     <ui:Instance template="DetailsReportsView" name="DetailsReportsView" class="main-view" style="display: none;" />
-                    <ui:Instance template="JobDetailsView" name="JobDetailsView" class="main-view" />
-                    <ui:Instance template="LoginView" name="LoginView" class="main-view" style="display: none;" />
+                    <ui:Instance template="JobDetailsView" name="JobDetailsView" class="main-view" style="display: none;" />
+                    <ui:Instance template="LoginView" name="LoginView" class="main-view" />
                     <ui:Instance template="UsersView" name="UsersView" class="main-view" style="display: none;" />
-                    <ui:Instance template="NavigationButtons" name="NavigationButtons" />
+                    <ui:Instance template="NavigationButtons" name="NavigationButtons" style="max-height: 75px; height: 10%; min-height: 75px;" />
                 </CustomVisualElement>
             </CustomVisualElement>
             <CustomVisualElement name="debug-info" picking-mode="Ignore" style="position: absolute; top: 0; right: 0;">
@@ -33,7 +33,7 @@
             </CustomVisualElement>
         </CustomVisualElement>
         <ui:Instance template="InteractionBlocker" name="InteractionBlocker" class="interaction-blocker" style="display: none;" />
-        <ui:Instance template="RadialTimeSelect" name="RadialTimeSelect" style="position: absolute; min-width: 60%; min-height: 60%; align-content: center; align-self: center; justify-content: center; align-items: center; max-width: 60%; max-height: 60%; top: 20%;" />
+        <ui:Instance template="RadialTimeSelect" name="RadialTimeSelect" style="position: absolute; min-width: 60%; min-height: 60%; align-content: center; align-self: center; justify-content: center; align-items: center; max-width: 60%; max-height: 60%; top: 20%; display: none;" />
         <ui:Instance template="Popups" name="Popups" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%; justify-content: center; align-items: center; display: none;" />
         <CustomVisualElement name="draw-canvas" picking-mode="Ignore" style="position: absolute; width: 100%; height: 100%;" />
     </CustomVisualElement>

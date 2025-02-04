@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,7 +28,6 @@ namespace Enumerations
 
     public enum JobTypeEnum
     {
-        JobType = 0,
         BiWeekly = 1,
         FirstTime = 2,
         Monthly = 3,

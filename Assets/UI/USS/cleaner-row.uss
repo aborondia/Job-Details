@@ -1,21 +1,21 @@
 .cleaner-row-main {
-    width: 100%;
     height: 100%;
     flex-direction: row;
     justify-content: space-between;
+    width: 100%;
+    min-height: 60px;
 }
 
 .name-label-container {
     justify-content: center;
     overflow: hidden;
     height: 100%;
-    flex-grow: 1;
 }
 
 .hours-input-container {
     flex-direction: row;
-    min-width: 10%;
-    max-width: 24%;
+    min-width: 70px;
+    margin-right: 5px;
 }
 
 .name-label {
@@ -27,9 +27,12 @@
 }
 
 .name-selection-container {
-    flex-grow: 1;
     justify-content: center;
     flex-direction: row;
+    margin-right: 5px;
+    flex-grow: 1;
+    min-width: 150px;
+    max-width: 150px;
 }
 
 .cleaners-scrollview {
@@ -48,9 +51,11 @@
     max-height: 400%;
 }
 
-.select-cleaner-button-container {
-    min-width: 60px;
-    max-width: 60px;
+.cleaner-button-container {
+    min-width: 50px;
+    max-width: 50px;
+    height: 100%;
+    margin-right: 5px;
 }
 
 .select-cleaner-button {

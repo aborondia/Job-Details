@@ -1,6 +1,6 @@
 .user-row-button-container {
     height: 100%;
-    min-width: 7.5%;
+    min-width: 60px;
 }
 
 .user-row-button {
@@ -31,8 +31,8 @@
 .user-type-container {
     height: 100%;
     justify-content: center;
+    min-width: 125px;
     width: 20%;
-    min-width: 20%;
 }
 
 .user-role-label-container {
@@ -53,4 +53,26 @@
     padding-right: 5px;
     padding-bottom: 5px;
     padding-left: 5px;
+}
+
+DropdownField > VisualElement {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+DropdownField > VisualElement > PopupTextElement {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    -unity-text-align: middle-center;
+    white-space: normal;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }

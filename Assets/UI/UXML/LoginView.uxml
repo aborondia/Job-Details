@@ -2,12 +2,12 @@
     <Style src="project://database/Assets/UI/USS/login-container.uss?fileID=7433441132597879392&amp;guid=e980b69dd4e8a5c4a9df4865c6f1f4af&amp;type=3#login-container" />
     <CustomVisualElement name="main" style="justify-content: space-between; width: 100%; align-items: center; height: 100%;">
         <CustomVisualElement name="display-text-body" style="justify-content: space-around; align-items: center; display: flex;">
-            <CustomVisualElement name="display-label-container">
-                <CustomLabel text="Please enter your verification code." class="x-large-font" style="white-space: normal; -unity-text-align: middle-center;" />
+            <CustomVisualElement name="display-label-container" style="padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px;">
+                <CustomLabel text="Please enter your verification code." class="large-font" style="white-space: normal; -unity-text-align: middle-center;" />
             </CustomVisualElement>
         </CustomVisualElement>
         <CustomVisualElement name="inputs-container" class="centered-element inputs-container">
-            <CustomVisualElement name="display-name-input-container" class="input-container">
+            <CustomVisualElement name="display-name-input-container" class="input-container" style="min-width: 400px;">
                 <CustomVisualElement name="name-input-floating-label-container" class="input-floating-label-container">
                     <CustomVisualElement name="floating-label-container" class="floating-label-container" style="display: none;">
                         <CustomLabel text="Display Name" class="large-font white-font" />
@@ -63,7 +63,7 @@
                 <CustomInput placeholder-text="Code" class="large-font" style="min-width: 300px;" />
             </CustomVisualElement>
         </CustomVisualElement>
-        <CustomVisualElement name="navigation-buttons-container" class="centered-element" />
+        <CustomVisualElement name="navigation-buttons-container" class="centered-element" style="min-height: 75px; max-height: 75px;" />
         <CustomVisualElement name="options-container" class="options-container centered-element regular-font">
             <CustomVisualElement name="register-button-container" class="option-button-container" style="min-width: 100%; max-width: 100%;">
                 <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button">
@@ -71,12 +71,12 @@
                 </CustomButton>
             </CustomVisualElement>
             <CustomVisualElement name="forgot-username-button-container" class="option-button-container">
-                <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button">
+                <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button" style="align-items: flex-start;">
                     <CustomLabel text="Forgot Username?" class="white-font option-button-label" />
                 </CustomButton>
             </CustomVisualElement>
             <CustomVisualElement name="forgot-password-button-container" class="option-button-container">
-                <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button">
+                <CustomButton use-background-color="false" use-border="false" hover-text-highlight="true" class="option-button" style="align-items: flex-end;">
                     <CustomLabel text="Forgot Password?" class="white-font option-button-label" />
                 </CustomButton>
             </CustomVisualElement>

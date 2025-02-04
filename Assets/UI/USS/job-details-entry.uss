@@ -6,7 +6,8 @@
 .info-labels-container {
     flex-direction: row;
     flex-grow: 1;
-    justify-content: space-between;
+    justify-content: flex-start;
+    flex-wrap: wrap;
 }
 
 .multi-labels-container {
@@ -30,15 +31,9 @@
 
 .job-option-buttons-container {
     flex-direction: row;
-    min-width: 25%;
+    min-width: 120px;
     justify-content: flex-end;
-    max-width: 25%;
-}
-
-.option-button-container {
-    min-width: 33%;
-    padding-right: 1.5%;
-    padding-left: 1.5%;
+    height: 100%;
 }
 
 .option-button {
@@ -52,7 +47,6 @@
     padding-bottom: 5px;
     padding-left: 5px;
     justify-content: space-between;
-    width: 65%;
 }
 
 .right-labels-container {
@@ -61,7 +55,6 @@
     padding-bottom: 5px;
     padding-left: 5px;
     justify-content: space-between;
-    width: 35%;
 }
 
 .client-info-label {

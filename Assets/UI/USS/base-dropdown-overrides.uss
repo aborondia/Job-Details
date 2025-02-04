@@ -1,0 +1,69 @@
+.unity-base-dropdown
+  > .unity-base-dropdown__container-outer
+  > .unity-base-dropdown__container-inner
+  > .unity-scroll-view__content-and-vertical-scroll-container
+  > .unity-scroll-view__content-viewport
+  > .unity-scroll-view__content-container {
+  max-width: 100%;
+}
+
+.unity-base-dropdown
+  /* > .unity-base-dropdown__container-outer
+  > .unity-base-dropdown__container-inner
+  > .unity-scroll-view__content-and-vertical-scroll-container
+  > .unity-scroll-view__content-viewport
+  > .unity-scroll-view__content-container
+  >  */
+  .unity-base-dropdown__item {
+  width: 100%;
+  padding-right: 0;
+  justify-content: center;
+  min-width: none;
+}
+
+.unity-base-dropdown
+  > .unity-base-dropdown__container-outer
+  > .unity-base-dropdown__container-inner
+  > .unity-scroll-view__content-and-vertical-scroll-container
+  > .unity-scroll-view__content-viewport
+  > .unity-scroll-view__content-container
+  > .unity-base-dropdown__item
+  > .unity-base-dropdown__item-content {
+  justify-content: center;
+  align-content: center;
+}
+
+.unity-base-dropdown
+  > .unity-base-dropdown__container-outer
+  > .unity-base-dropdown__container-inner
+  > .unity-scroll-view__content-and-vertical-scroll-container
+  > .unity-scroll-view__content-viewport
+  > .unity-scroll-view__content-container
+  > .unity-base-dropdown__item
+  > .unity-base-dropdown__item-content
+  > Label {
+  margin-top: 0;
+  margin-left: 0;
+  margin-bottom: 0;
+  margin-right: 0;
+}
+
+.unity-base-dropdown
+  /* > .unity-base-dropdown__container-outer
+  > .unity-base-dropdown__container-inner
+  > .unity-scroll-view__content-and-vertical-scroll-container
+  > .unity-scroll-view__content-viewport
+  > .unity-scroll-view__content-container
+  > .unity-base-dropdown__item
+  > .unity-base-dropdown__item-content
+  >  */
+  .unity-base-dropdown__checkmark {
+  display: none;
+}
+
+.unity-base-dropdown
+  > .unity-base-dropdown__container-outer
+  > .unity-base-dropdown__container-inner
+  > Scroller {
+  display: none;
+}

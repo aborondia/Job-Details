@@ -18,11 +18,15 @@
 }
 
 .small-font {
-    font-size: 8px;
+    font-size: 12px;
 }
 
 .regular-font {
     font-size: 16px;
+}
+
+.medium-large-font {
+    font-size: 20px;
 }
 
 .large-font {
@@ -31,8 +35,4 @@
 
 .x-large-font {
     font-size: 36px;
-}
-
-.big-font{
-    font-size: 84px;
 }

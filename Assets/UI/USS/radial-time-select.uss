@@ -1,14 +1,21 @@
-.hour-label {
+.time-label {
     position: absolute;
     width: 40px;
     height: 40px;
     color: rgb(0, 0, 0);
-    font-size: 36px;
     -unity-text-align: middle-center;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     border-bottom-right-radius: 20px;
     border-bottom-left-radius: 20px;
+}
+
+.hour-label {
+    font-size: 36px;
+}
+
+.minute-label {
+    font-size: 24px;
 }
 
 .center-reference {

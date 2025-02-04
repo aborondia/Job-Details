@@ -37,7 +37,6 @@ public partial class TimeLabel : CustomLabel
             SetDisplayPropertiesMinutes();
         }
 
-        SetDisplayPropertiesMinutes();
         RegisterCallback<GeometryChangedEvent>(e => { });
         RegisterCallback<DetachFromPanelEvent>(e => { });
     }

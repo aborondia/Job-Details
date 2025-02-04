@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -210,7 +211,7 @@ public class PopupsQueryHandler : QueryHandler
         UpdateSendEmailButtonState();
     }
 
-    public void OpenNameSelectPopup(Action<string> confirmAction, Action cancelAction = null, bool canNavigateAway = true)
+    public void OpenNameSelectPopup(Action<string> confirmAction, HashSet<string> exclusions = null, Action cancelAction = null, bool canNavigateAway = true)
     {
         ShowParent();
         OnOpeningPopup(canNavigateAway);
@@ -228,11 +229,11 @@ public class PopupsQueryHandler : QueryHandler
 
         this.cancelAction = cancelAction;
 
-        PopulateUserSelect(UserSelectType.Username);
+        PopulateUserSelect(UserSelectType.Username, exclusions);
         UpdateSelectNameButtonState();
     }
 
-    private void PopulateUserSelect(UserSelectType userSelectType)
+    private void PopulateUserSelect(UserSelectType userSelectType, HashSet<string> exclusions = null)
     {
         foreach (User user in AppController.Active.UserDataHandler.Users.Values)
         {
@@ -240,7 +241,8 @@ public class PopupsQueryHandler : QueryHandler
             string username;
             string userEmail;
 
-            if (user.RoleDTM.name == UserDataHandler._DeveloperRoleServerName)
+            if (user.RoleDTM.name == UserDataHandler._DeveloperRoleServerName
+            || (!ReferenceEquals(exclusions, null) && exclusions.Contains(user.DTM.displayName)))
             {
                 continue;
             }

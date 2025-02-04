@@ -10,22 +10,14 @@ public class UsersQueryHandler : QueryHandler
     [SerializeField] private VisualTreeAsset userRowBase;
     ScrollView usersScrollView;
     VisualElement usersScrollViewContentContainer;
-    private List<Enumerations.UserRoleEnum> roleInputDropdownValues = new List<Enumerations.UserRoleEnum>();
+    private List<string> roleInputDropdownValues = new List<string>();
     public UnityEvent OnUserDataChange = new UnityEvent();
 
     protected override void Awake()
     {
         base.Awake();
 
-        foreach (Enumerations.UserRoleEnum roleType in Enum.GetValues(typeof(Enumerations.UserRoleEnum)))
-        {
-            if ((int)roleType >= (int)Enumerations.UserRoleEnum.Owner)
-            {
-                continue;
-            }
-
-            this.roleInputDropdownValues.Add(roleType);
-        }
+        PopulateRoleChoices();
     }
 
     protected override void InitializeElements()
@@ -170,10 +162,7 @@ public class UsersQueryHandler : QueryHandler
 
         if (canChangeRoles && user.RoleDTM.name != UserDataHandler._OwnerRoleServerName)
         {
-            userTypeDropdownField.choices = this.roleInputDropdownValues
-            .Select(role => role.ToString())
-            .Where(roleName => roleName != UserDataHandler._DeveloperRoleServerName)
-            .ToList();
+            userTypeDropdownField.choices = this.roleInputDropdownValues;
 
             userTypeDropdownField.value = AppController.Active.UserDataHandler.GetRoleEnum(user.RoleDTM.name).ToString();
             userTypeDropdownField.SetEnabled(true);
@@ -181,7 +170,7 @@ public class UsersQueryHandler : QueryHandler
             userTypeDropdownField.RegisterValueChangedCallback(evt =>
             {
                 string newRoleId;
-                string newRoleName = evt.newValue;
+                string newRoleName = evt.newValue.Replace(" ", "");
                 RoleUpdateDTM roleUpdateDTM;
                 RoleDTM newRoleDTM;
 
@@ -243,6 +232,29 @@ public class UsersQueryHandler : QueryHandler
                     onDataChangeAction?.Invoke();
                 });
             });
+        }
+    }
+
+    private void PopulateRoleChoices()
+    {
+        this.roleInputDropdownValues = new List<string>();
+
+        foreach (Enumerations.UserRoleEnum roleType in Enum.GetValues(typeof(Enumerations.UserRoleEnum)))
+        {
+            switch (roleType)
+            {
+                case Enumerations.UserRoleEnum.Admin:
+                    this.roleInputDropdownValues.Add("Admin");
+                    break;
+                case Enumerations.UserRoleEnum.Developer:
+                    continue;
+                case Enumerations.UserRoleEnum.Owner:
+                    continue;
+                case Enumerations.UserRoleEnum.RegularUser:
+                    this.roleInputDropdownValues.Add("Regular User");
+                    break;
+            }
+
         }
     }
 }

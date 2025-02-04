@@ -1,18 +1,22 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UI.Dates;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class DatePickerController : MonoBehaviour
 {
+    private const string date_picker_inline_name = "DatePicker - Inline";
     public static DatePickerController Active;
     [SerializeField] private DatePicker datePicker;
     [SerializeField] private Canvas datePickerCanvas;
     [SerializeField] private Transform datePickerDayTable;
+    private RectTransform datePickerInlineTransform;
     public DatePicker DatePicker => datePicker;
     public DateTime CurrentDate => datePicker.SelectedDate.Date;
-   
+    private bool datePickerElementStylesSet = false;
+
     private void Awake()
     {
         if (Active != null)
@@ -49,7 +53,27 @@ public class DatePickerController : MonoBehaviour
         {
             this.datePicker.SelectedDate = dateTime.Value;
         }
+
         this.datePicker.Config.Misc.CloseWhenDateSelected = true;
+
+        if (!this.datePickerElementStylesSet)
+        {
+            ActionHelper.ExecuteActionNextFrame(() =>
+            {
+                this.datePickerInlineTransform = this.datePickerCanvas.transform
+                .GetComponentsInChildren<RectTransform>()
+                .FirstOrDefault(rt => rt.transform.name == date_picker_inline_name);
+
+                if (!ReferenceEquals(this.datePickerInlineTransform, null))
+                {
+                    this.datePickerInlineTransform.anchorMin = Vector2.zero;
+                    this.datePickerInlineTransform.anchorMax = Vector2.one;
+
+                    this.datePickerInlineTransform.offsetMin = Vector2.zero;
+                    this.datePickerInlineTransform.offsetMax = Vector2.zero;
+                }
+            });
+        }
     }
 
     public void CloseDatePicker()
