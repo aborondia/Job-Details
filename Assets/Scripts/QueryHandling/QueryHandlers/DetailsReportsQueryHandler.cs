@@ -10,6 +10,7 @@ public class DetailsReportsQueryHandler : QueryHandler
     [SerializeField] private VisualTreeAsset jobDetailsEntryBase;
     private VisualElement scrollviewContainer;
     private ScrollView scrollview;
+    private VisualElement detailsReportsContainer;
     private Dictionary<string, bool> reportElementExpandedStates = new Dictionary<string, bool>();
 
     #region Initialization
@@ -31,6 +32,7 @@ public class DetailsReportsQueryHandler : QueryHandler
     {
         this.scrollviewContainer = this.parentElement.Q<VisualElement>("details-scrollview-container");
         this.scrollview = this.scrollviewContainer.Q<ScrollView>();
+        this.detailsReportsContainer = this.scrollview.Q<VisualElement>("detail-reports-container");
     }
 
     protected override void SetViewElements()
@@ -75,7 +77,7 @@ public class DetailsReportsQueryHandler : QueryHandler
 
     private void RefreshDetailsReports()
     {
-        this.scrollview.contentContainer.Clear();
+        this.detailsReportsContainer.Clear();
 
         if (ReferenceEquals(AppController.Active.DetailsReportsHandler.DetailsReports, null))
         {
@@ -88,7 +90,7 @@ public class DetailsReportsQueryHandler : QueryHandler
             VisualElement reportElement = CreateDetailsReportElement(detailsReport);
             VisualElement detailsContainer = reportElement.Q<VisualElement>("job-details-container");
 
-            this.scrollview.contentContainer.Add(reportElement);
+            this.detailsReportsContainer.Add(reportElement);
         }
     }
 

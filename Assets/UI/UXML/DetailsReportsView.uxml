@@ -3,8 +3,11 @@
     <Style src="project://database/Assets/UI/USS/details-reports-view.uss?fileID=7433441132597879392&amp;guid=055cc069986c7e347b2a7c64b561a1a9&amp;type=3#details-reports-view" />
     <CustomVisualElement name="main" class="details-reports-view-main">
         <CustomVisualElement name="details-scrollview-container" style="flex-grow: 1; height: 100%;">
-            <ui:ScrollView horizontal-scroller-visibility="Hidden" class="custom-scrollbar" style="min-height: 100%;">
-                <ui:Instance template="DetailsReportEntry" name="DetailsReportEntry" />
+            <ui:ScrollView horizontal-scroller-visibility="Hidden" mouse-wheel-scroll-size="50" class="custom-scrollbar">
+                <CustomVisualElement name="detail-reports-container">
+                    <ui:Instance template="DetailsReportEntry" name="DetailsReportEntry" />
+                    <ui:Instance template="DetailsReportEntry" name="DetailsReportEntry" />
+                </CustomVisualElement>
             </ui:ScrollView>
         </CustomVisualElement>
     </CustomVisualElement>
