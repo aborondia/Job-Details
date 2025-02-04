@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using ResponseDelegateString = ActionHelper.StringDelegate;
 using ResponseDelegateBool = ActionHelper.BoolDelegate;
 using Cysharp.Threading.Tasks;
+using UnityEditor.PackageManager;
 
 public class ServerCommunicator : MonoBehaviour
 {
@@ -55,6 +56,20 @@ public class ServerCommunicator : MonoBehaviour
 
     #region Communication
 
+    private async UniTask SendRequest(UnityWebRequest request, int timeout = 10)
+    {
+        request.timeout = timeout;
+
+        try
+        {
+            await request.SendWebRequest();
+        }
+        catch (Exception e)
+        {
+            Debug.Log($"Request Failed: {e.Message}");
+        }
+    }
+
     #region Users
 
     public void CreateUser(UserSignupDTM userSignupDTM, ResponseDelegateBool responseDelegateBool)
@@ -79,7 +94,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -115,7 +130,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Revocable-Session", "1");
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -149,7 +164,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -193,7 +208,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -227,7 +242,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -262,7 +277,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -296,7 +311,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Revocable-Session", "1");
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -330,7 +345,7 @@ public class ServerCommunicator : MonoBehaviour
         UnityWebRequest request = UnityWebRequest.Post(this.FunctionsUrl + "/getRole", form);
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -367,7 +382,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -411,7 +426,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -445,7 +460,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -480,7 +495,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -515,7 +530,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -564,7 +579,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -601,7 +616,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -637,7 +652,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -670,7 +685,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -702,7 +717,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -750,7 +765,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -788,7 +803,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -823,7 +838,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -872,7 +887,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -904,7 +919,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -952,7 +967,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -992,7 +1007,7 @@ public class ServerCommunicator : MonoBehaviour
         request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
         request.SetRequestHeader("X-Parse-Session-Token", this.currentUserDTM.sessionToken);
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
@@ -1036,7 +1051,7 @@ public class ServerCommunicator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
 
-        await request.SendWebRequest();
+        await SendRequest(request);
 
         if (request.result == UnityWebRequest.Result.Success)
         {

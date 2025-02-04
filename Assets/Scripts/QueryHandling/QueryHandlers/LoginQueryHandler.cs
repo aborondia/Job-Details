@@ -577,7 +577,7 @@ public class LoginQueryHandler : QueryHandler
         {
             QueryController.Active.ChangeView(MainView.Login, Subview.Login_ResetPassword);
             QueryController.Active.PopupsQueryHandler.OpenNotificationPopup(null,
-            "If an account is found your username will be emailed to you.");
+            "If an account is found your reset code will be emailed to you.");
         });
     }
 
