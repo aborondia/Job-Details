@@ -90,7 +90,6 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 100%;
 }
 
 .send-email-header-label-container {
@@ -107,6 +106,7 @@
     padding-right: 5px;
     padding-bottom: 5px;
     padding-left: 5px;
+    min-height: 60px;
 }
 
 .sen-email-body-input {

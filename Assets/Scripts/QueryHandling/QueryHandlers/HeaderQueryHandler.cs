@@ -4,11 +4,14 @@ using System.Linq;
 using MainView = Enumerations.MainView;
 using Subview = Enumerations.Subview;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 
 public class HeaderQueryHandler : QueryHandler
 {
     private VisualElement headerLabelContainer;
     private Label headerLabel;
+    private VisualElement logoElement;
     private VisualElement rightHeaderContainer;
     private VisualElement addDetailsReportButtonContainer;
     private CustomButton addDetailsReportButton;
@@ -19,9 +22,18 @@ public class HeaderQueryHandler : QueryHandler
     private CustomButton teamButton;
     private VisualElement viewUsersNotificationContainer;
     private Label viewUsersNotificationLabel;
+    private Texture2D logoImage;
+
+    protected override void Start()
+    {
+        base.Start();
+
+        RetrieveLogo();
+    }
 
     protected override void InitializeElements()
     {
+        this.logoElement = this.parentElement.Q<VisualElement>("logo");
         this.headerLabelContainer = this.parentElement.Q<VisualElement>("header-label-container");
         this.headerLabel = this.headerLabelContainer.Q<Label>();
         this.rightHeaderContainer = this.parentElement.Q<VisualElement>("right-header-container");
@@ -35,6 +47,7 @@ public class HeaderQueryHandler : QueryHandler
         this.viewUsersNotificationContainer = this.teamButton.Q<VisualElement>("notification-container");
         this.viewUsersNotificationLabel = this.viewUsersNotificationContainer.Q<Label>("notification-label");
 
+        VisualElementHelper.SetElementDisplay(this.logoElement, DisplayStyle.None);
         VisualElementHelper.SetElementDisplay(this.logoutButtonContainer, DisplayStyle.None);
     }
 
@@ -168,5 +181,25 @@ public class HeaderQueryHandler : QueryHandler
         {
             VisualElementHelper.SetElementDisplay(this.viewUsersNotificationContainer, DisplayStyle.None);
         }
+    }
+
+    private void RetrieveLogo()
+    {
+        LogoImageDTM logoImageDTM;
+
+        ActionHelper.StringDelegate completeAction = result =>
+        {
+            if (!String.IsNullOrEmpty(result))
+            {
+                logoImageDTM = JSONHelper.GetLogoImageDTM(result);
+                this.logoImage = new Texture2D(2, 2);
+                this.logoImage.LoadImage(logoImageDTM.imageBytesContent);
+
+                this.logoElement.style.backgroundImage = new StyleBackground(this.logoImage);
+                VisualElementHelper.SetElementDisplay(this.logoElement, DisplayStyle.Flex);
+            }
+        };
+
+        AppController.Active.ServerCommunicator.RetrieveLogo(completeAction);
     }
 }

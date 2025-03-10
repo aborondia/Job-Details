@@ -280,6 +280,24 @@ public static class JSONHelper
         return users;
     }
 
+    public static LogoImageDTM GetLogoImageDTM(string response)
+    {
+        LogoImageDTM dtm;
+        JSONNode result = JSON.Parse(response)["results"];
+        JSONNode imageBytesString = result.AsArray[0]["imageBytes"];
+
+        if (result.AsArray.Count <= 0)
+        {
+            dtm = null;
+        }
+        else
+        {
+            dtm = new LogoImageDTM(imageBytesString);
+        }
+
+        return dtm;
+    }
+
     private static UserDTM GetUserDTM(JSONNode node)
     {
         UserDTM dtm = new UserDTM();

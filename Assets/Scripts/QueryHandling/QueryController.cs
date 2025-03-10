@@ -6,7 +6,6 @@ using MainView = Enumerations.MainView;
 using Subview = Enumerations.Subview;
 using System.Linq;
 using CircularBuffer;
-using Cysharp.Threading.Tasks;
 
 public class QueryController : MonoBehaviour
 {

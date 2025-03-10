@@ -277,6 +277,7 @@ Parse.Cloud.define("getUsersForRegularUser", async (request) => {
       username: user.get("username"),
       displayName: user.get("displayName"),
       email: user.get("email"),
+      roleId: user.get("roleId"),
     }));
 
     return sanitizedUsers;
@@ -435,7 +436,7 @@ Parse.Cloud.define("forgotUsername", async (request) => {
           to: email,
           from: process.env.SENDGRID_EMAIL,
           subject: "Job Details - Forgot Username",
-          html: `<p>Your username is $<b><i>{username}</b></i></p>
+          html: `<p>Your username is $<b><i>${username}</b></i></p>
           <p>If you did not make this request, you can safely ignore this email.</p>`,
         };
 

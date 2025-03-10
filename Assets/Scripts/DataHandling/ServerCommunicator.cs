@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using ResponseDelegateString = ActionHelper.StringDelegate;
 using ResponseDelegateBool = ActionHelper.BoolDelegate;
 using Cysharp.Threading.Tasks;
-using UnityEditor.PackageManager;
 
 public class ServerCommunicator : MonoBehaviour
 {
@@ -18,6 +17,7 @@ public class ServerCommunicator : MonoBehaviour
     [SerializeField] private bool showSuccessLogs = true;
     [SerializeField] private bool showFailureLogs = true;
     public string FunctionsUrl => $"{apiUrl}/functions";
+    public string LogoUrl => $"{apiUrl}/classes/logo";
     public string UsersUrl => $"{apiUrl}/users";
     public string RolesUrl => $"{apiUrl}/roles";
     public string ClassesUrl => $"{apiUrl}/classes";
@@ -1068,6 +1068,41 @@ public class ServerCommunicator : MonoBehaviour
     }
 
     #endregion
+
+    public string imageUrl = "https://example.com/path/to/your/image.jpg";
+
+    #endregion
+
+    #region Other
+
+    public void RetrieveLogo(ResponseDelegateString returnDelegate)
+    {
+        StartRetrievingLogo(returnDelegate).Forget();
+    }
+
+    private async UniTaskVoid StartRetrievingLogo(ResponseDelegateString returnDelegate)
+    {
+        string url = $"{this.LogoUrl}";
+        UnityWebRequest request = UnityWebRequest.Get(url);
+
+        request.SetRequestHeader("X-Parse-Application-Id", ServerConfiguration.AppId);
+        request.SetRequestHeader("X-Parse-JavaScript-Key", ServerConfiguration.JavaScriptKey);
+
+        await SendRequest(request);
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            ShowSuccessLog("Response (StartUpdatingRole): " + request.downloadHandler.text);
+            returnDelegate?.Invoke(request.downloadHandler.text);
+        }
+        else
+        {
+            OnFailure(request, "(StartUpdatingRole)");
+            returnDelegate?.Invoke(null);
+        }
+
+        this.OnRequestCompletedEvent.Invoke();
+    }
 
     #endregion
 

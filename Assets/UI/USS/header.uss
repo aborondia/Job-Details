@@ -8,22 +8,21 @@
 }
 
 .header-label-container {
-    padding-top: 10px;
-    padding-right: 10px;
-    padding-bottom: 10px;
-    padding-left: 10px;
-    flex-grow: 1;
     justify-content: center;
 }
 
 .header-label {
+    white-space: normal;
+    -unity-text-align: middle-center;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .right-header-button-container {
     height: 100%;
     min-width: 50px;
     margin-left: 5px;
-    margin-right: 5px;
 }
 
 .right-header-button {
@@ -71,4 +70,12 @@
 .notification-label {
     -unity-text-align: middle-center;
     -unity-font-style: bold;
+}
+
+.logo {
+    -unity-background-scale-mode: scale-to-fit;
+    opacity: 0.5;
+    height: 100%;
+    margin-right: 5px;
+    min-width: 100px;
 }

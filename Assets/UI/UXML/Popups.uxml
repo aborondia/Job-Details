@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/USS/popups.uss?fileID=7433441132597879392&amp;guid=49860d6f707b08b4dbc136bf00cbb0a5&amp;type=3#popups" />
     <CustomVisualElement name="main" picking-mode="Ignore" class="popups-main">
-        <CustomVisualElement name="confirmation-popup" class="gray1-border popup-parent confirmation-popup">
+        <CustomVisualElement name="confirmation-popup" class="gray1-border popup-parent confirmation-popup" style="display: none;">
             <CustomVisualElement name="bottom" class="popup-bottom">
                 <CustomVisualElement name="buttons-container" class="popup-buttons-container">
                     <CustomVisualElement name="cancel-button-container" class="popup-button-container">
@@ -26,7 +26,7 @@
                 </CustomVisualElement>
             </CustomVisualElement>
         </CustomVisualElement>
-        <CustomVisualElement name="send-email-popup" class="gray1-border popup-parent send-email-popup" style="min-width: 80%; display: none;">
+        <CustomVisualElement name="send-email-popup" class="gray1-border popup-parent send-email-popup" style="min-width: 80%;">
             <CustomVisualElement name="bottom" class="popup-bottom">
                 <CustomVisualElement name="buttons-container" class="popup-buttons-container">
                     <CustomVisualElement name="cancel-button-container" class="popup-button-container">

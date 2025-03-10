@@ -243,8 +243,8 @@ public class PopupsQueryHandler : QueryHandler
             CustomLabel userLabel;
             string username;
             string userEmail;
-
-            if (user.RoleDTM.name == UserDataHandler._DeveloperRoleServerName
+            Debug.Log($"{user.DTM.displayName} - {user.RoleDTM?.name}");
+            if ((!ReferenceEquals(user.RoleDTM, null) && user.RoleDTM.name == UserDataHandler._DeveloperRoleServerName)
             || (!ReferenceEquals(exclusions, null) && exclusions.Contains(user.DTM.displayName)))
             {
                 continue;
